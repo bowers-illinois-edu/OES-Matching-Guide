@@ -1,0 +1,757 @@
+# The OES Guide to Making and Evaluating Matched Designs
+
+## Approach 1: Problem-First Structure (Practitioner-Focused)
+
+---
+
+## 1. When Should You Use Matching?
+
+### 1.1 Decision Framework
+- **Flowchart**: Treatment assignment → Sample characteristics → Research question → Method recommendation
+- **Key decision points**:
+  - Is your treatment binary, multi-level, or continuous?
+  - Do you have a clear comparison group?
+  - Are you seeking causal estimates or descriptive comparisons?
+  - What are your data constraints (sample size, missingness)?
+
+### 1.2 Contexts Where Matching Excels
+- Observational studies with selection into treatment
+- When you have rich covariate information
+- Policy evaluations without experimental assignment
+- When you need transparent, interpretable comparisons
+- Studies where exact balance on key variables is critical
+
+### 1.3 When NOT to Use Matching
+- True experiments (matching is redundant)
+- Weak overlap between treated and control groups
+- Limited covariate information
+- When regression discontinuity or IV designs are available
+- Very small sample sizes (case-by-case)
+
+### 1.4 Alternatives to Consider
+- Regression adjustment (and why it's different)
+- Inverse probability weighting
+- Regression discontinuity designs
+- Instrumental variables
+- Difference-in-differences
+- Synthetic control methods
+
+### 1.5 Common Pitfalls and Red Flags
+- "Fishing" for balance by trying many matching approaches
+- Matching on post-treatment variables
+- Over-matching (matching away treatment effects)
+- Ignoring common support problems
+- Confusing balance with bias elimination
+
+---
+
+## 2. Why We Match: The Causal Inference Problem
+
+### 2.1 The Fundamental Problem of Causal Inference
+- Potential outcomes framework
+- The missing counterfactual
+- Simple numerical example with job training program
+
+### 2.2 Alternative Explanations and Confounding
+- What is a confounder?
+- Visual examples: DAGs showing confounding paths
+- The age and job training example (expanded from current draft)
+
+### 2.3 What Randomization Does
+- How random assignment eliminates confounding
+- Balance in expectation vs. exact balance
+- Block-randomized experiments as template
+
+### 2.4 What Randomization Doesn't Do
+- Doesn't guarantee exact balance
+- Doesn't solve non-compliance
+- Doesn't address spillovers or interference
+- Limited to observed confounders in practice
+
+### 2.5 What Matching Can Achieve
+- Approximating experimental comparison groups
+- Creating defensible counterfactuals
+- Making assumptions explicit and testable
+- Reducing model dependence
+
+### 2.6 What Matching Cannot Achieve
+- **Critical**: Cannot control for unobserved confounders
+- Cannot fix fundamental lack of overlap
+- Cannot create data where none exists
+- Not a substitute for good research design
+
+### 2.7 Core Assumptions for Causal Interpretation
+- **Ignorability/No unmeasured confounding**: Treatment assignment independent of potential outcomes given covariates
+- **Overlap/Common support**: Positive probability of treatment for all covariate values
+- **SUTVA**: Stable unit treatment value assumption
+- Making these assumptions plausible through design
+
+### 2.8 The Stratification Solution
+- How stratification addresses confounding
+- Connection between exact matching and stratification
+- Why we need algorithms for multivariate matching
+
+---
+
+## 3. The Matching Toolkit: Methods Overview
+
+### 3.1 Quick Reference Table
+| Method | Treatment Type | Set Structure | Software | Best For |
+|--------|---------------|---------------|----------|----------|
+| Pair Matching | Binary | Fixed pairs | optmatch, designmatch | Maximum transparency |
+| Full Matching | Binary | Variable sets | optmatch | Maximum sample use |
+| Bipartite (designmatch) | Binary | Fixed k:1 | designmatch | Fine-tuned constraints |
+| Non-bipartite | Continuous/Multi-level | Variable sets | designmatch | Dose-response |
+
+### 3.2 Bipartite vs. Non-bipartite Matching
+- **Bipartite**: Separate treated and control groups
+  - Used when treatment is binary
+  - Creates strata comparing treated to control units
+  - Most common in practice
+- **Non-bipartite**: No clear treated/control division
+  - Used with continuous treatments or doses
+  - Creates strata varying in treatment level
+  - Each stratum has range of treatment values
+
+### 3.3 Pair Matching vs. Full Matching
+- **Pair matching**: One treated, one control per set
+  - Advantages: Maximum simplicity, easy interpretation
+  - Disadvantages: Discards data, may force poor matches
+  - Effective sample size considerations
+- **Full matching**: Variable number of treated and controls
+  - Advantages: Uses all data, optimizes overall balance
+  - Disadvantages: More complex sets to interpret
+  - When to prefer each approach
+
+### 3.4 Distance Metrics Compared
+- **Mahalanobis distance**: Weights all covariates equally (after scaling)
+  - When to use: Theory suggests all covariates matter equally
+  - Rank-based version for robustness
+- **Propensity score distance**: Weights by predictiveness
+  - When to use: Some covariates strongly predict treatment
+  - Requires careful model specification
+- **Absolute/Euclidean distance**: Single variable differences
+  - When to use: One variable dominates concern
+- **Combined distances**: Adding multiple distance matrices
+  - When to use: Multiple dimensions of similarity matter
+
+### 3.5 Software Ecosystem
+- **optmatch**: Network flow optimization, fast, flexible
+- **designmatch**: Mixed integer programming, more constraints
+- **Other options**: MatchIt, Matching, CBPS (brief mentions)
+- When to use which package
+
+---
+
+## 4. Building Your Match: Step-by-Step Workflow
+
+### 4.1 Universal Matching Workflow
+```
+1. Define comparison question
+2. Identify relevant covariates (theory-driven)
+3. Assess overlap/common support
+4. Choose matching method and distance
+5. Set initial constraints
+6. Execute matching algorithm
+7. Evaluate balance
+8. Iterate if needed (steps 5-7)
+9. Once satisfied: estimate effects
+10. Sensitivity analysis
+```
+
+### 4.2 Step 1-2: Choosing Covariates
+- **Theory-driven selection**: What variables could confound?
+- Pre-treatment covariates only (post-treatment variables are outcomes)
+- Balance quantity vs. quality of covariates
+- What to do about missing covariate data
+- Example decision process for job training case
+
+### 4.3 Step 3: Assessing Overlap
+- Visual checks: propensity score distributions by group
+- Identifying regions of poor overlap
+- Trimming decisions and trade-offs
+- Code examples for overlap assessment
+
+### 4.4 Step 4: Selecting Distance Metrics
+- Decision tree for metric selection
+- When to combine multiple distances
+- Dimension reduction strategies
+- Code: Creating distance matrices
+
+### 4.5 Step 5: Setting Constraints
+- **Calipers**: Maximum allowed distance
+  - How to choose caliper width
+  - Trade-offs: balance vs. sample retention
+- **Exact matching**: Perfect balance on categorical variables
+  - When to use exact matching
+  - Computational considerations
+- **Set size restrictions**: min/max controls
+  - Impact on effective sample size
+  - When to constrain set sizes
+
+### 4.6 Steps 6-8: Execute and Iterate
+- Running your first match
+- Interpreting initial results
+- Systematic iteration strategy (not data mining)
+- When to stop iterating
+
+### 4.7 Documentation Best Practices
+- Keep record of all attempts
+- Pre-specify stopping rules if possible
+- Transparent reporting of iteration process
+
+---
+
+## 5. Method Details: Bipartite Matching with optmatch
+
+### 5.1 When to Use optmatch
+- Fast network flow algorithm
+- Flexible distance specifications
+- Excellent for exploratory matching
+- R-native with good integration
+
+### 5.2 Core Functions
+- `match_on()`: Creating distance matrices
+- `pairmatch()`: Pair matching
+- `fullmatch()`: Full matching with variable sets
+- `caliper()`: Adding distance constraints
+- `exactMatch()`: Perfect balance requirements
+
+### 5.3 Key Parameters and Their Effects
+
+#### 5.3.1 pairmatch() Parameters
+```r
+pairmatch(
+  distance,           # Distance matrix
+  controls = 1,       # Number of controls per treated
+  data,              # Data frame
+  remove.unmatchables # Keep or drop unmatched units
+)
+```
+- **controls**: Fixed ratio (e.g., 2 means 1:2 matching)
+- **remove.unmatchables**: TRUE drops units that can't be matched
+- Trade-offs of each parameter choice
+
+#### 5.3.2 fullmatch() Parameters
+```r
+fullmatch(
+  distance,
+  min.controls,     # Minimum controls per treated
+  max.controls,     # Maximum controls per treated
+  data,
+  tol              # Optimization tolerance
+)
+```
+- **min/max.controls**: Constrains set sizes
+  - Larger range = better balance, more complex sets
+  - Smaller range = simpler interpretation, may sacrifice balance
+- **tol**: Smaller values = better solution, slower computation
+- Effective sample size implications
+
+#### 5.3.3 Distance Specification Options
+- Method argument: "rank_mahalanobis", "mahalanobis"
+- Within-group matching using exactMatch()
+- Combining distances with + operator
+- Adding calipers and penalties
+
+### 5.4 Complete Worked Example
+- Job training program data (use existing simulated data)
+- Step-by-step code with narrative
+- Multiple iterations shown
+- Comparison of pair vs. full match on same data
+
+### 5.5 Parameter Tuning Guide
+- Starting recommendations
+- How to adjust based on balance results
+- Computational time considerations
+
+### 5.6 Troubleshooting Common Issues
+- "No feasible solution" errors
+- Very slow execution
+- Poor balance despite iteration
+- Excessive dropped units
+
+---
+
+## 6. Method Details: Bipartite Matching with designmatch
+
+### 6.1 When to Use designmatch
+- Need more fine-grained control over constraints
+- Want to specify "near" constraints (penalties, not hard limits)
+- Working with integer programming optimization
+- Specific balance requirements
+
+### 6.2 Core Function: bmatch()
+
+### 6.3 Key Parameters and Their Effects
+
+#### 6.3.1 Basic bmatch() Syntax
+```r
+bmatch(
+  t_ind,           # Treatment indicator (sorted!)
+  dist_mat,        # Distance matrix
+  n_controls,      # Fixed number of controls
+  total_groups,    # Number of matched sets
+  solver           # Optimization solver settings
+)
+```
+- **Critical**: Data must be sorted by treatment (decreasing)
+- **n_controls**: Fixed ratio only (no variable sets like fullmatch)
+- **total_groups**: Determines how many units are matched
+
+#### 6.3.2 Constraint Parameters
+```r
+bmatch(
+  ...,
+  subset_weight,   # Weight on minimizing distance vs. maximizing matches
+  near_exact,      # Variables to nearly match
+  exact,           # Variables to exactly match
+  near_pairs       # Pairs of variables to be near each other
+)
+```
+- **subset_weight**: 0 = minimize distance only; 1 = maximize matches
+- **near_exact**: Soft constraint (penalty for deviation)
+- **exact**: Hard constraint (must match exactly)
+- **near_pairs**: Keep specified variables close together
+
+#### 6.3.3 Solver Options
+```r
+solver = list(
+  name = "highs",
+  approximate = 1,  # Use heuristics (faster)
+  t_max = 1000,    # Time limit in seconds
+  trace = 1        # Verbosity
+)
+```
+- Solver choice: "highs", "gurobi", "symphony"
+- Trade-offs: speed vs. optimality
+
+### 6.4 Comparison to optmatch
+| Feature | optmatch | designmatch |
+|---------|----------|-------------|
+| Algorithm | Network flow | Mixed integer programming |
+| Variable set sizes | Yes (fullmatch) | No |
+| Near constraints | No | Yes |
+| Speed | Faster | Slower |
+| Flexibility | High | Very high |
+
+### 6.5 Complete Worked Example
+- Same job training data as optmatch example
+- Demonstrating near_exact constraints
+- Converting bmatch output to usable format
+- Comparison to equivalent optmatch design
+
+### 6.6 When designmatch is Worth the Extra Complexity
+- Need near-exact balance without hard calipers
+- Multiple competing balance objectives
+- Want to penalize rather than prohibit certain matches
+
+---
+
+## 7. Method Details: Non-bipartite Matching
+
+### 7.1 When to Use Non-bipartite Matching
+- Continuous treatment variable (dosage, intensity)
+- Multi-level treatment (low, medium, high dose)
+- No clear control group
+- Interested in dose-response relationships
+
+### 7.2 Key Conceptual Differences
+- Creates pairs/sets varying in treatment level
+- Each set should have spread on treatment variable
+- Still aiming to match on confounders
+
+### 7.3 Using nmatch() from designmatch
+- Function syntax and key parameters
+- Creating appropriate distance matrices
+- Specifying treatment variation requirements
+
+### 7.4 Complete Worked Example
+- Using trtcont variable from simulated data
+- Creating quartile-based comparisons
+- Evaluation specific to non-bipartite case
+
+### 7.5 Special Considerations
+- Effective sample size more complex
+- Balance evaluation differs slightly
+- Estimation approaches for dose-response
+
+---
+
+## 8. Evaluating Your Design
+
+### 8.1 Philosophy: How Good is Good Enough?
+- No universal standard
+- Context and theory should guide
+- Balance vs. sample size trade-offs
+- Comparison to experimental standard as benchmark
+
+### 8.2 Two Complementary Approaches
+1. **Substantive balance**: Look at specific important variables
+2. **Statistical balance**: Overall comparison to randomized experiments
+
+### 8.3 Substantive Balance Evaluation
+
+#### 8.3.1 Within-Set Differences Visualization
+- Boxplots by set for key variables (keep existing Figure)
+- Identifying worst-performing sets
+- Quantile summaries of set-specific differences
+- Code for creating these diagnostics
+
+#### 8.3.2 Context-Specific Standards
+- What difference in age is acceptable for your study?
+- Which variables absolutely must be balanced?
+- Can you defend remaining imbalances?
+- Documenting your reasoning
+
+### 8.4 Statistical Balance: The Omnibus Test
+
+#### 8.4.1 Conceptual Foundation
+- What would we expect in a randomized experiment?
+- Comparing observational design to experimental benchmark
+- Why large differences can occur by chance
+
+#### 8.4.2 Using balanceTest() from RItools
+```r
+balanceTest(
+  formula,           # Treatment ~ covariates + strata()
+  data,
+  p.adjust.method    # Multiple testing correction
+)
+```
+- Interpreting the overall χ² test
+- Interpreting individual covariate statistics
+- Understanding p-values in this context
+  - p = 0.001: Design looks much worse than experiment
+  - p = 0.80: Design looks better than 80% of experiments
+
+#### 8.4.3 Individual Covariate Balance
+- Z-statistics and adjusted p-values
+- Multiple testing corrections (Holm-Bonferroni)
+- Standardized differences
+- Which statistics matter most
+
+#### 8.4.4 Alternative: coin Package
+- independence_test() for omnibus testing
+- When to use permutation-based vs. asymptotic tests
+- Computational considerations
+
+### 8.5 Deep Dive: What balanceTest() is Doing
+
+#### 8.5.1 The Test Statistic
+- Harmonic mean (precision) weights explained
+- Why this weighting scheme is powerful
+- Connection to fixed effects estimation
+- Mathematical details (keep current section)
+
+#### 8.5.2 The Null Distribution
+- Permutation-based inference
+- Why we shuffle within strata
+- Large-sample χ² approximation
+- Code showing manual calculation (keep current section)
+
+#### 8.5.3 The d² Statistic in Detail
+- Combining multiple covariate tests
+- Why squared and standardized differences
+- Connection to multivariate testing
+
+### 8.6 Iteration Strategies
+
+#### 8.6.1 Systematic Improvement Approach
+1. Identify worst-balanced covariates
+2. Prioritize by substantive importance
+3. Adjust constraints to target these
+4. Re-match and evaluate
+5. Document all attempts
+
+#### 8.6.2 Common Iteration Tactics
+- Tightening calipers on problematic variables
+- Adding exact matching on categorical variables
+- Changing distance metric
+- Adjusting set size constraints
+- Changing match ratio
+
+#### 8.6.3 When to Stop
+- Pre-specified balance standards met
+- Diminishing returns on iteration
+- Sample size becoming too small
+- Trade-off between balance and retention
+
+#### 8.6.4 Avoiding Data Mining
+- Don't iterate based on outcome analysis
+- Document all attempts transparently
+- Use theory, not chance, to guide changes
+- Consider pre-registration of stopping rules
+
+### 8.7 Reporting Balance Results
+- What to include in papers/reports
+- Tables and figures for transparency
+- Describing iteration process
+- Making match quality transparent to readers
+
+---
+
+## 9. From Design to Inference: Estimation and Testing
+
+### 9.1 What the Matched Design Allows You to Conclude
+
+#### 9.1.1 Causal Claims vs. Associational Claims
+- Under what assumptions is causal language appropriate?
+- Making assumptions explicit
+- Appropriate hedging language
+- Sensitivity analysis as part of causal argument
+
+#### 9.1.2 Target Estimands
+- Average Treatment Effect (ATE)
+- Average Treatment Effect on the Treated (ATT)
+- Which estimand does your design target?
+- Sample vs. population effects
+
+### 9.2 Estimation Approaches
+
+#### 9.2.1 Within-Set Estimation
+- Difference in means within each set/pair
+- Weighted combination across sets
+- This is what you calculated in Section 2!
+
+#### 9.2.2 Weighting Schemes
+
+**Block-Size Weights (Horvitz-Thompson Style)**
+```r
+difference_in_means(outcome ~ treatment, blocks = matched_sets, data)
+```
+- Weights by number of treated in each set
+- Unbiased under randomization within sets
+- ATT-style estimator
+
+**Precision Weights (Fixed Effects Style)**
+```r
+lm_robust(outcome ~ treatment, fixed_effects = ~matched_sets, data)
+# OR equivalently:
+lm_robust(outcome ~ treatment + matched_sets, data)
+```
+- Harmonic mean weights
+- Lower variance estimates
+- May be biased but often preferred in practice
+
+#### 9.2.3 Which Weights to Use?
+- Practical guidance: pair matching → doesn't matter
+- Full matching → precision weights reduce variance
+- Why we often use fixed effects approach
+- Acknowledging bias-variance trade-off
+
+### 9.3 Standard Errors and Confidence Intervals
+
+#### 9.3.1 Clustering at Set Level
+- Why standard errors must account for design
+- Using cluster-robust standard errors
+- Implementation in estimatr package
+
+#### 9.3.2 Randomization-Based Inference
+- Permutation tests within sets
+- More conservative in small samples
+- Implementation with coin package
+
+### 9.4 Testing Hypotheses About Effects
+
+#### 9.4.1 Null Hypothesis Framework
+- Sharp null hypothesis of no effect
+- Why this is stronger than typical nulls
+- Randomization-based testing
+
+#### 9.4.2 Implementation Examples
+- Using lm_robust() for linear models
+- Using permutation tests
+- Comparison of p-values
+
+### 9.5 Complete Estimation Examples
+- Using fm1 design from earlier sections
+- Block-size weighted estimate
+- Precision weighted estimate
+- With appropriate uncertainty quantification
+- Reporting template
+
+### 9.6 Non-bipartite Estimation Considerations
+- Dose-response curves
+- Comparing adjacent levels
+- More complex than binary treatment
+- Brief overview with references
+
+---
+
+## 10. Sensitivity Analysis: Assessing Robustness
+
+### 10.1 The Unobserved Confounder Problem
+- What matching cannot do
+- Why sensitivity analysis is essential
+- Making the case for plausibility
+
+### 10.2 Rosenbaum Sensitivity Analysis
+
+#### 10.2.1 The Γ Parameter
+- What Γ represents: odds ratio of differential treatment assignment
+- Interpreting different Γ values
+- Relationship to unobserved confounding
+
+#### 10.2.2 Using senstrat Package
+```r
+library(senstrat)
+senstrat(
+  outcome,
+  treatment,
+  strata,
+  gamma = seq(1, 3, 0.1)
+)
+```
+- Running sensitivity analysis
+- Interpreting results
+- How large must bias be to change conclusions?
+
+#### 10.2.3 Reporting Sensitivity Results
+- "Conclusions robust to Γ = X"
+- Contextualizing what this means substantively
+- Comparing to plausible confounders
+
+### 10.3 Outcome-Based Sensitivity (sensemakr)
+
+#### 10.3.1 Benchmarking Approach
+- Using observed covariates as benchmarks
+- "A confounder would need to be X times stronger than age..."
+- More intuitive for some audiences
+
+#### 10.3.2 Using sensemakr Package
+- Implementation with matched designs
+- Visualization of sensitivity
+- Reporting recommendations
+
+### 10.4 Integrating Sensitivity into Causal Claims
+- Sensitivity analysis as part of evidence
+- When conclusions are robust vs. fragile
+- How to discuss in papers
+
+---
+
+## 11. Complete Case Study: Job Training Program Evaluation
+
+### 11.1 Background and Research Question
+- Policy context (realistic scenario)
+- Available data description
+- Evaluation goals
+
+### 11.2 Step 1-2: Covariate Selection
+- Theory of selection into job training
+- Which covariates are confounders?
+- Data exploration
+
+### 11.3 Step 3: Assessing Overlap
+- Propensity score distributions
+- Regions of common support
+- Trimming decisions
+
+### 11.4 Step 4-5: Method and Distance Choice
+- Why full matching with propensity distance
+- Initial constraint decisions
+- Rationale for each choice
+
+### 11.5 Step 6-8: First Match and Iteration
+- Initial balance results
+- Problems identified
+- Iteration 1: Adding age caliper
+- Iteration 2: Exact matching on education
+- Final design
+
+### 11.6 Step 9: Effect Estimation
+- Weighted analysis
+- Confidence intervals
+- Interpretation
+
+### 11.7 Step 10: Sensitivity Analysis
+- Rosenbaum bounds
+- Benchmarking
+- Robustness conclusions
+
+### 11.8 Complete Reporting Template
+- How to write this up
+- Tables and figures
+- Appendix materials
+
+---
+
+## 12. Trade-offs and Method Comparison
+
+### 12.1 The Bias-Variance-Interpretability Triangle
+- You can't optimize all three simultaneously
+- How different methods make different trade-offs
+
+### 12.2 Systematic Comparison Table
+
+| Dimension | Pair Match | Full Match | designmatch | Non-bipartite |
+|-----------|------------|------------|-------------|---------------|
+| Sample use | Poor | Excellent | Medium | Excellent |
+| Balance achievable | Good | Best | Excellent | Good |
+| Interpretability | Excellent | Good | Good | Medium |
+| Computation time | Fast | Fast | Slow | Medium |
+| Flexibility | Medium | High | Very high | High |
+| Learning curve | Easy | Easy | Steep | Medium |
+
+### 12.3 Decision Framework Summary
+- Flowchart for method selection
+- Context-specific recommendations
+- When to try multiple approaches
+
+### 12.4 Computational Considerations
+- Sample size scalability
+- Memory requirements
+- When to use approximations
+- Parallel processing options
+
+### 12.5 The Sample Size Trade-off
+- Pair matching: Maximum balance, minimum sample
+- Full matching: Good balance, maximum sample
+- When sample size constraints dominate
+
+### 12.6 The Interpretability Trade-off
+- Simple pairs are easy to understand
+- Complex sets are harder to explain
+- Stakeholder communication considerations
+
+### 12.7 Practical Recommendations by Context
+- Small samples (N < 200)
+- Medium samples (N = 200-2000)
+- Large samples (N > 2000)
+- When you have strong theory about key confounders
+- When you're unsure what matters
+- When transparency is paramount
+
+---
+
+## Appendices
+
+### Appendix A: Software Installation and Setup
+- Installing required R packages
+- Python alternatives (brief)
+- Stata alternatives (brief)
+
+### Appendix B: Mathematical Details
+- Optimization problems in detail
+- Balance test derivations
+- Weighting scheme mathematics
+
+### Appendix C: Additional Resources
+- Key papers to read
+- Online tutorials
+- When to consult a statistician
+
+### Appendix D: Glossary
+- Technical terms defined
+- Common abbreviations
+
+### Appendix E: Troubleshooting Guide
+- Common errors and solutions
+- Performance optimization tips
+
+---
+
+## References
+
+[Bibliography as in original document]

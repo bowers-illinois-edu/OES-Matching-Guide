@@ -1,0 +1,1855 @@
+# The OES Guide to Making and Evaluating Matched Designs
+
+## Approach 5: Two-Path Structure (Quick Start + Deep Dive)
+
+**How to Use This Guide:**
+- **Need to get started quickly?** → Read Part A (Practitioner's Guide) and skim the relevant Method Module in Part C
+- **Want deep understanding?** → Read Part B (Conceptual Foundation) before diving into Part C
+- **Comparing methods?** → Jump to Part D (Case Studies) after reading Part A
+- **Reference specific parameters?** → Use Part C (Method Encyclopædia) as lookup
+
+---
+
+# PART A: PRACTITIONER'S GUIDE (Quick Start)
+
+*Goal: Get you matching correctly within 30 minutes*
+
+## 1. Quick Decision Tree: Which Method for Your Context?
+
+### 1.1 Visual Decision Flowchart
+```
+START: What type of treatment do you have?
+
+├─ BINARY (treated vs. control)
+│  ├─ Need maximum transparency? → PAIR MATCHING (§A.2.1)
+│  ├─ Can't afford to lose data? → FULL MATCHING (§A.2.2)
+│  └─ Need fine-tuned constraints? → DESIGNMATCH (§A.2.3)
+│
+├─ CONTINUOUS or MULTI-LEVEL (dose, intensity)
+│  └─ → NON-BIPARTITE MATCHING (§A.2.4)
+│
+└─ Not sure matching is right?
+   └─ → See Decision Guide (§A.1.2)
+```
+
+### 1.2 Is Matching Right for Your Study?
+
+**Use matching when:**
+- ✓ Treatment assignment is non-random
+- ✓ You have comparison group
+- ✓ Rich covariate information available
+- ✓ Seeking causal estimates
+
+**Don't use matching when:**
+- ✗ True randomized experiment (matching redundant)
+- ✗ No comparison group exists
+- ✗ Poor covariate overlap between groups
+- ✗ Better design available (RDD, IV)
+
+**Quick check:** Can you identify 5+ pre-treatment covariates that predict both treatment and outcome? If yes → matching likely appropriate.
+
+---
+
+## 2. Minimal Working Examples: Copy and Modify These
+
+### 2.1 Pair Matching in 10 Lines (optmatch)
+
+```r
+# Install if needed: install.packages(c("optmatch", "RItools", "estimatr"))
+library(optmatch)
+library(RItools)
+library(estimatr)
+
+# Create propensity score distance
+ps_model <- glm(treatment ~ age + education + income, data = mydata, family = binomial)
+ps_dist <- match_on(ps_model, data = mydata)
+
+# Execute pair match
+pair_match <- pairmatch(ps_dist, data = mydata, remove.unmatchables = TRUE)
+mydata$pair_id <- pair_match
+
+# Check balance
+balance_result <- balanceTest(treatment ~ age + education + income + strata(pair_id), 
+                              data = mydata)
+print(balance_result$overall)  # Want p-value > 0.05 ideally
+
+# Estimate effect if balance looks good
+effect <- lm_robust(outcome ~ treatment, fixed_effects = ~pair_id, data = mydata)
+summary(effect)
+```
+
+**When to use:** Maximum transparency, easy interpretation, willing to drop some observations.
+
+**Key parameter to adjust:** Add `caliper(ps_dist, 0.5)` inside pairmatch() to prevent bad matches.
+
+---
+
+### 2.2 Full Matching in 10 Lines (optmatch)
+
+```r
+library(optmatch)
+library(RItools)
+library(estimatr)
+
+# Create distance (using multiple covariates)
+mh_dist <- match_on(treatment ~ age + education + income, 
+                    data = mydata, method = "rank_mahalanobis")
+
+# Execute full match with set size limits
+full_match <- fullmatch(mh_dist, min.controls = 1, max.controls = 5, data = mydata)
+mydata$set_id <- full_match
+
+# Check balance
+balance_result <- balanceTest(treatment ~ age + education + income + strata(set_id), 
+                              data = mydata)
+print(balance_result$overall)
+
+# Estimate effect
+effect <- lm_robust(outcome ~ treatment, fixed_effects = ~set_id, data = mydata)
+summary(effect)
+```
+
+**When to use:** Want to keep all observations, willing to accept variable set sizes.
+
+**Key parameters to adjust:** 
+- `min.controls`, `max.controls`: Restrict set sizes (1 to 5 is good default)
+- Add calipers like: `fullmatch(mh_dist + caliper(mh_dist, 4), ...)`
+
+---
+
+### 2.3 Bipartite Matching in 15 Lines (designmatch)
+
+```r
+library(designmatch)
+library(highs)
+
+# Sort data by treatment (REQUIRED!)
+mydata <- mydata[order(mydata$treatment, decreasing = TRUE), ]
+
+# Create distance matrix
+ps_model <- glm(treatment ~ age + education + income, data = mydata, family = binomial)
+ps_scores <- predict(ps_model)
+ps_matrix <- outer(ps_scores[mydata$treatment==1], 
+                   ps_scores[mydata$treatment==0], 
+                   FUN = function(x,y) abs(x-y))
+
+# Execute match
+dm_match <- bmatch(
+  t_ind = mydata$treatment,
+  dist_mat = ps_matrix,
+  n_controls = 1,  # Pair matching
+  solver = list(name = "highs", approximate = 1, t_max = 600)
+)
+
+# Convert to usable format [helper function needed - see Part C]
+# ... balance checking and estimation similar to above
+```
+
+**When to use:** Need near-exact constraints, willing to invest setup time.
+
+**Key parameters to adjust:** 
+- `n_controls`: Number of controls per treated
+- Add `near_exact = mydata$age[mydata$treatment==1]` for soft age matching
+
+---
+
+### 2.4 Non-bipartite Matching in 12 Lines (designmatch)
+
+```r
+library(designmatch)
+
+# For continuous treatment
+# Create distance on confounders
+confounder_matrix <- as.matrix(dist(mydata[, c("age", "education", "income")]))
+
+# Execute non-bipartite match
+nb_match <- nmatch(
+  dist_mat = confounder_matrix,
+  mom_covs = mydata$treatment_dose,  # Want variation in this
+  solver = list(name = "highs", approximate = 1, t_max = 600)
+)
+
+# ... evaluation and estimation specialized for continuous treatment
+# See Part C for complete implementation
+```
+
+**When to use:** Treatment is continuous or multi-level, interested in dose-response.
+
+---
+
+## 3. Essential Steps Checklist
+
+Use this checklist for every matching analysis:
+
+### 3.1 Before Matching
+
+- [ ] **Define research question clearly**
+  - What is the treatment?
+  - What is the outcome?
+  - What is the causal effect of interest?
+
+- [ ] **Identify confounders (theory-driven)**
+  - List variables that affect BOTH treatment and outcome
+  - Only use pre-treatment variables
+  - Document your reasoning
+
+- [ ] **Check data quality**
+  - Missing data on treatment? (Fatal if too much)
+  - Missing data on covariates? (Handle before matching)
+  - Missing data on outcome? (OK for design, problem for analysis)
+
+- [ ] **Assess overlap/common support**
+  - Plot propensity scores by treatment group
+  - Identify regions with no overlap → may need trimming
+  - Code: `boxplot(ps_scores ~ treatment, data = mydata)`
+
+### 3.2 During Matching
+
+- [ ] **Choose initial method**
+  - Use decision tree (§A.1.1)
+  - Start simple (pair or full matching)
+
+- [ ] **Create distance matrix**
+  - Choose metric: propensity score OR Mahalanobis
+  - When unsure, try both
+
+- [ ] **Set initial constraints**
+  - No calipers initially (see what happens)
+  - No exact matching initially (unless obvious need)
+
+- [ ] **Execute first match**
+  - Use minimal working example as template
+  - Document your code
+
+- [ ] **Check balance** ← CRITICAL STEP
+  - Run balanceTest() or equivalent
+  - Is overall p-value > 0.05? Good sign.
+  - Is overall p-value < 0.001? Need iteration.
+  - Look at worst-balanced variables
+
+### 3.3 Iteration (if needed)
+
+- [ ] **Identify problem variables**
+  - Which covariates still imbalanced?
+  - Which matter most theoretically?
+
+- [ ] **Make ONE change**
+  - Option 1: Add caliper on problem variable
+  - Option 2: Add exact matching on categorical
+  - Option 3: Change distance metric
+  - Option 4: Adjust set size constraints
+
+- [ ] **Re-run and check balance**
+  - Is it better? Continue iterating.
+  - Getting worse? Try different tactic.
+
+- [ ] **Stop when:** Balance acceptable OR diminishing returns OR sample too small
+
+- [ ] **Document all attempts** (transparency!)
+
+### 3.4 After Matching (Once Satisfied)
+
+- [ ] **Estimate treatment effect**
+  - Use fixed effects or block-weighted approach
+  - Cluster standard errors at set level
+
+- [ ] **Run sensitivity analysis**
+  - How robust to unobserved confounding?
+  - Use senstrat or sensemakr package
+
+- [ ] **Report results transparently**
+  - Show balance tables
+  - Describe iteration process
+  - Include sensitivity results
+
+---
+
+## 4. Common Pitfalls and How to Avoid Them
+
+### 4.1 PITFALL: Matching on post-treatment variables
+**Problem:** Matching on outcomes or mediators destroys causal inference.
+
+**How to avoid:** Only include covariates measured BEFORE treatment assignment.
+
+**Example:** In job training study, don't match on "employment status 1 month after training started" even if measured before outcome.
+
+---
+
+### 4.2 PITFALL: Ignoring common support
+**Problem:** Matching units with no comparable comparison units creates extrapolation.
+
+**How to avoid:** 
+- Always plot propensity scores by group
+- Consider trimming extreme values
+- Report how many units lack support
+
+**Code check:**
+```r
+# Check overlap
+ps_treated <- ps_scores[treatment == 1]
+ps_control <- ps_scores[treatment == 0]
+range_treated <- range(ps_treated)
+range_control <- range(ps_control)
+# Should have substantial overlap
+```
+
+---
+
+### 4.3 PITFALL: Data mining for balance
+**Problem:** Trying many matching specifications and picking the one that looks best on outcomes.
+
+**How to avoid:**
+- Iterate based on balance only, never look at outcomes
+- Document all specifications tried
+- Pre-specify if possible
+
+---
+
+### 4.4 PITFALL: Over-matching
+**Problem:** Matching on variables affected by treatment (mediators) or too closely related to outcome.
+
+**How to avoid:**
+- Think about causal paths
+- Don't match on near-perfect proxies for outcome
+- When unsure, test sensitivity to including/excluding
+
+---
+
+### 4.5 PITFALL: Claiming too much
+**Problem:** Saying matching "controls for all confounding" or produces "causal estimates" without caveats.
+
+**How to avoid:**
+- Always acknowledge unobserved confounding limitation
+- Use sensitivity analysis
+- Appropriate hedging language: "assuming no unmeasured confounders..."
+
+---
+
+## 5. When to Get More Help
+
+**Consult Part B (Conceptual Foundation) when:**
+- You don't understand what matching is actually doing
+- Results don't make sense
+- Need to explain approach to skeptical audience
+- Writing up for publication
+
+**Consult Part C (Method Encyclopædia) when:**
+- Need to understand all parameters of a method
+- Troubleshooting errors
+- Want to use advanced features
+- Comparing multiple approaches
+
+**Consult a statistician when:**
+- Design seems fundamentally flawed
+- Can't achieve acceptable balance
+- Sample size very small (N < 100)
+- Complex treatment structure
+- Unusual data structure (clustering, time-series, etc.)
+
+---
+
+# PART B: CONCEPTUAL FOUNDATION (Deep Dive)
+
+*Goal: Understand what matching is doing and why*
+
+## 6. The Causal Inference Problem
+
+### 6.1 The Fundamental Problem
+- Potential outcomes framework [Y₁ᵢ, Y₀ᵢ]
+- We observe Y₁ᵢ for treated, Y₀ᵢ for controls
+- Never observe both for same unit → missing data problem
+- Numerical example with job training
+
+### 6.2 What We Want: Causal Effects
+- Individual treatment effect: τᵢ = Y₁ᵢ - Y₀ᵢ (unobservable)
+- Average treatment effect: ATE = E[Y₁ᵢ - Y₀ᵢ]
+- Average effect on treated: ATT = E[Y₁ᵢ - Y₀ᵢ | Zᵢ = 1]
+
+### 6.3 The Selection Problem
+- Why simple comparison fails: E[Yᵢ | Zᵢ = 1] - E[Yᵢ | Zᵢ = 0] ≠ ATE
+- Selection bias decomposition
+- Directed acyclic graphs (DAGs) showing confounding
+- The age example from current document (expanded)
+
+### 6.4 How Randomization Solves It
+- Random assignment → Zᵢ ⊥ (Y₁ᵢ, Y₀ᵢ)
+- Treatment and potential outcomes independent
+- Simple comparison becomes unbiased: E[Yᵢ | Zᵢ = 1] - E[Yᵢ | Zᵢ = 0] = ATE
+- Balance in expectation (not exact)
+
+### 6.5 Block Randomization as Template
+- Stratification within groups
+- Randomization within strata
+- Why this is the model for matching
+- Connection between experimental blocks and matched sets
+
+### 6.6 What Matching Attempts
+- Approximate randomization via stratification on observables
+- Create strata where treated and controls are similar
+- Make treatment assignment "as if random" within strata
+- Key: Conditional on covariates X, assume Zᵢ ⊥ (Y₁ᵢ, Y₀ᵢ) | Xᵢ
+
+---
+
+## 7. How Matching Algorithms Work
+
+### 7.1 The Optimization Problem
+
+#### 7.1.1 What Are We Minimizing?
+- Total distance between matched units
+- Subject to: each treated unit matched to control(s)
+- Balance vs. sample retention trade-off
+
+#### 7.1.2 Why Distance Matrices?
+- Encode similarity between every pair of units
+- Algorithm finds sets that minimize total distance
+- Different distances emphasize different aspects of similarity
+
+### 7.2 Network Flow Algorithm (optmatch)
+
+#### 7.2.1 Graph Representation
+- Bipartite graph: treated nodes, control nodes, edges weighted by distance
+- Flow from source through treated to controls to sink
+- Min-cost flow problem
+
+#### 7.2.2 Why It's Fast
+- Specialized algorithms for network flow
+- Can handle thousands of units
+- Exact optimization (finds true minimum)
+
+#### 7.2.3 Limitations
+- Less flexible constraints
+- Variable set sizes only via fullmatch
+- Can't do "soft" constraints
+
+### 7.3 Mixed Integer Programming (designmatch)
+
+#### 7.3.1 Integer Programming Formulation
+- Binary variables: xᵢⱼ ∈ {0,1} indicates unit i matched to unit j
+- Objective: minimize Σ dᵢⱼ xᵢⱼ
+- Constraints: matching structure, balance requirements
+
+#### 7.3.2 Why More Flexible
+- Can add arbitrary linear constraints
+- Can have "soft" constraints (penalties, not prohibitions)
+- Can balance on multiple dimensions simultaneously
+
+#### 7.3.3 Why Slower
+- Integer programming is NP-hard
+- Uses heuristics for large problems
+- May not find true optimal solution (approximate)
+
+### 7.4 Dimension Reduction: Creating Distance Matrices
+
+#### 7.4.1 The Curse of Dimensionality
+- Can't exactly match on 10+ variables
+- Need to reduce to one or few dimensions
+- Two main approaches: Mahalanobis and propensity
+
+#### 7.4.2 Mahalanobis Distance
+- Multivariate distance accounting for correlation
+- Ranks transform for robustness
+- Treats all variables as equally important
+- Mathematical formula: d²(i,j) = (Xᵢ - Xⱼ)ᵀ Σ⁻¹ (Xᵢ - Xⱼ)
+
+#### 7.4.3 Propensity Score
+- Probability of treatment given covariates: e(X) = P(Z=1|X)
+- Rosenbaum & Rubin (1983): balancing score property
+- If Z ⊥ (Y₁, Y₀) | X, then Z ⊥ (Y₁, Y₀) | e(X)
+- Reduces any dimension to one dimension
+- Weights variables by predictiveness of treatment
+
+#### 7.4.4 Which to Use?
+- Mahalanobis: Theory says all variables matter equally
+- Propensity: Some variables strongly predict treatment
+- Combined: Often best in practice
+- Try both and compare balance
+
+---
+
+## 8. Balance Testing Theory
+
+### 8.1 The Experimental Standard
+
+#### 8.1.1 What Happens in Experiments?
+- Randomization balances covariates in expectation
+- Not exact balance (except in expectation)
+- We know distribution of imbalance under randomization
+
+#### 8.1.2 Comparing Designs to Experiments
+- Hansen & Bowers (2008) insight
+- If matched design looks like randomized experiment → good sign
+- Can generate null distribution via permutation
+
+### 8.2 The Omnibus Balance Test
+
+#### 8.2.1 Individual Covariate Tests
+- For each covariate k: test null of no difference
+- Within-strata weighted difference
+- Standardized by standard error under randomization
+- Approximately N(0,1) distributed under null
+
+#### 8.2.2 Combining Tests: The d² Statistic
+- Can't just look at each p-value (multiple testing problem)
+- Combine all covariate tests into single statistic
+- d = vector of standardized differences
+- d² = dᵀ Σ⁻¹ d where Σ = covariance of d under randomization
+- Follows χ² distribution with p degrees of freedom (p = # covariates)
+
+#### 8.2.3 Why This Works
+- Under null, each standardized difference ~ N(0,1)
+- Accounting for correlation among covariates
+- Large-sample approximation to permutation distribution
+
+### 8.3 Interpreting Balance Test Results
+
+#### 8.3.1 The Overall χ² Test
+- **p-value interpretation**: 
+  - p = 0.001 → Design has more imbalance than 99.9% of experiments
+  - p = 0.10 → Design has more imbalance than 90% of experiments
+  - p = 0.50 → Design looks like typical experiment
+  - p = 0.80 → Design more balanced than 80% of experiments
+
+#### 8.3.2 Individual Covariate Balance
+- Look beyond overall test
+- Which variables still imbalanced?
+- Z-statistics > 2 in absolute value → concern
+- Adjusted p-values account for multiple testing
+
+#### 8.3.3 Practical vs. Statistical Significance
+- With large samples, small imbalances can be "significant"
+- Focus on standardized differences
+- Is remaining imbalance substantively meaningful?
+
+### 8.4 Permutation-Based Inference Detail
+
+#### 8.4.1 Generating Null Distribution
+- Shuffle treatment within each stratum
+- Recalculate balance statistics
+- Repeat 1000s of times
+- Observed statistic compared to this distribution
+
+#### 8.4.2 Code Walk-Through
+[Keep detailed code section from current document showing manual calculation]
+
+#### 8.4.3 Asymptotic vs. Permutation
+- χ² approximation faster
+- Permutation exact in finite samples
+- Usually very similar with N > 100
+
+---
+
+## 9. Effect Estimation Theory
+
+### 9.1 Weighted Average of Within-Set Effects
+
+#### 9.1.1 Basic Idea
+- Calculate effect within each stratum: τ̂ₛ
+- Weighted average across strata: τ̂ = Σ wₛ τ̂ₛ
+- Different weights → different estimators
+
+#### 9.1.2 Block-Size Weights
+- wₛ = nₛ / N (proportion of sample in stratum s)
+- Alternatively: wₛ = n₁ₛ / N₁ (proportion of treated in stratum s)
+- Unbiased in block-randomized experiments
+- Targets ATT if using treated counts
+
+#### 9.1.3 Precision Weights (Harmonic Mean)
+- wₛ ∝ n₁ₛ n₀ₛ / nₛ (effective sample size in stratum)
+- Also called "fixed effects" weights
+- Minimize variance of estimator
+- May be biased but often preferred for efficiency
+
+### 9.2 Why Precision Weights?
+
+#### 9.2.1 Variance Reduction
+- Strata with balanced treatment/control contribute more
+- Strata with extreme ratios contribute less
+- Reduces noise from strata with little information
+
+#### 9.2.2 Connection to Fixed Effects Regression
+- lm(Y ~ Z + factor(stratum)) uses precision weights
+- Equivalent to weighted regression
+- Easy to compute with standard software
+
+#### 9.2.3 Bias-Variance Trade-off
+- Precision weights may be biased if effect varies by stratum
+- But lower variance often outweighs bias
+- In pair matching: doesn't matter (same result)
+
+### 9.3 Standard Errors and Inference
+
+#### 9.3.1 Why Standard Errors Need Adjustment
+- Observations within strata are not independent
+- Must cluster at stratum level
+- lm_robust() with fixed_effects = ~stratum does this
+
+#### 9.3.2 Conservative Approaches
+- Cluster-robust standard errors (HC2 or HC3)
+- Randomization-based inference (permutation tests)
+- Both valid under matching design
+
+#### 9.3.3 What About Model-Based SE?
+- Standard lm() underestimates uncertainty
+- Only valid if very strong assumptions hold
+- Not recommended for matched designs
+
+### 9.4 Assumptions for Causal Interpretation
+
+#### 9.4.1 Ignorability Given Observables
+- **Assumption**: (Y₁ᵢ, Y₀ᵢ) ⊥ Zᵢ | Xᵢ
+- In words: No unmeasured confounders
+- **Untestable** but can assess plausibility
+- Domain knowledge crucial
+
+#### 9.4.2 Overlap / Common Support
+- **Assumption**: 0 < P(Zᵢ = 1 | Xᵢ) < 1 for all observed Xᵢ
+- In words: Both treatment levels possible for all covariate patterns
+- **Testable**: Check propensity score distributions
+- Trimming may be needed
+
+#### 9.4.3 SUTVA
+- **Assumption**: Stable unit treatment value assumption
+  - No interference: unit i's outcome not affected by unit j's treatment
+  - No hidden variations: treatment is well-defined
+- In words: Your treatment doesn't affect my outcome
+- Often violated in social settings (spillovers)
+- Consider design implications
+
+#### 9.4.4 Making Assumptions Plausible
+- Thorough covariate measurement
+- Sensitivity analysis for unobserved confounding
+- Theory-driven covariate selection
+- Transparent reporting of limitations
+
+---
+
+## 10. Sensitivity Analysis Theory
+
+### 10.1 The Unobserved Confounder Problem
+
+#### 10.1.1 What Matching Cannot Do
+- Only controls for measured confounders
+- Unobserved confounders remain threat
+- No statistical test can rule this out
+- Need substantive reasoning
+
+#### 10.1.2 Making the Case for Robustness
+- How strong would confounder need to be?
+- Is that plausible given domain knowledge?
+- Sensitivity analysis quantifies this
+
+### 10.2 Rosenbaum's Sensitivity Analysis
+
+#### 10.2.1 The Γ Framework
+- Even after matching, residual confounding possible
+- Γ: odds ratio of differential treatment assignment
+- Γ = 1: no hidden bias (randomization assumption holds)
+- Γ = 2: one unit could be twice as likely to receive treatment as another, even with same observed covariates
+
+#### 10.2.2 Mathematical Setup
+- Two units with same X but different hidden U
+- Treatment odds ratio: (P(Z=1|U=1) / P(Z=0|U=1)) / (P(Z=1|U=0) / P(Z=0|U=0)) = Γ
+- Ask: would conclusions change if Γ = 1.5? Γ = 2? etc.
+
+#### 10.2.3 Using senstrat Package
+```r
+library(senstrat)
+senstrat(outcome, treatment, strata, gamma = seq(1, 3, 0.1))
+```
+- Returns p-values for each Γ
+- "Significant at Γ = 1.5" means robust to moderate hidden bias
+
+### 10.3 Benchmarking Approach (sensemakr)
+
+#### 10.3.1 Intuition
+- Use observed covariates as benchmarks
+- "How much stronger than [observed covariate] would confounder need to be?"
+- More intuitive for applied audience
+
+#### 10.3.2 Implementation
+```r
+library(sensemakr)
+sense_model <- sensemakr(model = lm_fit, treatment = "treatment")
+plot(sense_model)
+```
+- Visual sensitivity plot
+- Contours of estimate as function of confounder strength
+
+### 10.4 Reporting Sensitivity Results
+
+#### 10.4.1 Appropriate Language
+- "Results robust to hidden bias with Γ = 1.8"
+- "A confounder would need to be X times stronger than age..."
+- Always report range of Γ where conclusions stable
+
+#### 10.4.2 Contextualizing
+- Is Γ = 1.5 large or small in this context?
+- What substantive confounders might reach that level?
+- Transparent about limitations
+
+---
+
+# PART C: METHOD ENCYCLOPÆDIA
+
+*Goal: Complete reference for all parameters and options*
+
+## 11. Bipartite Pair Matching (optmatch)
+
+### 11.1 Overview
+- **Function**: `pairmatch()`
+- **Use case**: Binary treatment, maximum transparency
+- **Pros**: Simple interpretation, forces similar comparisons
+- **Cons**: Discards unmatched units, may force poor matches
+- **Typical sample retention**: 60-90%
+
+### 11.2 Complete Function Signature
+```r
+pairmatch(
+  x,                        # Distance specification (formula or matrix)
+  controls = 1,             # Number of controls per treated unit
+  data = NULL,              # Data frame
+  remove.unmatchables = FALSE,  # Drop unmatchable units?
+  ...                       # Additional arguments
+)
+```
+
+### 11.3 Parameter Reference
+
+#### 11.3.1 x: Distance Specification
+
+**Option 1: Formula Interface**
+```r
+pairmatch(treatment ~ age + education, data = mydata, method = "rank_mahalanobis")
+```
+- Automatically creates distance matrix
+- `method` options: "rank_mahalanobis", "mahalanobis", "euclidean"
+
+**Option 2: Distance Matrix**
+```r
+ps_model <- glm(treatment ~ age + education, family = binomial, data = mydata)
+ps_dist <- match_on(ps_model, data = mydata)
+pairmatch(ps_dist, data = mydata)
+```
+- More control over distance creation
+- Can combine distances: `ps_dist + mh_dist`
+- Can add constraints: `ps_dist + caliper(ps_dist, 2)`
+
+#### 11.3.2 controls: Match Ratio
+- `controls = 1`: Pair matching (1:1)
+- `controls = 2`: Triple matching (1:2)
+- `controls = k`: Each treated matched to k controls
+- Higher values → retain more controls but worse balance
+
+#### 11.3.3 remove.unmatchables: Handling Unmatched Units
+- `FALSE` (default): Unmatched units get NA for stratum
+- `TRUE`: Drop unmatched units from result
+- Always check how many units dropped!
+
+### 11.4 Adding Constraints
+
+#### 11.4.1 Calipers
+```r
+ps_dist_cal <- ps_dist + caliper(ps_dist, 2)
+pairmatch(ps_dist_cal, data = mydata, remove.unmatchables = TRUE)
+```
+- **What it does**: Sets distance to Inf if exceeds threshold
+- **caliper(dist, width)**: `width` in units of distance (often sd)
+- **Choosing width**: 
+  - Start without calipers
+  - Check balance, identify problems
+  - Add caliper on problem variable
+  - Typical values: 0.1 to 2 sd for propensity score
+
+#### 11.4.2 Exact Matching
+```r
+dist_exact <- ps_dist + exactMatch(treatment ~ sex + race, data = mydata)
+pairmatch(dist_exact, data = mydata)
+```
+- **What it does**: Only allows matches within same category
+- **Use when**: Categorical variable where balance is critical
+- **Computational note**: Each category matched separately (faster)
+
+#### 11.4.3 Combining Constraints
+```r
+dist_full <- ps_dist + 
+             caliper(ps_dist, 1.5) + 
+             caliper(age_dist, 5) +
+             exactMatch(treatment ~ sex, data = mydata)
+```
+- Can layer multiple constraints
+- Order doesn't matter
+- Be careful not to over-constrain (no feasible matches)
+
+### 11.5 Advanced Options
+
+#### 11.5.1 Solver Tolerance
+- Usually default is fine
+- For critical applications: add argument `tol = 0.00001`
+- Smaller tolerance → closer to true optimal, but slower
+
+#### 11.5.2 Handling Ties
+- Network flow may produce multiple optimal solutions
+- Results may vary slightly between runs (rare)
+- Set seed for reproducibility: `set.seed(12345)`
+
+### 11.6 Troubleshooting
+
+**Error: "No feasible solution"**
+- Constraints too strict (calipers too tight, exact matching removes overlap)
+- Solution: Relax constraints or check overlap
+
+**Warning: "Many units unmatched"**
+- May need wider calipers
+- May indicate poor overlap → consider trimming
+- Check: `table(is.na(match_result))`
+
+**Very slow execution**
+- Rare with pairmatch (typically fast)
+- If slow: try exact matching to split problem
+- Check data size (>10k can be slower)
+
+### 11.7 Complete Worked Example
+[Detailed example using simulated job training data, showing:]
+- Data setup
+- Distance creation with multiple options
+- Iteration with calipers
+- Balance checking at each step
+- Final estimation
+
+---
+
+## 12. Bipartite Full Matching (optmatch)
+
+### 12.1 Overview
+- **Function**: `fullmatch()`
+- **Use case**: Binary treatment, maximize sample retention
+- **Pros**: Uses all data, optimizes overall balance, flexible
+- **Cons**: Variable set sizes (harder to interpret)
+- **Typical sample retention**: 95-100%
+
+### 12.2 Complete Function Signature
+```r
+fullmatch(
+  x,                        # Distance specification
+  min.controls = 0,         # Minimum controls per treated
+  max.controls = Inf,       # Maximum controls per treated
+  omit.fraction = NULL,     # Fraction of sample to omit
+  mean.controls = NULL,     # Target average controls per treated
+  data = NULL,
+  tol = 1e-07,             # Solver tolerance
+  ...
+)
+```
+
+### 12.3 Parameter Reference
+
+#### 12.3.1 Distance Specification
+- Same as pairmatch (see §11.3.1)
+- Can use formula or distance matrix
+- Can add constraints with caliper() and exactMatch()
+
+#### 12.3.2 Set Size Control: min.controls and max.controls
+```r
+# No restrictions (not recommended)
+fullmatch(ps_dist, data = mydata)
+
+# Recommended: constrain set sizes
+fullmatch(ps_dist, min.controls = 1, max.controls = 5, data = mydata)
+
+# Very restrictive (approaches pair matching)
+fullmatch(ps_dist, min.controls = 1, max.controls = 1, data = mydata)
+```
+
+**Why constrain?**
+- Very large sets (100 controls : 1 treated) have little information
+- Balance often better with moderate set sizes
+- Effective sample size considerations
+- Default recommendation: `min.controls = 1, max.controls = 5`
+
+**Trade-offs:**
+- Tighter constraints → simpler sets, potentially worse balance
+- Looser constraints → better balance, more complex sets
+
+#### 12.3.3 omit.fraction: Allowing Some Exclusions
+```r
+fullmatch(ps_dist, min.controls = 1, max.controls = 3, 
+          omit.fraction = 0.05, data = mydata)
+```
+- Allow algorithm to drop worst X% of sample
+- Can improve balance by removing hard-to-match units
+- Use sparingly (defeats purpose of full matching)
+
+#### 12.3.4 mean.controls: Alternative to min/max
+```r
+fullmatch(ps_dist, mean.controls = 2, data = mydata)
+```
+- Specify target average ratio
+- Algorithm chooses actual ratios to optimize
+- Less commonly used than min/max
+
+#### 12.3.5 tol: Optimization Tolerance
+```r
+fullmatch(ps_dist, min.controls = 1, max.controls = 5, tol = 0.00001, data = mydata)
+```
+- Default usually sufficient (1e-7)
+- Smaller tolerance → closer to optimal, slower
+- If balance seems poor, try tighter tolerance
+- Typical range: 1e-5 to 1e-9
+
+### 12.4 Interpreting Results
+
+#### 12.4.1 Examining Set Structure
+```r
+fm_result <- fullmatch(...)
+summary(fm_result, min.controls = 0, max.controls = Inf)
+```
+Output shows:
+- Total number of sets
+- Distribution of set sizes
+- Number unmatched (should be 0 usually)
+
+#### 12.4.2 Visualizing Set Structure
+```r
+# Distribution of set sizes
+table(table(fm_result))
+
+# Specific sets
+dat$fm <- fm_result
+dat %>% filter(fm %in% c("1.1", "1.2")) %>% 
+  select(fm, treatment, age, education, income)
+```
+
+### 12.5 Comparing Full Match to Pair Match
+
+**When full match is better:**
+- Can't afford to lose sample
+- Overall balance more important than simplicity
+- Audience comfortable with variable sets
+
+**When pair match is better:**
+- Transparency critical (stakeholder communication)
+- Sample size ample
+- Interpretation simplicity paramount
+
+### 12.6 Effective Sample Size
+
+#### 12.6.1 Concept
+- Not all matched sets contribute equally to precision
+- Unbalanced sets (99 controls : 1 treated) contribute little
+- Balanced sets (1:1) contribute most
+
+#### 12.6.2 Calculating Effective N
+```r
+# Effective sample size for full match
+eff_n <- dat %>% 
+  group_by(fm) %>% 
+  summarize(
+    n_treat = sum(treatment),
+    n_control = sum(1 - treatment),
+    eff_n = (n_treat * n_control) / (n_treat + n_control)
+  ) %>%
+  summarize(total_eff_n = sum(eff_n))
+```
+- Effective N usually 60-90% of actual sample size
+- Compare across matching specifications
+
+### 12.7 Complete Worked Example
+[Detailed example parallel to pairmatch example, showing:]
+- Same data as §11.7 for comparison
+- Set size constraints exploration
+- Balance comparison to pair match
+- When to prefer full match
+
+---
+
+## 13. Bipartite Matching with designmatch
+
+### 13.1 Overview
+- **Function**: `bmatch()`
+- **Use case**: Binary treatment, need fine-grained control
+- **Pros**: Very flexible constraints, "near" matching
+- **Cons**: Slower, steeper learning curve, requires data sorting
+- **Typical sample retention**: Variable (depends on constraints)
+
+### 13.2 Complete Function Signature
+```r
+bmatch(
+  t_ind,              # Treatment indicator vector
+  dist_mat,           # Distance matrix (numeric)
+  subset_weight = 0,  # Balance between distance and sample size
+  n_controls = 1,     # Number of controls per treated
+  total_groups,       # Number of matched sets
+  solver,             # Solver specification
+  mom = NULL,         # Moment balancing constraints
+  exact = NULL,       # Exact matching variables
+  near = NULL,        # Near-exact matching (soft constraints)
+  near_exact = NULL,  # Deprecated (use 'near')
+  fine = NULL,        # Fine balance constraints
+  near_pairs = NULL,  # Variables to keep close between pairs
+  ...
+)
+```
+
+### 13.3 Critical Setup Requirements
+
+#### 13.3.1 Data Sorting (REQUIRED!)
+```r
+# MUST sort data by treatment (decreasing order)
+mydata <- mydata[order(mydata$treatment, decreasing = TRUE), ]
+
+# Verify sorting
+stopifnot(all(mydata$treatment[1:sum(mydata$treatment)] == 1))
+stopifnot(all(mydata$treatment[(sum(mydata$treatment)+1):nrow(mydata)] == 0))
+```
+**Why?** Algorithm expects treated units first, then controls.
+
+#### 13.3.2 Distance Matrix Scaling
+```r
+# Create distance matrix
+ps_matrix <- outer(ps_scores[treatment==1], ps_scores[treatment==0], 
+                   FUN = function(x,y) abs(x-y))
+
+# Scale (designmatch is sensitive to scale)
+ps_matrix_scaled <- round(ps_matrix / mean(ps_matrix), 2)
+```
+**Why?** Integer programming solver works better with scaled distances.
+
+### 13.4 Key Parameters
+
+#### 13.4.1 subset_weight: Core Trade-off
+```r
+# Minimize distance only (like optmatch)
+bmatch(t_ind, dist_mat, subset_weight = 0, ...)
+
+# Balance distance minimization with maximizing matches
+bmatch(t_ind, dist_mat, subset_weight = 0.5, ...)
+
+# Maximize number matched (distance secondary)
+bmatch(t_ind, dist_mat, subset_weight = 1, ...)
+```
+**Interpretation:**
+- 0: Pure minimum distance (discards hard-to-match units)
+- 1: Keep everyone, tolerate worse matches
+- 0.3-0.5: Middle ground (often good choice)
+
+**When to use:**
+- subset_weight = 0: Sample size less important, balance critical
+- subset_weight > 0: Can't afford to lose observations
+
+#### 13.4.2 n_controls and total_groups
+```r
+# Pair matching (1:1)
+bmatch(..., n_controls = 1, total_groups = n_treated)
+
+# Triple matching (1:2)
+bmatch(..., n_controls = 2, total_groups = n_treated)
+
+# Match subset of treated units
+bmatch(..., n_controls = 1, total_groups = n_treated * 0.8)
+```
+**Note:** Unlike fullmatch, cannot have variable ratios.
+
+#### 13.4.3 Solver Specification
+```r
+solver_options <- list(
+  name = "highs",        # Solver: "highs", "gurobi", "symphony"
+  approximate = 1,       # Use heuristics (1) or exact solution (0)
+  t_max = 1000,         # Time limit in seconds
+  trace = 1,            # Verbosity: 0 (silent) to 3 (verbose)
+  round_cplex = 0,      # Rounding option
+  trace_cplex = 0       # CPLEX-specific tracing
+)
+
+bmatch(..., solver = solver_options)
+```
+
+**Solver choice:**
+- **highs**: Free, good performance, recommended default
+- **gurobi**: Commercial, fastest, requires license
+- **symphony**: Free, slower than highs
+
+**approximate setting:**
+- `approximate = 1`: Use heuristics, faster, good enough for most
+- `approximate = 0`: Find provably optimal, slower, rarely needed
+
+**t_max:**
+- Increase if hitting time limit before convergence
+- Default 1000 seconds usually sufficient
+- Large problems (N > 5000) may need more
+
+### 13.5 Advanced Constraints
+
+#### 13.5.1 exact: Hard Exact Matching
+```r
+# Create dummy variables for exact matching categories
+sex_treated <- mydata$sex[mydata$treatment == 1]
+sex_control <- mydata$sex[mydata$treatment == 0]
+
+bmatch(
+  t_ind = mydata$treatment,
+  dist_mat = dist_matrix,
+  exact = cbind(sex_treated, sex_control),
+  ...
+)
+```
+**What it does:** Only allows matches within same category
+**Use when:** Categorical variable where perfect balance required
+
+#### 13.5.2 near: Soft Near-Exact Matching (POWERFUL)
+```r
+# Keep age within narrow range
+age_treated <- mydata$age[mydata$treatment == 1]
+age_control <- mydata$age[mydata$treatment == 0]
+
+bmatch(
+  t_ind = mydata$treatment,
+  dist_mat = dist_matrix,
+  near = list(age_treated, age_control),
+  ...
+)
+```
+**What it does:** Penalizes (but doesn't prohibit) large age differences
+**vs. caliper:** More flexible, doesn't create hard boundaries
+**Use when:** Want close matches on variable but not absolute requirement
+
+#### 13.5.3 fine: Fine Balance
+```r
+# Ensure overall balance on categorical variable
+bmatch(
+  t_ind = mydata$treatment,
+  dist_mat = dist_matrix,
+  fine = list(education_treated, education_control),
+  ...
+)
+```
+**What it does:** Marginal distribution of education same in matched sample
+**Use when:** Want overall balance on categorical variable
+
+#### 13.5.4 near_pairs: Paired Near Constraints
+```r
+bmatch(
+  t_ind = mydata$treatment,
+  dist_mat = dist_matrix,
+  near_pairs = list(
+    c(income_treated, income_control),
+    c(age_treated, age_control)
+  ),
+  ...
+)
+```
+**What it does:** Multiple variables kept close simultaneously
+**Use when:** Several variables all matter for similarity
+
+#### 13.5.5 mom: Moment Balance
+```r
+# Balance on mean and variance of continuous variable
+bmatch(
+  t_ind = mydata$treatment,
+  dist_mat = dist_matrix,
+  mom = list(age_treated, age_control),
+  ...
+)
+```
+**What it does:** Ensures matched sample balanced on moments (mean, variance)
+**Use when:** Want distributional balance, not just mean balance
+
+### 13.6 Converting Output to Usable Format
+
+#### 13.6.1 bmatch Returns
+```r
+result <- bmatch(...)
+str(result)
+# $t_id: Vector of treated unit indices
+# $c_id: Matrix of control unit indices
+# $group_id: Vector of set IDs
+# $obj_total: Total distance achieved
+# $obj_dist_mat: Distance contribution
+```
+
+#### 13.6.2 Helper Function for Conversion
+```r
+bmatch_to_factor <- function(bmatch_result, original_data) {
+  n_treated <- length(bmatch_result$t_id)
+  n_controls <- ncol(bmatch_result$c_id)
+  
+  # Create factor variable
+  match_id <- rep(NA, nrow(original_data))
+  
+  # Assign treated units
+  match_id[bmatch_result$t_id] <- bmatch_result$group_id
+  
+  # Assign control units
+  for(j in 1:n_controls) {
+    match_id[bmatch_result$c_id[, j]] <- bmatch_result$group_id
+  }
+  
+  return(factor(match_id))
+}
+
+# Use it
+mydata$match_set <- bmatch_to_factor(result, mydata)
+```
+
+### 13.7 When to Use designmatch vs. optmatch
+
+**Choose designmatch when:**
+- Need near-exact matching without hard calipers
+- Want fine balance on categorical variables
+- Need moment balance constraints
+- Have complex multi-dimensional balance requirements
+- Willing to invest time in setup
+
+**Choose optmatch when:**
+- Want fastest solution
+- Variable set sizes important (fullmatch)
+- Standard constraints sufficient
+- Prefer simpler workflow
+
+**Comparison table:**
+
+| Feature | optmatch | designmatch |
+|---------|----------|-------------|
+| Speed | Fast | Slower |
+| Variable sets | Yes (fullmatch) | No |
+| Near constraints | No | Yes |
+| Fine balance | No | Yes |
+| Setup complexity | Low | Medium-High |
+| Constraint flexibility | Medium | Very High |
+
+### 13.8 Complete Worked Example
+[Detailed example showing:]
+- Data preparation and sorting
+- Distance matrix creation and scaling
+- Basic match with comparison to optmatch
+- Advanced match using near and fine constraints
+- Balance evaluation
+- When added complexity is worth it
+
+---
+
+## 14. Non-bipartite Matching (designmatch)
+
+### 14.1 Overview
+- **Function**: `nmatch()`
+- **Use case**: Continuous/multi-level treatment
+- **Pros**: Handles dose-response, no control group needed
+- **Cons**: More complex interpretation, specialized estimation
+- **Typical sample retention**: Variable
+
+### 14.2 When to Use Non-bipartite Matching
+
+**Appropriate contexts:**
+- Continuous treatment (dosage, intensity, duration)
+- Ordered multi-level treatment (low/medium/high)
+- No clear untreated group
+- Interest in dose-response relationships
+
+**Examples:**
+- Effect of training hours (0 to 40 hours)
+- Impact of class size (10 to 40 students)
+- Relationship between medication dose and outcome
+- Effect of program intensity levels
+
+**Not appropriate for:**
+- Binary treatment (use bipartite instead)
+- Unordered categorical treatment (use separate bipartite matches)
+
+### 14.3 Conceptual Differences from Bipartite
+
+#### 14.3.1 Matching Goal
+- **Bipartite**: Match similar units with different treatment status
+- **Non-bipartite**: Match similar units with range of treatment values
+- Still want balance on confounders X
+- But now each set should vary in treatment Z
+
+#### 14.3.2 Set Structure
+- Each matched set contains units with different Z values
+- Variation in Z within set is desirable
+- Still minimize differences on confounders X
+
+### 14.4 Complete Function Signature
+```r
+nmatch(
+  dist_mat,           # Distance matrix on confounders (full N x N)
+  subset_weight = 0,  # Weight on sample retention
+  solver,            # Solver specification
+  mom_covs,          # Variables to balance (often treatment itself)
+  mom_tols,          # Tolerance for moment constraints
+  mom_targets,       # Target moments
+  total_groups,      # Number of sets to create
+  size_groups,       # Size of each set
+  ...
+)
+```
+
+### 14.5 Key Parameters
+
+#### 14.5.1 dist_mat: Distance on Confounders Only
+```r
+# Calculate distance on confounders (NOT including treatment)
+confounders <- c("age", "education", "income")
+X <- mydata[, confounders]
+
+# Full distance matrix (N x N, not N_treated x N_control)
+dist_matrix <- as.matrix(dist(X, method = "euclidean"))
+# Or use Mahalanobis distance
+```
+**Critical:** Distance should measure similarity on confounders only.
+Treatment variable should NOT be in distance.
+
+#### 14.5.2 mom_covs: What to Balance
+```r
+# Balance on treatment variable itself
+nmatch(
+  dist_mat = dist_matrix,
+  mom_covs = mydata$treatment_dose,  # The continuous treatment
+  ...
+)
+
+# Can also balance on other variables
+nmatch(
+  dist_mat = dist_matrix,
+  mom_covs = cbind(mydata$treatment_dose, mydata$age),
+  ...
+)
+```
+**Purpose:** Ensures matched sets have spread on treatment variable.
+
+#### 14.5.3 total_groups and size_groups
+```r
+# Create 100 matched triplets
+nmatch(..., total_groups = 100, size_groups = 3)
+
+# Create 50 matched sets of 5
+nmatch(..., total_groups = 50, size_groups = 5)
+```
+**Trade-off:**
+- More groups → more comparisons, but smaller sets
+- Larger sets → more variation in Z per set, but fewer sets
+
+### 14.6 Worked Example: Continuous Treatment
+
+#### 14.6.1 Setup
+```r
+# Simulate continuous treatment data
+set.seed(123)
+n <- 500
+age <- rnorm(n, 45, 10)
+education <- sample(12:20, n, replace = TRUE)
+income <- exp(rnorm(n, 10, 0.5))
+
+# Treatment dose (affected by confounders)
+treatment_dose <- 0.5*scale(age)[,1] + 0.3*scale(education)[,1] + rnorm(n, 0, 1)
+treatment_dose <- pmax(0, treatment_dose)  # Non-negative doses
+
+# Outcome
+outcome <- 0.5*treatment_dose + 0.3*scale(age)[,1] + rnorm(n)
+
+mydata <- data.frame(age, education, income, treatment_dose, outcome)
+```
+
+#### 14.6.2 Matching
+```r
+library(designmatch)
+
+# Distance on confounders only
+X <- cbind(age, education, log(income))
+dist_mat <- as.matrix(dist(X))
+
+# Match
+nm_result <- nmatch(
+  dist_mat = dist_mat,
+  mom_covs = treatment_dose,  # Want variation in dose
+  total_groups = 100,
+  size_groups = 3,
+  solver = list(name = "highs", approximate = 1, t_max = 300)
+)
+```
+
+#### 14.6.3 Extracting Results
+```r
+# Create set ID variable
+set_id <- rep(NA, nrow(mydata))
+for(i in 1:length(nm_result$group_id)) {
+  set_id[nm_result$id_1[i]] <- nm_result$group_id[i]
+  set_id[nm_result$id_2[i]] <- nm_result$group_id[i]
+  set_id[nm_result$id_3[i]] <- nm_result$group_id[i]
+}
+mydata$set_id <- factor(set_id)
+
+# Check structure
+mydata %>% 
+  filter(!is.na(set_id)) %>%
+  group_by(set_id) %>%
+  summarize(
+    n = n(),
+    min_dose = min(treatment_dose),
+    max_dose = max(treatment_dose),
+    range_dose = max_dose - min_dose
+  ) %>%
+  summary()
+```
+
+### 14.7 Evaluation for Non-bipartite Matching
+
+#### 14.7.1 Balance on Confounders
+```r
+# Still want balance on confounders within sets
+# But this is trickier without clear treatment/control division
+
+# Approach 1: Test null of no relationship between confounders and treatment
+# within sets
+library(coin)
+independence_test(age ~ treatment_dose | set_id, data = mydata)
+independence_test(education ~ treatment_dose | set_id, data = mydata)
+```
+
+#### 14.7.2 Variation in Treatment Within Sets
+```r
+# Want adequate spread in treatment within each set
+mydata %>%
+  group_by(set_id) %>%
+  summarize(
+    treatment_range = max(treatment_dose) - min(treatment_dose),
+    treatment_sd = sd(treatment_dose)
+  ) %>%
+  summary()
+
+# Plot
+ggplot(mydata %>% filter(!is.na(set_id)), 
+       aes(x = set_id, y = treatment_dose)) +
+  geom_boxplot() +
+  theme(axis.text.x = element_blank())
+```
+
+### 14.8 Estimation with Non-bipartite Matching
+
+#### 14.8.1 Linear Dose-Response Within Sets
+```r
+# Fixed effects for sets
+library(estimatr)
+dose_response <- lm_robust(
+  outcome ~ treatment_dose,
+  fixed_effects = ~set_id,
+  data = mydata %>% filter(!is.na(set_id))
+)
+summary(dose_response)
+```
+**Interpretation:** Estimated effect of 1-unit increase in dose, comparing within sets.
+
+#### 14.8.2 Non-linear Dose-Response
+```r
+# Quadratic term
+dose_response_quad <- lm_robust(
+  outcome ~ treatment_dose + I(treatment_dose^2),
+  fixed_effects = ~set_id,
+  data = mydata %>% filter(!is.na(set_id))
+)
+
+# Spline (more flexible)
+library(splines)
+dose_response_spline <- lm_robust(
+  outcome ~ ns(treatment_dose, df = 3),
+  fixed_effects = ~set_id,
+  data = mydata %>% filter(!is.na(set_id))
+)
+```
+
+#### 14.8.3 Comparing Levels
+```r
+# Convert continuous to categories for easier interpretation
+mydata$dose_category <- cut(mydata$treatment_dose, 
+                            breaks = quantile(mydata$treatment_dose, c(0, 0.33, 0.67, 1)),
+                            labels = c("Low", "Medium", "High"),
+                            include.lowest = TRUE)
+
+# Estimate effects of medium vs low, high vs low
+dose_levels <- lm_robust(
+  outcome ~ dose_category,
+  fixed_effects = ~set_id,
+  data = mydata %>% filter(!is.na(set_id))
+)
+```
+
+### 14.9 Challenges and Limitations
+
+#### 14.9.1 More Complex Than Bipartite
+- Harder to evaluate balance
+- Estimation requires more careful thought
+- Results harder to communicate
+
+#### 14.9.2 Functional Form Assumptions
+- Linear dose-response may be wrong
+- Need to explore non-linearity
+- More model-dependent than bipartite matching
+
+#### 14.9.3 When to Consider Alternatives
+- If treatment can be binned (low vs high), use bipartite
+- If many treatment levels, consider other approaches
+- Regression with careful modeling may be simpler
+
+### 14.10 Complete Worked Example with Interpretation
+[Full example with realistic data showing:]
+- Motivation for non-bipartite approach
+- Data preparation
+- Matching process
+- Balance evaluation specific to continuous treatment
+- Multiple estimation approaches
+- Visualization of dose-response curve
+- Appropriate caveats and limitations
+
+---
+
+# PART D: CASE STUDIES
+
+*Goal: See methods applied to realistic scenarios*
+
+## 15. Case Study 1: Simple Job Training Evaluation (Pair Matching)
+
+### 15.1 Context and Research Question
+**Background:** State workforce development agency offers job training program. Participation voluntary. Want to evaluate earnings impact.
+
+**Data:** Administrative data on 1,000 individuals
+- Treatment: Participated in training (N=334)
+- Control: Did not participate (N=666)
+- Covariates: Age, education, prior earnings, employment history
+- Outcome: Earnings 12 months after program
+
+**Question:** Does job training increase earnings?
+
+### 15.2 Why Matching?
+- Non-random selection into training (motivated workers more likely)
+- Rich pre-treatment data available
+- Clear comparison group exists
+- Want transparent, interpretable design
+
+### 15.3 Initial Data Exploration
+```r
+# Load data
+library(tidyverse)
+library(optmatch)
+library(RItools)
+library(estimatr)
+
+# Check treatment distribution
+table(mydata$training)
+
+# Key covariates
+summary(mydata[, c("age", "education", "prior_earnings")])
+
+# Naive comparison (problematic!)
+t.test(earnings ~ training, data = mydata)
+# Shows large difference, but is it causal?
+
+# Check for selection
+mydata %>% group_by(training) %>%
+  summarize(across(c(age, education, prior_earnings), mean))
+# Trainees older, more educated, higher prior earnings
+```
+
+### 15.4 Assessing Overlap
+```r
+# Propensity score for overlap check
+ps_model <- glm(training ~ age + education + prior_earnings + employment_history,
+                data = mydata, family = binomial)
+mydata$ps <- predict(ps_model, type = "response")
+
+# Visualize overlap
+ggplot(mydata, aes(x = ps, fill = factor(training))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "Propensity Score Distributions")
+
+# Check extremes
+summary(mydata$ps[mydata$training == 1])  # Treated
+summary(mydata$ps[mydata$training == 0])  # Control
+# Good overlap in range [0.2, 0.8]
+```
+
+### 15.5 First Match: Pair Matching on Propensity Score
+```r
+# Create distance
+ps_dist <- match_on(ps_model, data = mydata)
+
+# Execute pair match
+pm1 <- pairmatch(ps_dist, data = mydata, remove.unmatchables = TRUE)
+mydata$pm1 <- pm1
+
+# How many matched?
+table(is.na(pm1))
+# Matched: 620, Unmatched: 380
+
+# Check balance
+bal1 <- balanceTest(training ~ age + education + prior_earnings + 
+                    employment_history + strata(pm1),
+                    data = mydata, p.adjust.method = "holm")
+print(bal1$overall)
+print(bal1$results[, , "pm1"])
+```
+
+**Result:** p-value = 0.03 (not great, but improved from unadjusted)
+**Problem:** Age still imbalanced (z = 2.8)
+
+### 15.6 Iteration 1: Add Age Caliper
+```r
+# Check age distribution
+age_dist <- match_on(training ~ age, data = mydata)
+quantile(as.vector(age_dist), seq(0, 1, 0.1))
+
+# Add 5-year caliper on age
+pm2 <- pairmatch(ps_dist + caliper(age_dist, 5), 
+                 data = mydata, remove.unmatchables = TRUE)
+mydata$pm2 <- pm2
+
+# Check balance
+bal2 <- balanceTest(training ~ age + education + prior_earnings + 
+                    employment_history + strata(pm2),
+                    data = mydata, p.adjust.method = "holm")
+print(bal2$overall)
+```
+
+**Result:** p-value = 0.18 (better!)
+**Trade-off:** Now only 550 matched (lost 70 units)
+**Decision:** Acceptable trade-off for better balance
+
+### 15.7 Iteration 2: Exact Match on Education Level?
+```r
+# Check if education balance is concern
+bal2$results["education", , "pm2"]
+# Still some imbalance (z = 1.9)
+
+# Try exact matching on education categories
+mydata$ed_category <- cut(mydata$education, breaks = c(0, 12, 16, 20))
+
+pm3 <- pairmatch(ps_dist + caliper(age_dist, 5) + 
+                 exactMatch(training ~ ed_category, data = mydata),
+                 data = mydata, remove.unmatchables = TRUE)
+mydata$pm3 <- pm3
+
+bal3 <- balanceTest(training ~ age + education + prior_earnings + 
+                    employment_history + strata(pm3),
+                    data = mydata, p.adjust.method = "holm")
+print(bal3$overall)
+```
+
+**Result:** p-value = 0.45 (excellent!)
+**Trade-off:** Now 520 matched (lost 30 more)
+**Decision:** This is our final design
+
+### 15.8 Final Design Evaluation
+```r
+# Detailed balance table
+print(bal3$results[, , "pm3"])
+
+# Substantive balance check: worst sets
+set_diffs <- mydata %>%
+  filter(!is.na(pm3)) %>%
+  group_by(pm3) %>%
+  summarize(
+    age_diff = abs(mean(age[training==1]) - mean(age[training==0])),
+    earn_diff = abs(mean(prior_earnings[training==1]) - mean(prior_earnings[training==0]))
+  )
+
+quantile(set_diffs$age_diff, seq(0, 1, 0.1))
+# 90% of pairs differ by < 4 years (acceptable)
+
+quantile(set_diffs$earn_diff, seq(0, 1, 0.1))
+# 90% of pairs differ by < $8,000 (acceptable given variance)
+```
+
+### 15.9 Effect Estimation
+```r
+# Precision-weighted estimate (fixed effects)
+ate_estimate <- lm_robust(earnings ~ training, 
+                          fixed_effects = ~pm3,
+                          data = mydata %>% filter(!is.na(pm3)),
+                          clusters = pm3)
+summary(ate_estimate)
+
+# Point estimate: $3,200 increase
+# 95% CI: [$1,100, $5,300]
+# p-value: 0.003
+
+# Block-weighted estimate (for comparison)
+ate_block <- difference_in_means(earnings ~ training, blocks = pm3,
+                                data = mydata %>% filter(!is.na(pm3)))
+summary(ate_block)
+# Very similar: $3,150
+```
+
+### 15.10 Sensitivity Analysis
+```r
+library(senstrat)
+
+# Prepare data for senstrat
+matched_data <- mydata %>% filter(!is.na(pm3)) %>%
+  arrange(pm3, training)
+
+# Run sensitivity analysis
+sens_result <- senstrat(
+  outcome = matched_data$earnings,
+  z = matched_data$training,
+  s = as.numeric(matched_data$pm3),
+  gamma = seq(1, 2, 0.1)
+)
+
+plot(sens_result)
+
+# Interpretation: Significant up to Γ = 1.4
+# Meaning: Unobserved confounder would need to increase
+# odds of treatment by 40% to change conclusions
+```
+
+### 15.11 Reporting
+**Methods Summary:**
+"We used 1:1 propensity score matching with calipers on age (5 years) and exact matching on education level. Final matched sample included 520 individuals (260 pairs). Balance tests showed no significant imbalance on observed covariates (χ² p-value = 0.45)."
+
+**Results Summary:**
+"Job training increased earnings by $3,200 (95% CI: $1,100-$5,300, p=0.003). Results are robust to moderate unobserved confounding (Γ = 1.4), suggesting conclusions are reasonably robust."
+
+### 15.12 Lessons from This Case
+- Started simple, iterated based on balance
+- Made explicit trade-offs (balance vs. sample size)
+- Documented all steps transparently
+- Sensitivity analysis part of causal argument
+- Appropriate hedging in conclusions
+
+---
+
+## 16. Case Study 2: Complex Evaluation with Multiple Constraints (Full Matching)
+
+### 16.1 Context
+**Background:** Federal agency evaluating effect of site visits on contractor compliance. 
+
+**Complexity factors:**
+- Multiple confounders (contract size, type, history)
+- Some contractors much larger than others
+- Geographic clustering
+- Want to retain all observations (political sensitivity)
+
+**Data:** 2,000 contractors
+- Treatment: Received site visit (N=600)
+- Control: No visit (N=1,400)
+- Covariates: Contract value, contract type, prior violations, region, years in business
+
+### 16.2 Why Full Matching?
+- Cannot afford to discard contractors (all are stakeholders)
+- Variable set sizes can accommodate diverse population
+- Some contractors have no close matches → allow flexible set sizes
+
+### 16.3 Approach
+[Detailed walk-through showing:]
+- Exact matching on contract type and region
+- Mahalanobis distance on continuous variables
+- Calipers on contract size
+- Iteration with set size constraints
+- Comparison to pair matching (too many lost observations)
+- Final design with variable sets (1:1 to 1:5)
+- Careful interpretation of variable-sized sets for stakeholders
+
+### 16.4 Key Takeaways
+- Full matching when sample retention critical
+- Exact matching handles categorical variables with political importance
+- Communication challenge: explaining variable sets to non-technical audience
+- Solution: Focus on overall balance, use example sets for illustration
+
+---
+
+## 17. Case Study 3: Dose-Response Analysis (Non-bipartite Matching)
+
+### 17.1 Context
+**Background:** Education researcher studying effect of class size on student achievement.
+
+**Why non-bipartite:**
+- Treatment is continuous (class size: 15-35 students)
+- No clear "control" group
+- Interested in full dose-response curve
+- Non-linear effects plausible
+
+**Data:** 500 classrooms
+- Treatment: Class size (continuous)
+- Covariates: Teacher experience, school resources, student demographics
+- Outcome: Average test scores
+
+### 17.2 Approach
+[Detailed walk-through showing:]
+- Creating matched triplets varying in class size
+- Ensuring balance on confounders within triplets
+- Estimation of dose-response curve
+- Testing for non-linearity
+- Comparison to unmatched analysis
+- Visualization of results
+
+### 17.3 Key Challenges
+- Balance evaluation more complex
+- Functional form uncertainty
+- Communication: dose-response curves harder to explain than simple treatment effects
+
+### 17.4 Key Takeaways
+- Non-bipartite matching viable for continuous treatments
+- Requires more careful modeling than binary treatment
+- Visualization essential for communication
+- Consider whether binning treatment to high/low/medium simpler
+
+---
+
+## 18. Comparative Case Study: Same Data, Four Methods
+
+### 18.1 Setup
+Using job training data from Case Study 1, apply all four methods:
+1. Pair matching (optmatch)
+2. Full matching (optmatch)
+3. Bipartite bmatch (designmatch)
+4. Compare results systematically
+
+### 18.2 Implementation
+```r
+# [Complete code showing all four approaches with same distance matrices]
+```
+
+### 18.3 Comparison Table
+
+| Method | Sample Retained | Balance (χ² p) | Point Estimate | 95% CI | Computation Time |
+|--------|----------------|---------------|----------------|--------|------------------|
+| Pair (optmatch) | 520/1000 (52%) | 0.45 | $3,200 | [$1,100, $5,300] | 2 seconds |
+| Full (optmatch) | 980/1000 (98%) | 0.52 | $3,100 | [$1,300, $4,900] | 3 seconds |
+| Pair (designmatch) | 510/1000 (51%) | 0.48 | $3,250 | [$1,000, $5,500] | 45 seconds |
+
+### 18.4 Interpretation
+- All methods give similar point estimates (reassuring!)
+- Full matching has narrower CI (more sample)
+- Full matching also achieved slightly better balance
+- For this case, full matching preferred
+- designmatch didn't add value (standard constraints sufficient)
+
+### 18.5 Decision Guidelines
+**Use pair matching when:**
+- Interpretation simplicity paramount
+- Ample sample size
+- Stakeholder communication critical
+
+**Use full matching when:**
+- Cannot afford to lose observations
+- Want maximum statistical power
+- Audience comfortable with variable sets
+
+**Use designmatch when:**
+- Standard constraints insufficient
+- Need near-exact matching
+- Specific balance requirements
+
+### 18.6 Lessons
+- Results often robust to method choice (good sign!)
+- When different methods give different answers, investigate why
+- Use comparison as sensitivity check
+- Method choice often driven by practical considerations, not just statistics
+
+---
+
+## Appendices
+
+[Same appendices as Approach 1]
+
+## References
+
+[Bibliography]
