@@ -1,0 +1,2461 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>approach_5_two_path_structure</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="approach_5_two_path_structure_files/libs/clipboard/clipboard.min.js"></script>
+<script src="approach_5_two_path_structure_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="approach_5_two_path_structure_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="approach_5_two_path_structure_files/libs/quarto-html/popper.min.js"></script>
+<script src="approach_5_two_path_structure_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="approach_5_two_path_structure_files/libs/quarto-html/anchor.min.js"></script>
+<link href="approach_5_two_path_structure_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="approach_5_two_path_structure_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="approach_5_two_path_structure_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="approach_5_two_path_structure_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="approach_5_two_path_structure_files/libs/bootstrap/bootstrap-bb462d781dde1847d9e3ccf7736099dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="the-oes-guide-to-making-and-evaluating-matched-designs" class="level1">
+<h1>The OES Guide to Making and Evaluating Matched Designs</h1>
+<section id="approach-5-two-path-structure-quick-start-deep-dive" class="level2">
+<h2 class="anchored" data-anchor-id="approach-5-two-path-structure-quick-start-deep-dive">Approach 5: Two-Path Structure (Quick Start + Deep Dive)</h2>
+<p><strong>How to Use This Guide:</strong></p>
+<ul>
+<li><p><strong>Need to get started quickly?</strong> → Read Part A (Practitioner’s Guide) and skim the relevant Method Module in Part C</p></li>
+<li><p><strong>Want deep understanding?</strong> → Read Part B (Conceptual Foundation) before diving into Part C</p></li>
+<li><p><strong>Comparing methods?</strong> → Jump to Part D (Case Studies) after reading Part A</p></li>
+<li><p><strong>Reference specific parameters?</strong> → Use Part C (Method Encyclopædia) as lookup</p></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="part-a-practitioners-guide-quick-start" class="level1">
+<h1>PART A: PRACTITIONER’S GUIDE (Quick Start)</h1>
+<p><em>Goal: Get you matching correctly within 30 minutes</em></p>
+<section id="quick-decision-tree-which-method-for-your-context" class="level2">
+<h2 class="anchored" data-anchor-id="quick-decision-tree-which-method-for-your-context">1. Quick Decision Tree: Which Method for Your Context?</h2>
+<section id="visual-decision-flowchart" class="level3">
+<h3 class="anchored" data-anchor-id="visual-decision-flowchart">1.1 Visual Decision Flowchart</h3>
+<pre><code>START: What type of treatment do you have?
+
+├─ BINARY (treated vs. control)
+│  ├─ Need maximum transparency? → PAIR MATCHING (§A.2.1)
+│  ├─ Can't afford to lose data? → FULL MATCHING (§A.2.2)
+│  └─ Need fine-tuned constraints? → DESIGNMATCH (§A.2.3)
+│
+├─ CONTINUOUS or MULTI-LEVEL (dose, intensity)
+│  └─ → NON-BIPARTITE MATCHING (§A.2.4)
+│
+└─ Not sure matching is right?
+   └─ → See Decision Guide (§A.1.2)</code></pre>
+</section>
+<section id="is-matching-right-for-your-study" class="level3">
+<h3 class="anchored" data-anchor-id="is-matching-right-for-your-study">1.2 Is Matching Right for Your Study?</h3>
+<p><strong>Use matching when:</strong></p>
+<ul>
+<li><p>✓ Treatment assignment is non-random</p></li>
+<li><p>✓ You have comparison group</p></li>
+<li><p>✓ Rich covariate information available</p></li>
+<li><p>✓ Seeking causal estimates</p></li>
+</ul>
+<p><strong>Don’t use matching when:</strong></p>
+<ul>
+<li><p>✗ True randomized experiment (matching redundant)</p></li>
+<li><p>✗ No comparison group exists</p></li>
+<li><p>✗ Poor covariate overlap between groups</p></li>
+<li><p>✗ Better design available (RDD, IV)</p></li>
+</ul>
+<p><strong>Quick check:</strong> Can you identify 5+ pre-treatment covariates that predict both treatment and outcome? If yes → matching likely appropriate.</p>
+<hr>
+</section>
+</section>
+<section id="minimal-working-examples-copy-and-modify-these" class="level2">
+<h2 class="anchored" data-anchor-id="minimal-working-examples-copy-and-modify-these">2. Minimal Working Examples: Copy and Modify These</h2>
+<section id="pair-matching-in-10-lines-optmatch" class="level3">
+<h3 class="anchored" data-anchor-id="pair-matching-in-10-lines-optmatch">2.1 Pair Matching in 10 Lines (optmatch)</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install if needed: install.packages(c("optmatch", "RItools", "estimatr"))</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(optmatch)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RItools)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(estimatr)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Create propensity score distance</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>ps_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> income, <span class="at">data =</span> mydata, <span class="at">family =</span> binomial)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ps_dist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(ps_model, <span class="at">data =</span> mydata)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute pair match</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>pair_match <span class="ot">&lt;-</span> <span class="fu">pairmatch</span>(ps_dist, <span class="at">data =</span> mydata, <span class="at">remove.unmatchables =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>pair_id <span class="ot">&lt;-</span> pair_match</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>balance_result <span class="ot">&lt;-</span> <span class="fu">balanceTest</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> income <span class="sc">+</span> <span class="fu">strata</span>(pair_id), </span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>                              <span class="at">data =</span> mydata)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(balance_result<span class="sc">$</span>overall)  <span class="co"># Want p-value &gt; 0.05 ideally</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate effect if balance looks good</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>effect <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(outcome <span class="sc">~</span> treatment, <span class="at">fixed_effects =</span> <span class="sc">~</span>pair_id, <span class="at">data =</span> mydata)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(effect)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>When to use:</strong> Maximum transparency, easy interpretation, willing to drop some observations.</p>
+<p><strong>Key parameter to adjust:</strong> Add <code>caliper(ps_dist, 0.5)</code> inside pairmatch() to prevent bad matches.</p>
+<hr>
+</section>
+<section id="full-matching-in-10-lines-optmatch" class="level3">
+<h3 class="anchored" data-anchor-id="full-matching-in-10-lines-optmatch">2.2 Full Matching in 10 Lines (optmatch)</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(optmatch)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RItools)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(estimatr)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Create distance (using multiple covariates)</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>mh_dist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> income, </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> mydata, <span class="at">method =</span> <span class="st">"rank_mahalanobis"</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute full match with set size limits</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>full_match <span class="ot">&lt;-</span> <span class="fu">fullmatch</span>(mh_dist, <span class="at">min.controls =</span> <span class="dv">1</span>, <span class="at">max.controls =</span> <span class="dv">5</span>, <span class="at">data =</span> mydata)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>set_id <span class="ot">&lt;-</span> full_match</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>balance_result <span class="ot">&lt;-</span> <span class="fu">balanceTest</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> income <span class="sc">+</span> <span class="fu">strata</span>(set_id), </span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                              <span class="at">data =</span> mydata)</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(balance_result<span class="sc">$</span>overall)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate effect</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>effect <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(outcome <span class="sc">~</span> treatment, <span class="at">fixed_effects =</span> <span class="sc">~</span>set_id, <span class="at">data =</span> mydata)</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(effect)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>When to use:</strong> Want to keep all observations, willing to accept variable set sizes.</p>
+<p><strong>Key parameters to adjust:</strong> - <code>min.controls</code>, <code>max.controls</code>: Restrict set sizes (1 to 5 is good default) - Add calipers like: <code>fullmatch(mh_dist + caliper(mh_dist, 4), ...)</code></p>
+<hr>
+</section>
+<section id="bipartite-matching-in-15-lines-designmatch" class="level3">
+<h3 class="anchored" data-anchor-id="bipartite-matching-in-15-lines-designmatch">2.3 Bipartite Matching in 15 Lines (designmatch)</h3>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(designmatch)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(highs)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Sort data by treatment (REQUIRED!)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>mydata <span class="ot">&lt;-</span> mydata[<span class="fu">order</span>(mydata<span class="sc">$</span>treatment, <span class="at">decreasing =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Create distance matrix</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>ps_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> income, <span class="at">data =</span> mydata, <span class="at">family =</span> binomial)</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>ps_scores <span class="ot">&lt;-</span> <span class="fu">predict</span>(ps_model)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>ps_matrix <span class="ot">&lt;-</span> <span class="fu">outer</span>(ps_scores[mydata<span class="sc">$</span>treatment<span class="sc">==</span><span class="dv">1</span>], </span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>                   ps_scores[mydata<span class="sc">$</span>treatment<span class="sc">==</span><span class="dv">0</span>], </span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>                   <span class="at">FUN =</span> <span class="cf">function</span>(x,y) <span class="fu">abs</span>(x<span class="sc">-</span>y))</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute match</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>dm_match <span class="ot">&lt;-</span> <span class="fu">bmatch</span>(</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_ind =</span> mydata<span class="sc">$</span>treatment,</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> ps_matrix,</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_controls =</span> <span class="dv">1</span>,  <span class="co"># Pair matching</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">solver =</span> <span class="fu">list</span>(<span class="at">name =</span> <span class="st">"highs"</span>, <span class="at">approximate =</span> <span class="dv">1</span>, <span class="at">t_max =</span> <span class="dv">600</span>)</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert to usable format [helper function needed - see Part C]</span></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># ... balance checking and estimation similar to above</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>When to use:</strong> Need near-exact constraints, willing to invest setup time.</p>
+<p><strong>Key parameters to adjust:</strong> - <code>n_controls</code>: Number of controls per treated - Add <code>near_exact = mydata$age[mydata$treatment==1]</code> for soft age matching</p>
+<hr>
+</section>
+<section id="non-bipartite-matching-in-12-lines-designmatch" class="level3">
+<h3 class="anchored" data-anchor-id="non-bipartite-matching-in-12-lines-designmatch">2.4 Non-bipartite Matching in 12 Lines (designmatch)</h3>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(designmatch)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># For continuous treatment</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create distance on confounders</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>confounder_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(mydata[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"education"</span>, <span class="st">"income"</span>)]))</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute non-bipartite match</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>nb_match <span class="ot">&lt;-</span> <span class="fu">nmatch</span>(</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> confounder_matrix,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">mom_covs =</span> mydata<span class="sc">$</span>treatment_dose,  <span class="co"># Want variation in this</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">solver =</span> <span class="fu">list</span>(<span class="at">name =</span> <span class="st">"highs"</span>, <span class="at">approximate =</span> <span class="dv">1</span>, <span class="at">t_max =</span> <span class="dv">600</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ... evaluation and estimation specialized for continuous treatment</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># See Part C for complete implementation</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>When to use:</strong> Treatment is continuous or multi-level, interested in dose-response.</p>
+<hr>
+</section>
+</section>
+<section id="essential-steps-checklist" class="level2">
+<h2 class="anchored" data-anchor-id="essential-steps-checklist">3. Essential Steps Checklist</h2>
+<p>Use this checklist for every matching analysis:</p>
+<section id="before-matching" class="level3">
+<h3 class="anchored" data-anchor-id="before-matching">3.1 Before Matching</h3>
+<ul class="task-list">
+<li><label><input type="checkbox"><strong>Define research question clearly</strong></label>
+<ul>
+<li>What is the treatment?</li>
+<li>What is the outcome?</li>
+<li>What is the causal effect of interest?</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Identify confounders (theory-driven)</strong></label>
+<ul>
+<li>List variables that affect BOTH treatment and outcome</li>
+<li>Only use pre-treatment variables</li>
+<li>Document your reasoning</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Check data quality</strong></label>
+<ul>
+<li>Missing data on treatment? (Fatal if too much)</li>
+<li>Missing data on covariates? (Handle before matching)</li>
+<li>Missing data on outcome? (OK for design, problem for analysis)</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Assess overlap/common support</strong></label>
+<ul>
+<li>Plot propensity scores by treatment group</li>
+<li>Identify regions with no overlap → may need trimming</li>
+<li>Code: <code>boxplot(ps_scores ~ treatment, data = mydata)</code></li>
+</ul></li>
+</ul>
+</section>
+<section id="during-matching" class="level3">
+<h3 class="anchored" data-anchor-id="during-matching">3.2 During Matching</h3>
+<ul class="task-list">
+<li><label><input type="checkbox"><strong>Choose initial method</strong></label>
+<ul>
+<li>Use decision tree (§A.1.1)</li>
+<li>Start simple (pair or full matching)</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Create distance matrix</strong></label>
+<ul>
+<li>Choose metric: propensity score OR Mahalanobis</li>
+<li>When unsure, try both</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Set initial constraints</strong></label>
+<ul>
+<li>No calipers initially (see what happens)</li>
+<li>No exact matching initially (unless obvious need)</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Execute first match</strong></label>
+<ul>
+<li>Use minimal working example as template</li>
+<li>Document your code</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Check balance</strong> ← CRITICAL STEP</label>
+<ul>
+<li>Run balanceTest() or equivalent</li>
+<li>Is overall p-value &gt; 0.05? Good sign.</li>
+<li>Is overall p-value &lt; 0.001? Need iteration.</li>
+<li>Look at worst-balanced variables</li>
+</ul></li>
+</ul>
+</section>
+<section id="iteration-if-needed" class="level3">
+<h3 class="anchored" data-anchor-id="iteration-if-needed">3.3 Iteration (if needed)</h3>
+<ul class="task-list">
+<li><p><label><input type="checkbox"><strong>Identify problem variables</strong></label></p>
+<ul>
+<li>Which covariates still imbalanced?</li>
+<li>Which matter most theoretically?</li>
+</ul></li>
+<li><p><label><input type="checkbox"><strong>Make ONE change</strong></label></p>
+<ul>
+<li>Option 1: Add caliper on problem variable</li>
+<li>Option 2: Add exact matching on categorical</li>
+<li>Option 3: Change distance metric</li>
+<li>Option 4: Adjust set size constraints</li>
+</ul></li>
+<li><p><label><input type="checkbox"><strong>Re-run and check balance</strong></label></p>
+<ul>
+<li>Is it better? Continue iterating.</li>
+<li>Getting worse? Try different tactic.</li>
+</ul></li>
+<li><p><label><input type="checkbox"><strong>Stop when:</strong> Balance acceptable OR diminishing returns OR sample too small</label></p></li>
+<li><p><label><input type="checkbox"><strong>Document all attempts</strong> (transparency!)</label></p></li>
+</ul>
+</section>
+<section id="after-matching-once-satisfied" class="level3">
+<h3 class="anchored" data-anchor-id="after-matching-once-satisfied">3.4 After Matching (Once Satisfied)</h3>
+<ul class="task-list">
+<li><label><input type="checkbox"><strong>Estimate treatment effect</strong></label>
+<ul>
+<li>Use fixed effects or block-weighted approach</li>
+<li>Cluster standard errors at set level</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Run sensitivity analysis</strong></label>
+<ul>
+<li>How robust to unobserved confounding?</li>
+<li>Use senstrat or sensemakr package</li>
+</ul></li>
+<li><label><input type="checkbox"><strong>Report results transparently</strong></label>
+<ul>
+<li>Show balance tables</li>
+<li>Describe iteration process</li>
+<li>Include sensitivity results</li>
+</ul></li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="common-pitfalls-and-how-to-avoid-them" class="level2">
+<h2 class="anchored" data-anchor-id="common-pitfalls-and-how-to-avoid-them">4. Common Pitfalls and How to Avoid Them</h2>
+<section id="pitfall-matching-on-post-treatment-variables" class="level3">
+<h3 class="anchored" data-anchor-id="pitfall-matching-on-post-treatment-variables">4.1 PITFALL: Matching on post-treatment variables</h3>
+<p><strong>Problem:</strong> Matching on outcomes or mediators destroys causal inference.</p>
+<p><strong>How to avoid:</strong> Only include covariates measured BEFORE treatment assignment.</p>
+<p><strong>Example:</strong> In job training study, don’t match on “employment status 1 month after training started” even if measured before outcome.</p>
+<hr>
+</section>
+<section id="pitfall-ignoring-common-support" class="level3">
+<h3 class="anchored" data-anchor-id="pitfall-ignoring-common-support">4.2 PITFALL: Ignoring common support</h3>
+<p><strong>Problem:</strong> Matching units with no comparable comparison units creates extrapolation.</p>
+<p><strong>How to avoid:</strong> - Always plot propensity scores by group - Consider trimming extreme values - Report how many units lack support</p>
+<p><strong>Code check:</strong></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check overlap</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ps_treated <span class="ot">&lt;-</span> ps_scores[treatment <span class="sc">==</span> <span class="dv">1</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ps_control <span class="ot">&lt;-</span> ps_scores[treatment <span class="sc">==</span> <span class="dv">0</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>range_treated <span class="ot">&lt;-</span> <span class="fu">range</span>(ps_treated)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>range_control <span class="ot">&lt;-</span> <span class="fu">range</span>(ps_control)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Should have substantial overlap</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<hr>
+</section>
+<section id="pitfall-data-mining-for-balance" class="level3">
+<h3 class="anchored" data-anchor-id="pitfall-data-mining-for-balance">4.3 PITFALL: Data mining for balance</h3>
+<p><strong>Problem:</strong> Trying many matching specifications and picking the one that looks best on outcomes.</p>
+<p><strong>How to avoid:</strong> - Iterate based on balance only, never look at outcomes - Document all specifications tried - Pre-specify if possible</p>
+<hr>
+</section>
+<section id="pitfall-over-matching" class="level3">
+<h3 class="anchored" data-anchor-id="pitfall-over-matching">4.4 PITFALL: Over-matching</h3>
+<p><strong>Problem:</strong> Matching on variables affected by treatment (mediators) or too closely related to outcome.</p>
+<p><strong>How to avoid:</strong> - Think about causal paths - Don’t match on near-perfect proxies for outcome - When unsure, test sensitivity to including/excluding</p>
+<hr>
+</section>
+<section id="pitfall-claiming-too-much" class="level3">
+<h3 class="anchored" data-anchor-id="pitfall-claiming-too-much">4.5 PITFALL: Claiming too much</h3>
+<p><strong>Problem:</strong> Saying matching “controls for all confounding” or produces “causal estimates” without caveats.</p>
+<p><strong>How to avoid:</strong> - Always acknowledge unobserved confounding limitation - Use sensitivity analysis - Appropriate hedging language: “assuming no unmeasured confounders…”</p>
+<hr>
+</section>
+</section>
+<section id="when-to-get-more-help" class="level2">
+<h2 class="anchored" data-anchor-id="when-to-get-more-help">5. When to Get More Help</h2>
+<p><strong>Consult Part B (Conceptual Foundation) when:</strong> - You don’t understand what matching is actually doing - Results don’t make sense - Need to explain approach to skeptical audience - Writing up for publication</p>
+<p><strong>Consult Part C (Method Encyclopædia) when:</strong> - Need to understand all parameters of a method - Troubleshooting errors - Want to use advanced features - Comparing multiple approaches</p>
+<p><strong>Consult a statistician when:</strong> - Design seems fundamentally flawed - Can’t achieve acceptable balance - Sample size very small (N &lt; 100) - Complex treatment structure - Unusual data structure (clustering, time-series, etc.)</p>
+<hr>
+</section>
+</section>
+<section id="part-b-conceptual-foundation-deep-dive" class="level1">
+<h1>PART B: CONCEPTUAL FOUNDATION (Deep Dive)</h1>
+<p><em>Goal: Understand what matching is doing and why</em></p>
+<section id="the-causal-inference-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-causal-inference-problem">6. The Causal Inference Problem</h2>
+<section id="the-fundamental-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-fundamental-problem">6.1 The Fundamental Problem</h3>
+<ul>
+<li>Potential outcomes framework [Y₁ᵢ, Y₀ᵢ]</li>
+<li>We observe Y₁ᵢ for treated, Y₀ᵢ for controls</li>
+<li>Never observe both for same unit → missing data problem</li>
+<li>Numerical example with job training</li>
+</ul>
+</section>
+<section id="what-we-want-causal-effects" class="level3">
+<h3 class="anchored" data-anchor-id="what-we-want-causal-effects">6.2 What We Want: Causal Effects</h3>
+<ul>
+<li>Individual treatment effect: τᵢ = Y₁ᵢ - Y₀ᵢ (unobservable)</li>
+<li>Average treatment effect: ATE = E[Y₁ᵢ - Y₀ᵢ]</li>
+<li>Average effect on treated: ATT = E[Y₁ᵢ - Y₀ᵢ | Zᵢ = 1]</li>
+</ul>
+</section>
+<section id="the-selection-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-selection-problem">6.3 The Selection Problem</h3>
+<ul>
+<li>Why simple comparison fails: E[Yᵢ | Zᵢ = 1] - E[Yᵢ | Zᵢ = 0] ≠ ATE</li>
+<li>Selection bias decomposition</li>
+<li>Directed acyclic graphs (DAGs) showing confounding</li>
+<li>The age example from current document (expanded)</li>
+</ul>
+</section>
+<section id="how-randomization-solves-it" class="level3">
+<h3 class="anchored" data-anchor-id="how-randomization-solves-it">6.4 How Randomization Solves It</h3>
+<ul>
+<li>Random assignment → Zᵢ ⊥ (Y₁ᵢ, Y₀ᵢ)</li>
+<li>Treatment and potential outcomes independent</li>
+<li>Simple comparison becomes unbiased: E[Yᵢ | Zᵢ = 1] - E[Yᵢ | Zᵢ = 0] = ATE</li>
+<li>Balance in expectation (not exact)</li>
+</ul>
+</section>
+<section id="block-randomization-as-template" class="level3">
+<h3 class="anchored" data-anchor-id="block-randomization-as-template">6.5 Block Randomization as Template</h3>
+<ul>
+<li>Stratification within groups</li>
+<li>Randomization within strata</li>
+<li>Why this is the model for matching</li>
+<li>Connection between experimental blocks and matched sets</li>
+</ul>
+</section>
+<section id="what-matching-attempts" class="level3">
+<h3 class="anchored" data-anchor-id="what-matching-attempts">6.6 What Matching Attempts</h3>
+<ul>
+<li>Approximate randomization via stratification on observables</li>
+<li>Create strata where treated and controls are similar</li>
+<li>Make treatment assignment “as if random” within strata</li>
+<li>Key: Conditional on covariates X, assume Zᵢ ⊥ (Y₁ᵢ, Y₀ᵢ) | Xᵢ</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="how-matching-algorithms-work" class="level2">
+<h2 class="anchored" data-anchor-id="how-matching-algorithms-work">7. How Matching Algorithms Work</h2>
+<section id="the-optimization-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-optimization-problem">7.1 The Optimization Problem</h3>
+<section id="what-are-we-minimizing" class="level4">
+<h4 class="anchored" data-anchor-id="what-are-we-minimizing">7.1.1 What Are We Minimizing?</h4>
+<ul>
+<li>Total distance between matched units</li>
+<li>Subject to: each treated unit matched to control(s)</li>
+<li>Balance vs.&nbsp;sample retention trade-off</li>
+</ul>
+</section>
+<section id="why-distance-matrices" class="level4">
+<h4 class="anchored" data-anchor-id="why-distance-matrices">7.1.2 Why Distance Matrices?</h4>
+<ul>
+<li>Encode similarity between every pair of units</li>
+<li>Algorithm finds sets that minimize total distance</li>
+<li>Different distances emphasize different aspects of similarity</li>
+</ul>
+</section>
+</section>
+<section id="network-flow-algorithm-optmatch" class="level3">
+<h3 class="anchored" data-anchor-id="network-flow-algorithm-optmatch">7.2 Network Flow Algorithm (optmatch)</h3>
+<section id="graph-representation" class="level4">
+<h4 class="anchored" data-anchor-id="graph-representation">7.2.1 Graph Representation</h4>
+<ul>
+<li>Bipartite graph: treated nodes, control nodes, edges weighted by distance</li>
+<li>Flow from source through treated to controls to sink</li>
+<li>Min-cost flow problem</li>
+</ul>
+</section>
+<section id="why-its-fast" class="level4">
+<h4 class="anchored" data-anchor-id="why-its-fast">7.2.2 Why It’s Fast</h4>
+<ul>
+<li>Specialized algorithms for network flow</li>
+<li>Can handle thousands of units</li>
+<li>Exact optimization (finds true minimum)</li>
+</ul>
+</section>
+<section id="limitations" class="level4">
+<h4 class="anchored" data-anchor-id="limitations">7.2.3 Limitations</h4>
+<ul>
+<li>Less flexible constraints</li>
+<li>Variable set sizes only via fullmatch</li>
+<li>Can’t do “soft” constraints</li>
+</ul>
+</section>
+</section>
+<section id="mixed-integer-programming-designmatch" class="level3">
+<h3 class="anchored" data-anchor-id="mixed-integer-programming-designmatch">7.3 Mixed Integer Programming (designmatch)</h3>
+<section id="integer-programming-formulation" class="level4">
+<h4 class="anchored" data-anchor-id="integer-programming-formulation">7.3.1 Integer Programming Formulation</h4>
+<ul>
+<li>Binary variables: xᵢⱼ ∈ {0,1} indicates unit i matched to unit j</li>
+<li>Objective: minimize Σ dᵢⱼ xᵢⱼ</li>
+<li>Constraints: matching structure, balance requirements</li>
+</ul>
+</section>
+<section id="why-more-flexible" class="level4">
+<h4 class="anchored" data-anchor-id="why-more-flexible">7.3.2 Why More Flexible</h4>
+<ul>
+<li>Can add arbitrary linear constraints</li>
+<li>Can have “soft” constraints (penalties, not prohibitions)</li>
+<li>Can balance on multiple dimensions simultaneously</li>
+</ul>
+</section>
+<section id="why-slower" class="level4">
+<h4 class="anchored" data-anchor-id="why-slower">7.3.3 Why Slower</h4>
+<ul>
+<li>Integer programming is NP-hard</li>
+<li>Uses heuristics for large problems</li>
+<li>May not find true optimal solution (approximate)</li>
+</ul>
+</section>
+</section>
+<section id="dimension-reduction-creating-distance-matrices" class="level3">
+<h3 class="anchored" data-anchor-id="dimension-reduction-creating-distance-matrices">7.4 Dimension Reduction: Creating Distance Matrices</h3>
+<section id="the-curse-of-dimensionality" class="level4">
+<h4 class="anchored" data-anchor-id="the-curse-of-dimensionality">7.4.1 The Curse of Dimensionality</h4>
+<ul>
+<li>Can’t exactly match on 10+ variables</li>
+<li>Need to reduce to one or few dimensions</li>
+<li>Two main approaches: Mahalanobis and propensity</li>
+</ul>
+</section>
+<section id="mahalanobis-distance" class="level4">
+<h4 class="anchored" data-anchor-id="mahalanobis-distance">7.4.2 Mahalanobis Distance</h4>
+<ul>
+<li>Multivariate distance accounting for correlation</li>
+<li>Ranks transform for robustness</li>
+<li>Treats all variables as equally important</li>
+<li>Mathematical formula: d²(i,j) = (Xᵢ - Xⱼ)ᵀ Σ⁻¹ (Xᵢ - Xⱼ)</li>
+</ul>
+</section>
+<section id="propensity-score" class="level4">
+<h4 class="anchored" data-anchor-id="propensity-score">7.4.3 Propensity Score</h4>
+<ul>
+<li>Probability of treatment given covariates: e(X) = P(Z=1|X)</li>
+<li>Rosenbaum &amp; Rubin (1983): balancing score property</li>
+<li>If Z ⊥ (Y₁, Y₀) | X, then Z ⊥ (Y₁, Y₀) | e(X)</li>
+<li>Reduces any dimension to one dimension</li>
+<li>Weights variables by predictiveness of treatment</li>
+</ul>
+</section>
+<section id="which-to-use" class="level4">
+<h4 class="anchored" data-anchor-id="which-to-use">7.4.4 Which to Use?</h4>
+<ul>
+<li>Mahalanobis: Theory says all variables matter equally</li>
+<li>Propensity: Some variables strongly predict treatment</li>
+<li>Combined: Often best in practice</li>
+<li>Try both and compare balance</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="balance-testing-theory" class="level2">
+<h2 class="anchored" data-anchor-id="balance-testing-theory">8. Balance Testing Theory</h2>
+<section id="the-experimental-standard" class="level3">
+<h3 class="anchored" data-anchor-id="the-experimental-standard">8.1 The Experimental Standard</h3>
+<section id="what-happens-in-experiments" class="level4">
+<h4 class="anchored" data-anchor-id="what-happens-in-experiments">8.1.1 What Happens in Experiments?</h4>
+<ul>
+<li>Randomization balances covariates in expectation</li>
+<li>Not exact balance (except in expectation)</li>
+<li>We know distribution of imbalance under randomization</li>
+</ul>
+</section>
+<section id="comparing-designs-to-experiments" class="level4">
+<h4 class="anchored" data-anchor-id="comparing-designs-to-experiments">8.1.2 Comparing Designs to Experiments</h4>
+<ul>
+<li>Hansen &amp; Bowers (2008) insight</li>
+<li>If matched design looks like randomized experiment → good sign</li>
+<li>Can generate null distribution via permutation</li>
+</ul>
+</section>
+</section>
+<section id="the-omnibus-balance-test" class="level3">
+<h3 class="anchored" data-anchor-id="the-omnibus-balance-test">8.2 The Omnibus Balance Test</h3>
+<section id="individual-covariate-tests" class="level4">
+<h4 class="anchored" data-anchor-id="individual-covariate-tests">8.2.1 Individual Covariate Tests</h4>
+<ul>
+<li>For each covariate k: test null of no difference</li>
+<li>Within-strata weighted difference</li>
+<li>Standardized by standard error under randomization</li>
+<li>Approximately N(0,1) distributed under null</li>
+</ul>
+</section>
+<section id="combining-tests-the-d²-statistic" class="level4">
+<h4 class="anchored" data-anchor-id="combining-tests-the-d²-statistic">8.2.2 Combining Tests: The d² Statistic</h4>
+<ul>
+<li>Can’t just look at each p-value (multiple testing problem)</li>
+<li>Combine all covariate tests into single statistic</li>
+<li>d = vector of standardized differences</li>
+<li>d² = dᵀ Σ⁻¹ d where Σ = covariance of d under randomization</li>
+<li>Follows χ² distribution with p degrees of freedom (p = # covariates)</li>
+</ul>
+</section>
+<section id="why-this-works" class="level4">
+<h4 class="anchored" data-anchor-id="why-this-works">8.2.3 Why This Works</h4>
+<ul>
+<li>Under null, each standardized difference ~ N(0,1)</li>
+<li>Accounting for correlation among covariates</li>
+<li>Large-sample approximation to permutation distribution</li>
+</ul>
+</section>
+</section>
+<section id="interpreting-balance-test-results" class="level3">
+<h3 class="anchored" data-anchor-id="interpreting-balance-test-results">8.3 Interpreting Balance Test Results</h3>
+<section id="the-overall-χ²-test" class="level4">
+<h4 class="anchored" data-anchor-id="the-overall-χ²-test">8.3.1 The Overall χ² Test</h4>
+<ul>
+<li><strong>p-value interpretation</strong>:
+<ul>
+<li>p = 0.001 → Design has more imbalance than 99.9% of experiments</li>
+<li>p = 0.10 → Design has more imbalance than 90% of experiments</li>
+<li>p = 0.50 → Design looks like typical experiment</li>
+<li>p = 0.80 → Design more balanced than 80% of experiments</li>
+</ul></li>
+</ul>
+</section>
+<section id="individual-covariate-balance" class="level4">
+<h4 class="anchored" data-anchor-id="individual-covariate-balance">8.3.2 Individual Covariate Balance</h4>
+<ul>
+<li>Look beyond overall test</li>
+<li>Which variables still imbalanced?</li>
+<li>Z-statistics &gt; 2 in absolute value → concern</li>
+<li>Adjusted p-values account for multiple testing</li>
+</ul>
+</section>
+<section id="practical-vs.-statistical-significance" class="level4">
+<h4 class="anchored" data-anchor-id="practical-vs.-statistical-significance">8.3.3 Practical vs.&nbsp;Statistical Significance</h4>
+<ul>
+<li>With large samples, small imbalances can be “significant”</li>
+<li>Focus on standardized differences</li>
+<li>Is remaining imbalance substantively meaningful?</li>
+</ul>
+</section>
+</section>
+<section id="permutation-based-inference-detail" class="level3">
+<h3 class="anchored" data-anchor-id="permutation-based-inference-detail">8.4 Permutation-Based Inference Detail</h3>
+<section id="generating-null-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="generating-null-distribution">8.4.1 Generating Null Distribution</h4>
+<ul>
+<li>Shuffle treatment within each stratum</li>
+<li>Recalculate balance statistics</li>
+<li>Repeat 1000s of times</li>
+<li>Observed statistic compared to this distribution</li>
+</ul>
+</section>
+<section id="code-walk-through" class="level4">
+<h4 class="anchored" data-anchor-id="code-walk-through">8.4.2 Code Walk-Through</h4>
+<p>[Keep detailed code section from current document showing manual calculation]</p>
+</section>
+<section id="asymptotic-vs.-permutation" class="level4">
+<h4 class="anchored" data-anchor-id="asymptotic-vs.-permutation">8.4.3 Asymptotic vs.&nbsp;Permutation</h4>
+<ul>
+<li>χ² approximation faster</li>
+<li>Permutation exact in finite samples</li>
+<li>Usually very similar with N &gt; 100</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="effect-estimation-theory" class="level2">
+<h2 class="anchored" data-anchor-id="effect-estimation-theory">9. Effect Estimation Theory</h2>
+<section id="weighted-average-of-within-set-effects" class="level3">
+<h3 class="anchored" data-anchor-id="weighted-average-of-within-set-effects">9.1 Weighted Average of Within-Set Effects</h3>
+<section id="basic-idea" class="level4">
+<h4 class="anchored" data-anchor-id="basic-idea">9.1.1 Basic Idea</h4>
+<ul>
+<li>Calculate effect within each stratum: τ̂ₛ</li>
+<li>Weighted average across strata: τ̂ = Σ wₛ τ̂ₛ</li>
+<li>Different weights → different estimators</li>
+</ul>
+</section>
+<section id="block-size-weights" class="level4">
+<h4 class="anchored" data-anchor-id="block-size-weights">9.1.2 Block-Size Weights</h4>
+<ul>
+<li>wₛ = nₛ / N (proportion of sample in stratum s)</li>
+<li>Alternatively: wₛ = n₁ₛ / N₁ (proportion of treated in stratum s)</li>
+<li>Unbiased in block-randomized experiments</li>
+<li>Targets ATT if using treated counts</li>
+</ul>
+</section>
+<section id="precision-weights-harmonic-mean" class="level4">
+<h4 class="anchored" data-anchor-id="precision-weights-harmonic-mean">9.1.3 Precision Weights (Harmonic Mean)</h4>
+<ul>
+<li>wₛ ∝ n₁ₛ n₀ₛ / nₛ (effective sample size in stratum)</li>
+<li>Also called “fixed effects” weights</li>
+<li>Minimize variance of estimator</li>
+<li>May be biased but often preferred for efficiency</li>
+</ul>
+</section>
+</section>
+<section id="why-precision-weights" class="level3">
+<h3 class="anchored" data-anchor-id="why-precision-weights">9.2 Why Precision Weights?</h3>
+<section id="variance-reduction" class="level4">
+<h4 class="anchored" data-anchor-id="variance-reduction">9.2.1 Variance Reduction</h4>
+<ul>
+<li>Strata with balanced treatment/control contribute more</li>
+<li>Strata with extreme ratios contribute less</li>
+<li>Reduces noise from strata with little information</li>
+</ul>
+</section>
+<section id="connection-to-fixed-effects-regression" class="level4">
+<h4 class="anchored" data-anchor-id="connection-to-fixed-effects-regression">9.2.2 Connection to Fixed Effects Regression</h4>
+<ul>
+<li>lm(Y ~ Z + factor(stratum)) uses precision weights</li>
+<li>Equivalent to weighted regression</li>
+<li>Easy to compute with standard software</li>
+</ul>
+</section>
+<section id="bias-variance-trade-off" class="level4">
+<h4 class="anchored" data-anchor-id="bias-variance-trade-off">9.2.3 Bias-Variance Trade-off</h4>
+<ul>
+<li>Precision weights may be biased if effect varies by stratum</li>
+<li>But lower variance often outweighs bias</li>
+<li>In pair matching: doesn’t matter (same result)</li>
+</ul>
+</section>
+</section>
+<section id="standard-errors-and-inference" class="level3">
+<h3 class="anchored" data-anchor-id="standard-errors-and-inference">9.3 Standard Errors and Inference</h3>
+<section id="why-standard-errors-need-adjustment" class="level4">
+<h4 class="anchored" data-anchor-id="why-standard-errors-need-adjustment">9.3.1 Why Standard Errors Need Adjustment</h4>
+<ul>
+<li>Observations within strata are not independent</li>
+<li>Must cluster at stratum level</li>
+<li>lm_robust() with fixed_effects = ~stratum does this</li>
+</ul>
+</section>
+<section id="conservative-approaches" class="level4">
+<h4 class="anchored" data-anchor-id="conservative-approaches">9.3.2 Conservative Approaches</h4>
+<ul>
+<li>Cluster-robust standard errors (HC2 or HC3)</li>
+<li>Randomization-based inference (permutation tests)</li>
+<li>Both valid under matching design</li>
+</ul>
+</section>
+<section id="what-about-model-based-se" class="level4">
+<h4 class="anchored" data-anchor-id="what-about-model-based-se">9.3.3 What About Model-Based SE?</h4>
+<ul>
+<li>Standard lm() underestimates uncertainty</li>
+<li>Only valid if very strong assumptions hold</li>
+<li>Not recommended for matched designs</li>
+</ul>
+</section>
+</section>
+<section id="assumptions-for-causal-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="assumptions-for-causal-interpretation">9.4 Assumptions for Causal Interpretation</h3>
+<section id="ignorability-given-observables" class="level4">
+<h4 class="anchored" data-anchor-id="ignorability-given-observables">9.4.1 Ignorability Given Observables</h4>
+<ul>
+<li><strong>Assumption</strong>: (Y₁ᵢ, Y₀ᵢ) ⊥ Zᵢ | Xᵢ</li>
+<li>In words: No unmeasured confounders</li>
+<li><strong>Untestable</strong> but can assess plausibility</li>
+<li>Domain knowledge crucial</li>
+</ul>
+</section>
+<section id="overlap-common-support" class="level4">
+<h4 class="anchored" data-anchor-id="overlap-common-support">9.4.2 Overlap / Common Support</h4>
+<ul>
+<li><strong>Assumption</strong>: 0 &lt; P(Zᵢ = 1 | Xᵢ) &lt; 1 for all observed Xᵢ</li>
+<li>In words: Both treatment levels possible for all covariate patterns</li>
+<li><strong>Testable</strong>: Check propensity score distributions</li>
+<li>Trimming may be needed</li>
+</ul>
+</section>
+<section id="sutva" class="level4">
+<h4 class="anchored" data-anchor-id="sutva">9.4.3 SUTVA</h4>
+<ul>
+<li><strong>Assumption</strong>: Stable unit treatment value assumption
+<ul>
+<li>No interference: unit i’s outcome not affected by unit j’s treatment</li>
+<li>No hidden variations: treatment is well-defined</li>
+</ul></li>
+<li>In words: Your treatment doesn’t affect my outcome</li>
+<li>Often violated in social settings (spillovers)</li>
+<li>Consider design implications</li>
+</ul>
+</section>
+<section id="making-assumptions-plausible" class="level4">
+<h4 class="anchored" data-anchor-id="making-assumptions-plausible">9.4.4 Making Assumptions Plausible</h4>
+<ul>
+<li>Thorough covariate measurement</li>
+<li>Sensitivity analysis for unobserved confounding</li>
+<li>Theory-driven covariate selection</li>
+<li>Transparent reporting of limitations</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+<section id="sensitivity-analysis-theory" class="level2">
+<h2 class="anchored" data-anchor-id="sensitivity-analysis-theory">10. Sensitivity Analysis Theory</h2>
+<section id="the-unobserved-confounder-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-unobserved-confounder-problem">10.1 The Unobserved Confounder Problem</h3>
+<section id="what-matching-cannot-do" class="level4">
+<h4 class="anchored" data-anchor-id="what-matching-cannot-do">10.1.1 What Matching Cannot Do</h4>
+<ul>
+<li>Only controls for measured confounders</li>
+<li>Unobserved confounders remain threat</li>
+<li>No statistical test can rule this out</li>
+<li>Need substantive reasoning</li>
+</ul>
+</section>
+<section id="making-the-case-for-robustness" class="level4">
+<h4 class="anchored" data-anchor-id="making-the-case-for-robustness">10.1.2 Making the Case for Robustness</h4>
+<ul>
+<li>How strong would confounder need to be?</li>
+<li>Is that plausible given domain knowledge?</li>
+<li>Sensitivity analysis quantifies this</li>
+</ul>
+</section>
+</section>
+<section id="rosenbaums-sensitivity-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="rosenbaums-sensitivity-analysis">10.2 Rosenbaum’s Sensitivity Analysis</h3>
+<section id="the-γ-framework" class="level4">
+<h4 class="anchored" data-anchor-id="the-γ-framework">10.2.1 The Γ Framework</h4>
+<ul>
+<li>Even after matching, residual confounding possible</li>
+<li>Γ: odds ratio of differential treatment assignment</li>
+<li>Γ = 1: no hidden bias (randomization assumption holds)</li>
+<li>Γ = 2: one unit could be twice as likely to receive treatment as another, even with same observed covariates</li>
+</ul>
+</section>
+<section id="mathematical-setup" class="level4">
+<h4 class="anchored" data-anchor-id="mathematical-setup">10.2.2 Mathematical Setup</h4>
+<ul>
+<li>Two units with same X but different hidden U</li>
+<li>Treatment odds ratio: (P(Z=1|U=1) / P(Z=0|U=1)) / (P(Z=1|U=0) / P(Z=0|U=0)) = Γ</li>
+<li>Ask: would conclusions change if Γ = 1.5? Γ = 2? etc.</li>
+</ul>
+</section>
+<section id="using-senstrat-package" class="level4">
+<h4 class="anchored" data-anchor-id="using-senstrat-package">10.2.3 Using senstrat Package</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(senstrat)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="fu">senstrat</span>(outcome, treatment, strata, <span class="at">gamma =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="fl">0.1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Returns p-values for each Γ</li>
+<li>“Significant at Γ = 1.5” means robust to moderate hidden bias</li>
+</ul>
+</section>
+</section>
+<section id="benchmarking-approach-sensemakr" class="level3">
+<h3 class="anchored" data-anchor-id="benchmarking-approach-sensemakr">10.3 Benchmarking Approach (sensemakr)</h3>
+<section id="intuition" class="level4">
+<h4 class="anchored" data-anchor-id="intuition">10.3.1 Intuition</h4>
+<ul>
+<li>Use observed covariates as benchmarks</li>
+<li>“How much stronger than [observed covariate] would confounder need to be?”</li>
+<li>More intuitive for applied audience</li>
+</ul>
+</section>
+<section id="implementation" class="level4">
+<h4 class="anchored" data-anchor-id="implementation">10.3.2 Implementation</h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(sensemakr)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>sense_model <span class="ot">&lt;-</span> <span class="fu">sensemakr</span>(<span class="at">model =</span> lm_fit, <span class="at">treatment =</span> <span class="st">"treatment"</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sense_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Visual sensitivity plot</li>
+<li>Contours of estimate as function of confounder strength</li>
+</ul>
+</section>
+</section>
+<section id="reporting-sensitivity-results" class="level3">
+<h3 class="anchored" data-anchor-id="reporting-sensitivity-results">10.4 Reporting Sensitivity Results</h3>
+<section id="appropriate-language" class="level4">
+<h4 class="anchored" data-anchor-id="appropriate-language">10.4.1 Appropriate Language</h4>
+<ul>
+<li>“Results robust to hidden bias with Γ = 1.8”</li>
+<li>“A confounder would need to be X times stronger than age…”</li>
+<li>Always report range of Γ where conclusions stable</li>
+</ul>
+</section>
+<section id="contextualizing" class="level4">
+<h4 class="anchored" data-anchor-id="contextualizing">10.4.2 Contextualizing</h4>
+<ul>
+<li>Is Γ = 1.5 large or small in this context?</li>
+<li>What substantive confounders might reach that level?</li>
+<li>Transparent about limitations</li>
+</ul>
+<hr>
+</section>
+</section>
+</section>
+</section>
+<section id="part-c-method-encyclopædia" class="level1">
+<h1>PART C: METHOD ENCYCLOPÆDIA</h1>
+<p><em>Goal: Complete reference for all parameters and options</em></p>
+<section id="bipartite-pair-matching-optmatch" class="level2">
+<h2 class="anchored" data-anchor-id="bipartite-pair-matching-optmatch">11. Bipartite Pair Matching (optmatch)</h2>
+<section id="overview" class="level3">
+<h3 class="anchored" data-anchor-id="overview">11.1 Overview</h3>
+<ul>
+<li><strong>Function</strong>: <code>pairmatch()</code></li>
+<li><strong>Use case</strong>: Binary treatment, maximum transparency</li>
+<li><strong>Pros</strong>: Simple interpretation, forces similar comparisons</li>
+<li><strong>Cons</strong>: Discards unmatched units, may force poor matches</li>
+<li><strong>Typical sample retention</strong>: 60-90%</li>
+</ul>
+</section>
+<section id="complete-function-signature" class="level3">
+<h3 class="anchored" data-anchor-id="complete-function-signature">11.2 Complete Function Signature</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pairmatch</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  x,                        <span class="co"># Distance specification (formula or matrix)</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">controls =</span> <span class="dv">1</span>,             <span class="co"># Number of controls per treated unit</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="cn">NULL</span>,              <span class="co"># Data frame</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">remove.unmatchables =</span> <span class="cn">FALSE</span>,  <span class="co"># Drop unmatchable units?</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  ...                       <span class="co"># Additional arguments</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="parameter-reference" class="level3">
+<h3 class="anchored" data-anchor-id="parameter-reference">11.3 Parameter Reference</h3>
+<section id="x-distance-specification" class="level4">
+<h4 class="anchored" data-anchor-id="x-distance-specification">11.3.1 x: Distance Specification</h4>
+<p><strong>Option 1: Formula Interface</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pairmatch</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education, <span class="at">data =</span> mydata, <span class="at">method =</span> <span class="st">"rank_mahalanobis"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Automatically creates distance matrix</li>
+<li><code>method</code> options: “rank_mahalanobis”, “mahalanobis”, “euclidean”</li>
+</ul>
+<p><strong>Option 2: Distance Matrix</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ps_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(treatment <span class="sc">~</span> age <span class="sc">+</span> education, <span class="at">family =</span> binomial, <span class="at">data =</span> mydata)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>ps_dist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(ps_model, <span class="at">data =</span> mydata)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">pairmatch</span>(ps_dist, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>More control over distance creation</li>
+<li>Can combine distances: <code>ps_dist + mh_dist</code></li>
+<li>Can add constraints: <code>ps_dist + caliper(ps_dist, 2)</code></li>
+</ul>
+</section>
+<section id="controls-match-ratio" class="level4">
+<h4 class="anchored" data-anchor-id="controls-match-ratio">11.3.2 controls: Match Ratio</h4>
+<ul>
+<li><code>controls = 1</code>: Pair matching (1:1)</li>
+<li><code>controls = 2</code>: Triple matching (1:2)</li>
+<li><code>controls = k</code>: Each treated matched to k controls</li>
+<li>Higher values → retain more controls but worse balance</li>
+</ul>
+</section>
+<section id="remove.unmatchables-handling-unmatched-units" class="level4">
+<h4 class="anchored" data-anchor-id="remove.unmatchables-handling-unmatched-units">11.3.3 remove.unmatchables: Handling Unmatched Units</h4>
+<ul>
+<li><code>FALSE</code> (default): Unmatched units get NA for stratum</li>
+<li><code>TRUE</code>: Drop unmatched units from result</li>
+<li>Always check how many units dropped!</li>
+</ul>
+</section>
+</section>
+<section id="adding-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="adding-constraints">11.4 Adding Constraints</h3>
+<section id="calipers" class="level4">
+<h4 class="anchored" data-anchor-id="calipers">11.4.1 Calipers</h4>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>ps_dist_cal <span class="ot">&lt;-</span> ps_dist <span class="sc">+</span> <span class="fu">caliper</span>(ps_dist, <span class="dv">2</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pairmatch</span>(ps_dist_cal, <span class="at">data =</span> mydata, <span class="at">remove.unmatchables =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><strong>What it does</strong>: Sets distance to Inf if exceeds threshold</li>
+<li><strong>caliper(dist, width)</strong>: <code>width</code> in units of distance (often sd)</li>
+<li><strong>Choosing width</strong>:
+<ul>
+<li>Start without calipers</li>
+<li>Check balance, identify problems</li>
+<li>Add caliper on problem variable</li>
+<li>Typical values: 0.1 to 2 sd for propensity score</li>
+</ul></li>
+</ul>
+</section>
+<section id="exact-matching" class="level4">
+<h4 class="anchored" data-anchor-id="exact-matching">11.4.2 Exact Matching</h4>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>dist_exact <span class="ot">&lt;-</span> ps_dist <span class="sc">+</span> <span class="fu">exactMatch</span>(treatment <span class="sc">~</span> sex <span class="sc">+</span> race, <span class="at">data =</span> mydata)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">pairmatch</span>(dist_exact, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><strong>What it does</strong>: Only allows matches within same category</li>
+<li><strong>Use when</strong>: Categorical variable where balance is critical</li>
+<li><strong>Computational note</strong>: Each category matched separately (faster)</li>
+</ul>
+</section>
+<section id="combining-constraints" class="level4">
+<h4 class="anchored" data-anchor-id="combining-constraints">11.4.3 Combining Constraints</h4>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>dist_full <span class="ot">&lt;-</span> ps_dist <span class="sc">+</span> </span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>             <span class="fu">caliper</span>(ps_dist, <span class="fl">1.5</span>) <span class="sc">+</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>             <span class="fu">caliper</span>(age_dist, <span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>             <span class="fu">exactMatch</span>(treatment <span class="sc">~</span> sex, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Can layer multiple constraints</li>
+<li>Order doesn’t matter</li>
+<li>Be careful not to over-constrain (no feasible matches)</li>
+</ul>
+</section>
+</section>
+<section id="advanced-options" class="level3">
+<h3 class="anchored" data-anchor-id="advanced-options">11.5 Advanced Options</h3>
+<section id="solver-tolerance" class="level4">
+<h4 class="anchored" data-anchor-id="solver-tolerance">11.5.1 Solver Tolerance</h4>
+<ul>
+<li>Usually default is fine</li>
+<li>For critical applications: add argument <code>tol = 0.00001</code></li>
+<li>Smaller tolerance → closer to true optimal, but slower</li>
+</ul>
+</section>
+<section id="handling-ties" class="level4">
+<h4 class="anchored" data-anchor-id="handling-ties">11.5.2 Handling Ties</h4>
+<ul>
+<li>Network flow may produce multiple optimal solutions</li>
+<li>Results may vary slightly between runs (rare)</li>
+<li>Set seed for reproducibility: <code>set.seed(12345)</code></li>
+</ul>
+</section>
+</section>
+<section id="troubleshooting" class="level3">
+<h3 class="anchored" data-anchor-id="troubleshooting">11.6 Troubleshooting</h3>
+<p><strong>Error: “No feasible solution”</strong> - Constraints too strict (calipers too tight, exact matching removes overlap) - Solution: Relax constraints or check overlap</p>
+<p><strong>Warning: “Many units unmatched”</strong> - May need wider calipers - May indicate poor overlap → consider trimming - Check: <code>table(is.na(match_result))</code></p>
+<p><strong>Very slow execution</strong> - Rare with pairmatch (typically fast) - If slow: try exact matching to split problem - Check data size (&gt;10k can be slower)</p>
+</section>
+<section id="complete-worked-example" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example">11.7 Complete Worked Example</h3>
+<p>[Detailed example using simulated job training data, showing:] - Data setup - Distance creation with multiple options - Iteration with calipers - Balance checking at each step - Final estimation</p>
+<hr>
+</section>
+</section>
+<section id="bipartite-full-matching-optmatch" class="level2">
+<h2 class="anchored" data-anchor-id="bipartite-full-matching-optmatch">12. Bipartite Full Matching (optmatch)</h2>
+<section id="overview-1" class="level3">
+<h3 class="anchored" data-anchor-id="overview-1">12.1 Overview</h3>
+<ul>
+<li><strong>Function</strong>: <code>fullmatch()</code></li>
+<li><strong>Use case</strong>: Binary treatment, maximize sample retention</li>
+<li><strong>Pros</strong>: Uses all data, optimizes overall balance, flexible</li>
+<li><strong>Cons</strong>: Variable set sizes (harder to interpret)</li>
+<li><strong>Typical sample retention</strong>: 95-100%</li>
+</ul>
+</section>
+<section id="complete-function-signature-1" class="level3">
+<h3 class="anchored" data-anchor-id="complete-function-signature-1">12.2 Complete Function Signature</h3>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  x,                        <span class="co"># Distance specification</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">min.controls =</span> <span class="dv">0</span>,         <span class="co"># Minimum controls per treated</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">max.controls =</span> <span class="cn">Inf</span>,       <span class="co"># Maximum controls per treated</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">omit.fraction =</span> <span class="cn">NULL</span>,     <span class="co"># Fraction of sample to omit</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">mean.controls =</span> <span class="cn">NULL</span>,     <span class="co"># Target average controls per treated</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> <span class="cn">NULL</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">tol =</span> <span class="fl">1e-07</span>,             <span class="co"># Solver tolerance</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="parameter-reference-1" class="level3">
+<h3 class="anchored" data-anchor-id="parameter-reference-1">12.3 Parameter Reference</h3>
+<section id="distance-specification" class="level4">
+<h4 class="anchored" data-anchor-id="distance-specification">12.3.1 Distance Specification</h4>
+<ul>
+<li>Same as pairmatch (see §11.3.1)</li>
+<li>Can use formula or distance matrix</li>
+<li>Can add constraints with caliper() and exactMatch()</li>
+</ul>
+</section>
+<section id="set-size-control-min.controls-and-max.controls" class="level4">
+<h4 class="anchored" data-anchor-id="set-size-control-min.controls-and-max.controls">12.3.2 Set Size Control: min.controls and max.controls</h4>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># No restrictions (not recommended)</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(ps_dist, <span class="at">data =</span> mydata)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Recommended: constrain set sizes</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(ps_dist, <span class="at">min.controls =</span> <span class="dv">1</span>, <span class="at">max.controls =</span> <span class="dv">5</span>, <span class="at">data =</span> mydata)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Very restrictive (approaches pair matching)</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(ps_dist, <span class="at">min.controls =</span> <span class="dv">1</span>, <span class="at">max.controls =</span> <span class="dv">1</span>, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Why constrain?</strong> - Very large sets (100 controls : 1 treated) have little information - Balance often better with moderate set sizes - Effective sample size considerations - Default recommendation: <code>min.controls = 1, max.controls = 5</code></p>
+<p><strong>Trade-offs:</strong> - Tighter constraints → simpler sets, potentially worse balance - Looser constraints → better balance, more complex sets</p>
+</section>
+<section id="omit.fraction-allowing-some-exclusions" class="level4">
+<h4 class="anchored" data-anchor-id="omit.fraction-allowing-some-exclusions">12.3.3 omit.fraction: Allowing Some Exclusions</h4>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(ps_dist, <span class="at">min.controls =</span> <span class="dv">1</span>, <span class="at">max.controls =</span> <span class="dv">3</span>, </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">omit.fraction =</span> <span class="fl">0.05</span>, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Allow algorithm to drop worst X% of sample</li>
+<li>Can improve balance by removing hard-to-match units</li>
+<li>Use sparingly (defeats purpose of full matching)</li>
+</ul>
+</section>
+<section id="mean.controls-alternative-to-minmax" class="level4">
+<h4 class="anchored" data-anchor-id="mean.controls-alternative-to-minmax">12.3.4 mean.controls: Alternative to min/max</h4>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(ps_dist, <span class="at">mean.controls =</span> <span class="dv">2</span>, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Specify target average ratio</li>
+<li>Algorithm chooses actual ratios to optimize</li>
+<li>Less commonly used than min/max</li>
+</ul>
+</section>
+<section id="tol-optimization-tolerance" class="level4">
+<h4 class="anchored" data-anchor-id="tol-optimization-tolerance">12.3.5 tol: Optimization Tolerance</h4>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(ps_dist, <span class="at">min.controls =</span> <span class="dv">1</span>, <span class="at">max.controls =</span> <span class="dv">5</span>, <span class="at">tol =</span> <span class="fl">0.00001</span>, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Default usually sufficient (1e-7)</li>
+<li>Smaller tolerance → closer to optimal, slower</li>
+<li>If balance seems poor, try tighter tolerance</li>
+<li>Typical range: 1e-5 to 1e-9</li>
+</ul>
+</section>
+</section>
+<section id="interpreting-results" class="level3">
+<h3 class="anchored" data-anchor-id="interpreting-results">12.4 Interpreting Results</h3>
+<section id="examining-set-structure" class="level4">
+<h4 class="anchored" data-anchor-id="examining-set-structure">12.4.1 Examining Set Structure</h4>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>fm_result <span class="ot">&lt;-</span> <span class="fu">fullmatch</span>(...)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fm_result, <span class="at">min.controls =</span> <span class="dv">0</span>, <span class="at">max.controls =</span> <span class="cn">Inf</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Output shows: - Total number of sets - Distribution of set sizes - Number unmatched (should be 0 usually)</p>
+</section>
+<section id="visualizing-set-structure" class="level4">
+<h4 class="anchored" data-anchor-id="visualizing-set-structure">12.4.2 Visualizing Set Structure</h4>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Distribution of set sizes</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">table</span>(fm_result))</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Specific sets</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>dat<span class="sc">$</span>fm <span class="ot">&lt;-</span> fm_result</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>dat <span class="sc">%&gt;%</span> <span class="fu">filter</span>(fm <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"1.1"</span>, <span class="st">"1.2"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(fm, treatment, age, education, income)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="comparing-full-match-to-pair-match" class="level3">
+<h3 class="anchored" data-anchor-id="comparing-full-match-to-pair-match">12.5 Comparing Full Match to Pair Match</h3>
+<p><strong>When full match is better:</strong> - Can’t afford to lose sample - Overall balance more important than simplicity - Audience comfortable with variable sets</p>
+<p><strong>When pair match is better:</strong> - Transparency critical (stakeholder communication) - Sample size ample - Interpretation simplicity paramount</p>
+</section>
+<section id="effective-sample-size" class="level3">
+<h3 class="anchored" data-anchor-id="effective-sample-size">12.6 Effective Sample Size</h3>
+<section id="concept" class="level4">
+<h4 class="anchored" data-anchor-id="concept">12.6.1 Concept</h4>
+<ul>
+<li>Not all matched sets contribute equally to precision</li>
+<li>Unbalanced sets (99 controls : 1 treated) contribute little</li>
+<li>Balanced sets (1:1) contribute most</li>
+</ul>
+</section>
+<section id="calculating-effective-n" class="level4">
+<h4 class="anchored" data-anchor-id="calculating-effective-n">12.6.2 Calculating Effective N</h4>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Effective sample size for full match</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>eff_n <span class="ot">&lt;-</span> dat <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(fm) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_treat =</span> <span class="fu">sum</span>(treatment),</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_control =</span> <span class="fu">sum</span>(<span class="dv">1</span> <span class="sc">-</span> treatment),</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">eff_n =</span> (n_treat <span class="sc">*</span> n_control) <span class="sc">/</span> (n_treat <span class="sc">+</span> n_control)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">total_eff_n =</span> <span class="fu">sum</span>(eff_n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Effective N usually 60-90% of actual sample size</li>
+<li>Compare across matching specifications</li>
+</ul>
+</section>
+</section>
+<section id="complete-worked-example-1" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example-1">12.7 Complete Worked Example</h3>
+<p>[Detailed example parallel to pairmatch example, showing:] - Same data as §11.7 for comparison - Set size constraints exploration - Balance comparison to pair match - When to prefer full match</p>
+<hr>
+</section>
+</section>
+<section id="bipartite-matching-with-designmatch" class="level2">
+<h2 class="anchored" data-anchor-id="bipartite-matching-with-designmatch">13. Bipartite Matching with designmatch</h2>
+<section id="overview-2" class="level3">
+<h3 class="anchored" data-anchor-id="overview-2">13.1 Overview</h3>
+<ul>
+<li><strong>Function</strong>: <code>bmatch()</code></li>
+<li><strong>Use case</strong>: Binary treatment, need fine-grained control</li>
+<li><strong>Pros</strong>: Very flexible constraints, “near” matching</li>
+<li><strong>Cons</strong>: Slower, steeper learning curve, requires data sorting</li>
+<li><strong>Typical sample retention</strong>: Variable (depends on constraints)</li>
+</ul>
+</section>
+<section id="complete-function-signature-2" class="level3">
+<h3 class="anchored" data-anchor-id="complete-function-signature-2">13.2 Complete Function Signature</h3>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  t_ind,              <span class="co"># Treatment indicator vector</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  dist_mat,           <span class="co"># Distance matrix (numeric)</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">subset_weight =</span> <span class="dv">0</span>,  <span class="co"># Balance between distance and sample size</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">n_controls =</span> <span class="dv">1</span>,     <span class="co"># Number of controls per treated</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  total_groups,       <span class="co"># Number of matched sets</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  solver,             <span class="co"># Solver specification</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">mom =</span> <span class="cn">NULL</span>,         <span class="co"># Moment balancing constraints</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">exact =</span> <span class="cn">NULL</span>,       <span class="co"># Exact matching variables</span></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">near =</span> <span class="cn">NULL</span>,        <span class="co"># Near-exact matching (soft constraints)</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">near_exact =</span> <span class="cn">NULL</span>,  <span class="co"># Deprecated (use 'near')</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">fine =</span> <span class="cn">NULL</span>,        <span class="co"># Fine balance constraints</span></span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">near_pairs =</span> <span class="cn">NULL</span>,  <span class="co"># Variables to keep close between pairs</span></span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="critical-setup-requirements" class="level3">
+<h3 class="anchored" data-anchor-id="critical-setup-requirements">13.3 Critical Setup Requirements</h3>
+<section id="data-sorting-required" class="level4">
+<h4 class="anchored" data-anchor-id="data-sorting-required">13.3.1 Data Sorting (REQUIRED!)</h4>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MUST sort data by treatment (decreasing order)</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>mydata <span class="ot">&lt;-</span> mydata[<span class="fu">order</span>(mydata<span class="sc">$</span>treatment, <span class="at">decreasing =</span> <span class="cn">TRUE</span>), ]</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Verify sorting</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(mydata<span class="sc">$</span>treatment[<span class="dv">1</span><span class="sc">:</span><span class="fu">sum</span>(mydata<span class="sc">$</span>treatment)] <span class="sc">==</span> <span class="dv">1</span>))</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="fu">stopifnot</span>(<span class="fu">all</span>(mydata<span class="sc">$</span>treatment[(<span class="fu">sum</span>(mydata<span class="sc">$</span>treatment)<span class="sc">+</span><span class="dv">1</span>)<span class="sc">:</span><span class="fu">nrow</span>(mydata)] <span class="sc">==</span> <span class="dv">0</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Why?</strong> Algorithm expects treated units first, then controls.</p>
+</section>
+<section id="distance-matrix-scaling" class="level4">
+<h4 class="anchored" data-anchor-id="distance-matrix-scaling">13.3.2 Distance Matrix Scaling</h4>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create distance matrix</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>ps_matrix <span class="ot">&lt;-</span> <span class="fu">outer</span>(ps_scores[treatment<span class="sc">==</span><span class="dv">1</span>], ps_scores[treatment<span class="sc">==</span><span class="dv">0</span>], </span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">FUN =</span> <span class="cf">function</span>(x,y) <span class="fu">abs</span>(x<span class="sc">-</span>y))</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Scale (designmatch is sensitive to scale)</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>ps_matrix_scaled <span class="ot">&lt;-</span> <span class="fu">round</span>(ps_matrix <span class="sc">/</span> <span class="fu">mean</span>(ps_matrix), <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Why?</strong> Integer programming solver works better with scaled distances.</p>
+</section>
+</section>
+<section id="key-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="key-parameters">13.4 Key Parameters</h3>
+<section id="subset_weight-core-trade-off" class="level4">
+<h4 class="anchored" data-anchor-id="subset_weight-core-trade-off">13.4.1 subset_weight: Core Trade-off</h4>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Minimize distance only (like optmatch)</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(t_ind, dist_mat, <span class="at">subset_weight =</span> <span class="dv">0</span>, ...)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Balance distance minimization with maximizing matches</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(t_ind, dist_mat, <span class="at">subset_weight =</span> <span class="fl">0.5</span>, ...)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Maximize number matched (distance secondary)</span></span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(t_ind, dist_mat, <span class="at">subset_weight =</span> <span class="dv">1</span>, ...)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Interpretation:</strong> - 0: Pure minimum distance (discards hard-to-match units) - 1: Keep everyone, tolerate worse matches - 0.3-0.5: Middle ground (often good choice)</p>
+<p><strong>When to use:</strong> - subset_weight = 0: Sample size less important, balance critical - subset_weight &gt; 0: Can’t afford to lose observations</p>
+</section>
+<section id="n_controls-and-total_groups" class="level4">
+<h4 class="anchored" data-anchor-id="n_controls-and-total_groups">13.4.2 n_controls and total_groups</h4>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Pair matching (1:1)</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(..., <span class="at">n_controls =</span> <span class="dv">1</span>, <span class="at">total_groups =</span> n_treated)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Triple matching (1:2)</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(..., <span class="at">n_controls =</span> <span class="dv">2</span>, <span class="at">total_groups =</span> n_treated)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Match subset of treated units</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(..., <span class="at">n_controls =</span> <span class="dv">1</span>, <span class="at">total_groups =</span> n_treated <span class="sc">*</span> <span class="fl">0.8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Note:</strong> Unlike fullmatch, cannot have variable ratios.</p>
+</section>
+<section id="solver-specification" class="level4">
+<h4 class="anchored" data-anchor-id="solver-specification">13.4.3 Solver Specification</h4>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>solver_options <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"highs"</span>,        <span class="co"># Solver: "highs", "gurobi", "symphony"</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">approximate =</span> <span class="dv">1</span>,       <span class="co"># Use heuristics (1) or exact solution (0)</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_max =</span> <span class="dv">1000</span>,         <span class="co"># Time limit in seconds</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace =</span> <span class="dv">1</span>,            <span class="co"># Verbosity: 0 (silent) to 3 (verbose)</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">round_cplex =</span> <span class="dv">0</span>,      <span class="co"># Rounding option</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace_cplex =</span> <span class="dv">0</span>       <span class="co"># CPLEX-specific tracing</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(..., <span class="at">solver =</span> solver_options)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Solver choice:</strong> - <strong>highs</strong>: Free, good performance, recommended default - <strong>gurobi</strong>: Commercial, fastest, requires license - <strong>symphony</strong>: Free, slower than highs</p>
+<p><strong>approximate setting:</strong> - <code>approximate = 1</code>: Use heuristics, faster, good enough for most - <code>approximate = 0</code>: Find provably optimal, slower, rarely needed</p>
+<p><strong>t_max:</strong> - Increase if hitting time limit before convergence - Default 1000 seconds usually sufficient - Large problems (N &gt; 5000) may need more</p>
+</section>
+</section>
+<section id="advanced-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="advanced-constraints">13.5 Advanced Constraints</h3>
+<section id="exact-hard-exact-matching" class="level4">
+<h4 class="anchored" data-anchor-id="exact-hard-exact-matching">13.5.1 exact: Hard Exact Matching</h4>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create dummy variables for exact matching categories</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>sex_treated <span class="ot">&lt;-</span> mydata<span class="sc">$</span>sex[mydata<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>]</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>sex_control <span class="ot">&lt;-</span> mydata<span class="sc">$</span>sex[mydata<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>]</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_ind =</span> mydata<span class="sc">$</span>treatment,</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">exact =</span> <span class="fu">cbind</span>(sex_treated, sex_control),</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What it does:</strong> Only allows matches within same category <strong>Use when:</strong> Categorical variable where perfect balance required</p>
+</section>
+<section id="near-soft-near-exact-matching-powerful" class="level4">
+<h4 class="anchored" data-anchor-id="near-soft-near-exact-matching-powerful">13.5.2 near: Soft Near-Exact Matching (POWERFUL)</h4>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Keep age within narrow range</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>age_treated <span class="ot">&lt;-</span> mydata<span class="sc">$</span>age[mydata<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">1</span>]</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>age_control <span class="ot">&lt;-</span> mydata<span class="sc">$</span>age[mydata<span class="sc">$</span>treatment <span class="sc">==</span> <span class="dv">0</span>]</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_ind =</span> mydata<span class="sc">$</span>treatment,</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">near =</span> <span class="fu">list</span>(age_treated, age_control),</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What it does:</strong> Penalizes (but doesn’t prohibit) large age differences <strong>vs.&nbsp;caliper:</strong> More flexible, doesn’t create hard boundaries <strong>Use when:</strong> Want close matches on variable but not absolute requirement</p>
+</section>
+<section id="fine-fine-balance" class="level4">
+<h4 class="anchored" data-anchor-id="fine-fine-balance">13.5.3 fine: Fine Balance</h4>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Ensure overall balance on categorical variable</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_ind =</span> mydata<span class="sc">$</span>treatment,</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">fine =</span> <span class="fu">list</span>(education_treated, education_control),</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What it does:</strong> Marginal distribution of education same in matched sample <strong>Use when:</strong> Want overall balance on categorical variable</p>
+</section>
+<section id="near_pairs-paired-near-constraints" class="level4">
+<h4 class="anchored" data-anchor-id="near_pairs-paired-near-constraints">13.5.4 near_pairs: Paired Near Constraints</h4>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_ind =</span> mydata<span class="sc">$</span>treatment,</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">near_pairs =</span> <span class="fu">list</span>(</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(income_treated, income_control),</span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">c</span>(age_treated, age_control)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What it does:</strong> Multiple variables kept close simultaneously <strong>Use when:</strong> Several variables all matter for similarity</p>
+</section>
+<section id="mom-moment-balance" class="level4">
+<h4 class="anchored" data-anchor-id="mom-moment-balance">13.5.5 mom: Moment Balance</h4>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Balance on mean and variance of continuous variable</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_ind =</span> mydata<span class="sc">$</span>treatment,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">mom =</span> <span class="fu">list</span>(age_treated, age_control),</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>What it does:</strong> Ensures matched sample balanced on moments (mean, variance) <strong>Use when:</strong> Want distributional balance, not just mean balance</p>
+</section>
+</section>
+<section id="converting-output-to-usable-format" class="level3">
+<h3 class="anchored" data-anchor-id="converting-output-to-usable-format">13.6 Converting Output to Usable Format</h3>
+<section id="bmatch-returns" class="level4">
+<h4 class="anchored" data-anchor-id="bmatch-returns">13.6.1 bmatch Returns</h4>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>result <span class="ot">&lt;-</span> <span class="fu">bmatch</span>(...)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(result)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="co"># $t_id: Vector of treated unit indices</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># $c_id: Matrix of control unit indices</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co"># $group_id: Vector of set IDs</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="co"># $obj_total: Total distance achieved</span></span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a><span class="co"># $obj_dist_mat: Distance contribution</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="helper-function-for-conversion" class="level4">
+<h4 class="anchored" data-anchor-id="helper-function-for-conversion">13.6.2 Helper Function for Conversion</h4>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>bmatch_to_factor <span class="ot">&lt;-</span> <span class="cf">function</span>(bmatch_result, original_data) {</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  n_treated <span class="ot">&lt;-</span> <span class="fu">length</span>(bmatch_result<span class="sc">$</span>t_id)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  n_controls <span class="ot">&lt;-</span> <span class="fu">ncol</span>(bmatch_result<span class="sc">$</span>c_id)</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create factor variable</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  match_id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">nrow</span>(original_data))</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Assign treated units</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>  match_id[bmatch_result<span class="sc">$</span>t_id] <span class="ot">&lt;-</span> bmatch_result<span class="sc">$</span>group_id</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Assign control units</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span>(j <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span>n_controls) {</span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    match_id[bmatch_result<span class="sc">$</span>c_id[, j]] <span class="ot">&lt;-</span> bmatch_result<span class="sc">$</span>group_id</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(<span class="fu">factor</span>(match_id))</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Use it</span></span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>match_set <span class="ot">&lt;-</span> <span class="fu">bmatch_to_factor</span>(result, mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="when-to-use-designmatch-vs.-optmatch" class="level3">
+<h3 class="anchored" data-anchor-id="when-to-use-designmatch-vs.-optmatch">13.7 When to Use designmatch vs.&nbsp;optmatch</h3>
+<p><strong>Choose designmatch when:</strong> - Need near-exact matching without hard calipers - Want fine balance on categorical variables - Need moment balance constraints - Have complex multi-dimensional balance requirements - Willing to invest time in setup</p>
+<p><strong>Choose optmatch when:</strong> - Want fastest solution - Variable set sizes important (fullmatch) - Standard constraints sufficient - Prefer simpler workflow</p>
+<p><strong>Comparison table:</strong></p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>optmatch</th>
+<th>designmatch</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Speed</td>
+<td>Fast</td>
+<td>Slower</td>
+</tr>
+<tr class="even">
+<td>Variable sets</td>
+<td>Yes (fullmatch)</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td>Near constraints</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td>Fine balance</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr class="odd">
+<td>Setup complexity</td>
+<td>Low</td>
+<td>Medium-High</td>
+</tr>
+<tr class="even">
+<td>Constraint flexibility</td>
+<td>Medium</td>
+<td>Very High</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="complete-worked-example-2" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example-2">13.8 Complete Worked Example</h3>
+<p>[Detailed example showing:] - Data preparation and sorting - Distance matrix creation and scaling - Basic match with comparison to optmatch - Advanced match using near and fine constraints - Balance evaluation - When added complexity is worth it</p>
+<hr>
+</section>
+</section>
+<section id="non-bipartite-matching-designmatch" class="level2">
+<h2 class="anchored" data-anchor-id="non-bipartite-matching-designmatch">14. Non-bipartite Matching (designmatch)</h2>
+<section id="overview-3" class="level3">
+<h3 class="anchored" data-anchor-id="overview-3">14.1 Overview</h3>
+<ul>
+<li><strong>Function</strong>: <code>nmatch()</code></li>
+<li><strong>Use case</strong>: Continuous/multi-level treatment</li>
+<li><strong>Pros</strong>: Handles dose-response, no control group needed</li>
+<li><strong>Cons</strong>: More complex interpretation, specialized estimation</li>
+<li><strong>Typical sample retention</strong>: Variable</li>
+</ul>
+</section>
+<section id="when-to-use-non-bipartite-matching" class="level3">
+<h3 class="anchored" data-anchor-id="when-to-use-non-bipartite-matching">14.2 When to Use Non-bipartite Matching</h3>
+<p><strong>Appropriate contexts:</strong> - Continuous treatment (dosage, intensity, duration) - Ordered multi-level treatment (low/medium/high) - No clear untreated group - Interest in dose-response relationships</p>
+<p><strong>Examples:</strong> - Effect of training hours (0 to 40 hours) - Impact of class size (10 to 40 students) - Relationship between medication dose and outcome - Effect of program intensity levels</p>
+<p><strong>Not appropriate for:</strong> - Binary treatment (use bipartite instead) - Unordered categorical treatment (use separate bipartite matches)</p>
+</section>
+<section id="conceptual-differences-from-bipartite" class="level3">
+<h3 class="anchored" data-anchor-id="conceptual-differences-from-bipartite">14.3 Conceptual Differences from Bipartite</h3>
+<section id="matching-goal" class="level4">
+<h4 class="anchored" data-anchor-id="matching-goal">14.3.1 Matching Goal</h4>
+<ul>
+<li><strong>Bipartite</strong>: Match similar units with different treatment status</li>
+<li><strong>Non-bipartite</strong>: Match similar units with range of treatment values</li>
+<li>Still want balance on confounders X</li>
+<li>But now each set should vary in treatment Z</li>
+</ul>
+</section>
+<section id="set-structure" class="level4">
+<h4 class="anchored" data-anchor-id="set-structure">14.3.2 Set Structure</h4>
+<ul>
+<li>Each matched set contains units with different Z values</li>
+<li>Variation in Z within set is desirable</li>
+<li>Still minimize differences on confounders X</li>
+</ul>
+</section>
+</section>
+<section id="complete-function-signature-3" class="level3">
+<h3 class="anchored" data-anchor-id="complete-function-signature-3">14.4 Complete Function Signature</h3>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">nmatch</span>(</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  dist_mat,           <span class="co"># Distance matrix on confounders (full N x N)</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">subset_weight =</span> <span class="dv">0</span>,  <span class="co"># Weight on sample retention</span></span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>  solver,            <span class="co"># Solver specification</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  mom_covs,          <span class="co"># Variables to balance (often treatment itself)</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  mom_tols,          <span class="co"># Tolerance for moment constraints</span></span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>  mom_targets,       <span class="co"># Target moments</span></span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  total_groups,      <span class="co"># Number of sets to create</span></span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  size_groups,       <span class="co"># Size of each set</span></span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="key-parameters-1" class="level3">
+<h3 class="anchored" data-anchor-id="key-parameters-1">14.5 Key Parameters</h3>
+<section id="dist_mat-distance-on-confounders-only" class="level4">
+<h4 class="anchored" data-anchor-id="dist_mat-distance-on-confounders-only">14.5.1 dist_mat: Distance on Confounders Only</h4>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate distance on confounders (NOT including treatment)</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>confounders <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"education"</span>, <span class="st">"income"</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> mydata[, confounders]</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Full distance matrix (N x N, not N_treated x N_control)</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>dist_matrix <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(X, <span class="at">method =</span> <span class="st">"euclidean"</span>))</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Or use Mahalanobis distance</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Critical:</strong> Distance should measure similarity on confounders only. Treatment variable should NOT be in distance.</p>
+</section>
+<section id="mom_covs-what-to-balance" class="level4">
+<h4 class="anchored" data-anchor-id="mom_covs-what-to-balance">14.5.2 mom_covs: What to Balance</h4>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Balance on treatment variable itself</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nmatch</span>(</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">mom_covs =</span> mydata<span class="sc">$</span>treatment_dose,  <span class="co"># The continuous treatment</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Can also balance on other variables</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="fu">nmatch</span>(</span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_matrix,</span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">mom_covs =</span> <span class="fu">cbind</span>(mydata<span class="sc">$</span>treatment_dose, mydata<span class="sc">$</span>age),</span>
+<span id="cb38-12"><a href="#cb38-12" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb38-13"><a href="#cb38-13" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Purpose:</strong> Ensures matched sets have spread on treatment variable.</p>
+</section>
+<section id="total_groups-and-size_groups" class="level4">
+<h4 class="anchored" data-anchor-id="total_groups-and-size_groups">14.5.3 total_groups and size_groups</h4>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create 100 matched triplets</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nmatch</span>(..., <span class="at">total_groups =</span> <span class="dv">100</span>, <span class="at">size_groups =</span> <span class="dv">3</span>)</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create 50 matched sets of 5</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="fu">nmatch</span>(..., <span class="at">total_groups =</span> <span class="dv">50</span>, <span class="at">size_groups =</span> <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Trade-off:</strong> - More groups → more comparisons, but smaller sets - Larger sets → more variation in Z per set, but fewer sets</p>
+</section>
+</section>
+<section id="worked-example-continuous-treatment" class="level3">
+<h3 class="anchored" data-anchor-id="worked-example-continuous-treatment">14.6 Worked Example: Continuous Treatment</h3>
+<section id="setup" class="level4">
+<h4 class="anchored" data-anchor-id="setup">14.6.1 Setup</h4>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate continuous treatment data</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">500</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>age <span class="ot">&lt;-</span> <span class="fu">rnorm</span>(n, <span class="dv">45</span>, <span class="dv">10</span>)</span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>education <span class="ot">&lt;-</span> <span class="fu">sample</span>(<span class="dv">12</span><span class="sc">:</span><span class="dv">20</span>, n, <span class="at">replace =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb40-6"><a href="#cb40-6" aria-hidden="true" tabindex="-1"></a>income <span class="ot">&lt;-</span> <span class="fu">exp</span>(<span class="fu">rnorm</span>(n, <span class="dv">10</span>, <span class="fl">0.5</span>))</span>
+<span id="cb40-7"><a href="#cb40-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-8"><a href="#cb40-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Treatment dose (affected by confounders)</span></span>
+<span id="cb40-9"><a href="#cb40-9" aria-hidden="true" tabindex="-1"></a>treatment_dose <span class="ot">&lt;-</span> <span class="fl">0.5</span><span class="sc">*</span><span class="fu">scale</span>(age)[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span><span class="fu">scale</span>(education)[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(n, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb40-10"><a href="#cb40-10" aria-hidden="true" tabindex="-1"></a>treatment_dose <span class="ot">&lt;-</span> <span class="fu">pmax</span>(<span class="dv">0</span>, treatment_dose)  <span class="co"># Non-negative doses</span></span>
+<span id="cb40-11"><a href="#cb40-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-12"><a href="#cb40-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Outcome</span></span>
+<span id="cb40-13"><a href="#cb40-13" aria-hidden="true" tabindex="-1"></a>outcome <span class="ot">&lt;-</span> <span class="fl">0.5</span><span class="sc">*</span>treatment_dose <span class="sc">+</span> <span class="fl">0.3</span><span class="sc">*</span><span class="fu">scale</span>(age)[,<span class="dv">1</span>] <span class="sc">+</span> <span class="fu">rnorm</span>(n)</span>
+<span id="cb40-14"><a href="#cb40-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb40-15"><a href="#cb40-15" aria-hidden="true" tabindex="-1"></a>mydata <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(age, education, income, treatment_dose, outcome)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="matching" class="level4">
+<h4 class="anchored" data-anchor-id="matching">14.6.2 Matching</h4>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(designmatch)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Distance on confounders only</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">cbind</span>(age, education, <span class="fu">log</span>(income))</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>dist_mat <span class="ot">&lt;-</span> <span class="fu">as.matrix</span>(<span class="fu">dist</span>(X))</span>
+<span id="cb41-6"><a href="#cb41-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb41-7"><a href="#cb41-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Match</span></span>
+<span id="cb41-8"><a href="#cb41-8" aria-hidden="true" tabindex="-1"></a>nm_result <span class="ot">&lt;-</span> <span class="fu">nmatch</span>(</span>
+<span id="cb41-9"><a href="#cb41-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">dist_mat =</span> dist_mat,</span>
+<span id="cb41-10"><a href="#cb41-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">mom_covs =</span> treatment_dose,  <span class="co"># Want variation in dose</span></span>
+<span id="cb41-11"><a href="#cb41-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">total_groups =</span> <span class="dv">100</span>,</span>
+<span id="cb41-12"><a href="#cb41-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">size_groups =</span> <span class="dv">3</span>,</span>
+<span id="cb41-13"><a href="#cb41-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">solver =</span> <span class="fu">list</span>(<span class="at">name =</span> <span class="st">"highs"</span>, <span class="at">approximate =</span> <span class="dv">1</span>, <span class="at">t_max =</span> <span class="dv">300</span>)</span>
+<span id="cb41-14"><a href="#cb41-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="extracting-results" class="level4">
+<h4 class="anchored" data-anchor-id="extracting-results">14.6.3 Extracting Results</h4>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create set ID variable</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>set_id <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">NA</span>, <span class="fu">nrow</span>(mydata))</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(nm_result<span class="sc">$</span>group_id)) {</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  set_id[nm_result<span class="sc">$</span>id_1[i]] <span class="ot">&lt;-</span> nm_result<span class="sc">$</span>group_id[i]</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  set_id[nm_result<span class="sc">$</span>id_2[i]] <span class="ot">&lt;-</span> nm_result<span class="sc">$</span>group_id[i]</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  set_id[nm_result<span class="sc">$</span>id_3[i]] <span class="ot">&lt;-</span> nm_result<span class="sc">$</span>group_id[i]</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>set_id <span class="ot">&lt;-</span> <span class="fu">factor</span>(set_id)</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check structure</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>mydata <span class="sc">%&gt;%</span> </span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(set_id)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(set_id) <span class="sc">%&gt;%</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb42-16"><a href="#cb42-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_dose =</span> <span class="fu">min</span>(treatment_dose),</span>
+<span id="cb42-17"><a href="#cb42-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_dose =</span> <span class="fu">max</span>(treatment_dose),</span>
+<span id="cb42-18"><a href="#cb42-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">range_dose =</span> max_dose <span class="sc">-</span> min_dose</span>
+<span id="cb42-19"><a href="#cb42-19" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb42-20"><a href="#cb42-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="evaluation-for-non-bipartite-matching" class="level3">
+<h3 class="anchored" data-anchor-id="evaluation-for-non-bipartite-matching">14.7 Evaluation for Non-bipartite Matching</h3>
+<section id="balance-on-confounders" class="level4">
+<h4 class="anchored" data-anchor-id="balance-on-confounders">14.7.1 Balance on Confounders</h4>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Still want balance on confounders within sets</span></span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a><span class="co"># But this is trickier without clear treatment/control division</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Approach 1: Test null of no relationship between confounders and treatment</span></span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a><span class="co"># within sets</span></span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(coin)</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="fu">independence_test</span>(age <span class="sc">~</span> treatment_dose <span class="sc">|</span> set_id, <span class="at">data =</span> mydata)</span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a><span class="fu">independence_test</span>(education <span class="sc">~</span> treatment_dose <span class="sc">|</span> set_id, <span class="at">data =</span> mydata)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="variation-in-treatment-within-sets" class="level4">
+<h4 class="anchored" data-anchor-id="variation-in-treatment-within-sets">14.7.2 Variation in Treatment Within Sets</h4>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Want adequate spread in treatment within each set</span></span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>mydata <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(set_id) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_range =</span> <span class="fu">max</span>(treatment_dose) <span class="sc">-</span> <span class="fu">min</span>(treatment_dose),</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment_sd =</span> <span class="fu">sd</span>(treatment_dose)</span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-10"><a href="#cb44-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot</span></span>
+<span id="cb44-11"><a href="#cb44-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(set_id)), </span>
+<span id="cb44-12"><a href="#cb44-12" aria-hidden="true" tabindex="-1"></a>       <span class="fu">aes</span>(<span class="at">x =</span> set_id, <span class="at">y =</span> treatment_dose)) <span class="sc">+</span></span>
+<span id="cb44-13"><a href="#cb44-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb44-14"><a href="#cb44-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_blank</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="estimation-with-non-bipartite-matching" class="level3">
+<h3 class="anchored" data-anchor-id="estimation-with-non-bipartite-matching">14.8 Estimation with Non-bipartite Matching</h3>
+<section id="linear-dose-response-within-sets" class="level4">
+<h4 class="anchored" data-anchor-id="linear-dose-response-within-sets">14.8.1 Linear Dose-Response Within Sets</h4>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fixed effects for sets</span></span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(estimatr)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>dose_response <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>  outcome <span class="sc">~</span> treatment_dose,</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">fixed_effects =</span> <span class="sc">~</span>set_id,</span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(set_id))</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(dose_response)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Interpretation:</strong> Estimated effect of 1-unit increase in dose, comparing within sets.</p>
+</section>
+<section id="non-linear-dose-response" class="level4">
+<h4 class="anchored" data-anchor-id="non-linear-dose-response">14.8.2 Non-linear Dose-Response</h4>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Quadratic term</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>dose_response_quad <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  outcome <span class="sc">~</span> treatment_dose <span class="sc">+</span> <span class="fu">I</span>(treatment_dose<span class="sc">^</span><span class="dv">2</span>),</span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">fixed_effects =</span> <span class="sc">~</span>set_id,</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(set_id))</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Spline (more flexible)</span></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(splines)</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>dose_response_spline <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>  outcome <span class="sc">~</span> <span class="fu">ns</span>(treatment_dose, <span class="at">df =</span> <span class="dv">3</span>),</span>
+<span id="cb46-12"><a href="#cb46-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">fixed_effects =</span> <span class="sc">~</span>set_id,</span>
+<span id="cb46-13"><a href="#cb46-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(set_id))</span>
+<span id="cb46-14"><a href="#cb46-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="comparing-levels" class="level4">
+<h4 class="anchored" data-anchor-id="comparing-levels">14.8.3 Comparing Levels</h4>
+<div class="sourceCode" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert continuous to categories for easier interpretation</span></span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>dose_category <span class="ot">&lt;-</span> <span class="fu">cut</span>(mydata<span class="sc">$</span>treatment_dose, </span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">breaks =</span> <span class="fu">quantile</span>(mydata<span class="sc">$</span>treatment_dose, <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.33</span>, <span class="fl">0.67</span>, <span class="dv">1</span>)),</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"Low"</span>, <span class="st">"Medium"</span>, <span class="st">"High"</span>),</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>                            <span class="at">include.lowest =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Estimate effects of medium vs low, high vs low</span></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>dose_levels <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  outcome <span class="sc">~</span> dose_category,</span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">fixed_effects =</span> <span class="sc">~</span>set_id,</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(set_id))</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="challenges-and-limitations" class="level3">
+<h3 class="anchored" data-anchor-id="challenges-and-limitations">14.9 Challenges and Limitations</h3>
+<section id="more-complex-than-bipartite" class="level4">
+<h4 class="anchored" data-anchor-id="more-complex-than-bipartite">14.9.1 More Complex Than Bipartite</h4>
+<ul>
+<li>Harder to evaluate balance</li>
+<li>Estimation requires more careful thought</li>
+<li>Results harder to communicate</li>
+</ul>
+</section>
+<section id="functional-form-assumptions" class="level4">
+<h4 class="anchored" data-anchor-id="functional-form-assumptions">14.9.2 Functional Form Assumptions</h4>
+<ul>
+<li>Linear dose-response may be wrong</li>
+<li>Need to explore non-linearity</li>
+<li>More model-dependent than bipartite matching</li>
+</ul>
+</section>
+<section id="when-to-consider-alternatives" class="level4">
+<h4 class="anchored" data-anchor-id="when-to-consider-alternatives">14.9.3 When to Consider Alternatives</h4>
+<ul>
+<li>If treatment can be binned (low vs high), use bipartite</li>
+<li>If many treatment levels, consider other approaches</li>
+<li>Regression with careful modeling may be simpler</li>
+</ul>
+</section>
+</section>
+<section id="complete-worked-example-with-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example-with-interpretation">14.10 Complete Worked Example with Interpretation</h3>
+<p>[Full example with realistic data showing:] - Motivation for non-bipartite approach - Data preparation - Matching process - Balance evaluation specific to continuous treatment - Multiple estimation approaches - Visualization of dose-response curve - Appropriate caveats and limitations</p>
+<hr>
+</section>
+</section>
+</section>
+<section id="part-d-case-studies" class="level1">
+<h1>PART D: CASE STUDIES</h1>
+<p><em>Goal: See methods applied to realistic scenarios</em></p>
+<section id="case-study-1-simple-job-training-evaluation-pair-matching" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-1-simple-job-training-evaluation-pair-matching">15. Case Study 1: Simple Job Training Evaluation (Pair Matching)</h2>
+<section id="context-and-research-question" class="level3">
+<h3 class="anchored" data-anchor-id="context-and-research-question">15.1 Context and Research Question</h3>
+<p><strong>Background:</strong> State workforce development agency offers job training program. Participation voluntary. Want to evaluate earnings impact.</p>
+<p><strong>Data:</strong> Administrative data on 1,000 individuals - Treatment: Participated in training (N=334) - Control: Did not participate (N=666) - Covariates: Age, education, prior earnings, employment history - Outcome: Earnings 12 months after program</p>
+<p><strong>Question:</strong> Does job training increase earnings?</p>
+</section>
+<section id="why-matching" class="level3">
+<h3 class="anchored" data-anchor-id="why-matching">15.2 Why Matching?</h3>
+<ul>
+<li>Non-random selection into training (motivated workers more likely)</li>
+<li>Rich pre-treatment data available</li>
+<li>Clear comparison group exists</li>
+<li>Want transparent, interpretable design</li>
+</ul>
+</section>
+<section id="initial-data-exploration" class="level3">
+<h3 class="anchored" data-anchor-id="initial-data-exploration">15.3 Initial Data Exploration</h3>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load data</span></span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(optmatch)</span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(RItools)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(estimatr)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Check treatment distribution</span></span>
+<span id="cb48-8"><a href="#cb48-8" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(mydata<span class="sc">$</span>training)</span>
+<span id="cb48-9"><a href="#cb48-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-10"><a href="#cb48-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Key covariates</span></span>
+<span id="cb48-11"><a href="#cb48-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mydata[, <span class="fu">c</span>(<span class="st">"age"</span>, <span class="st">"education"</span>, <span class="st">"prior_earnings"</span>)])</span>
+<span id="cb48-12"><a href="#cb48-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-13"><a href="#cb48-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Naive comparison (problematic!)</span></span>
+<span id="cb48-14"><a href="#cb48-14" aria-hidden="true" tabindex="-1"></a><span class="fu">t.test</span>(earnings <span class="sc">~</span> training, <span class="at">data =</span> mydata)</span>
+<span id="cb48-15"><a href="#cb48-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows large difference, but is it causal?</span></span>
+<span id="cb48-16"><a href="#cb48-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-17"><a href="#cb48-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Check for selection</span></span>
+<span id="cb48-18"><a href="#cb48-18" aria-hidden="true" tabindex="-1"></a>mydata <span class="sc">%&gt;%</span> <span class="fu">group_by</span>(training) <span class="sc">%&gt;%</span></span>
+<span id="cb48-19"><a href="#cb48-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="fu">across</span>(<span class="fu">c</span>(age, education, prior_earnings), mean))</span>
+<span id="cb48-20"><a href="#cb48-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Trainees older, more educated, higher prior earnings</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="assessing-overlap" class="level3">
+<h3 class="anchored" data-anchor-id="assessing-overlap">15.4 Assessing Overlap</h3>
+<div class="sourceCode" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Propensity score for overlap check</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>ps_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(training <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> prior_earnings <span class="sc">+</span> employment_history,</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> mydata, <span class="at">family =</span> binomial)</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>ps <span class="ot">&lt;-</span> <span class="fu">predict</span>(ps_model, <span class="at">type =</span> <span class="st">"response"</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize overlap</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(mydata, <span class="fu">aes</span>(<span class="at">x =</span> ps, <span class="at">fill =</span> <span class="fu">factor</span>(training))) <span class="sc">+</span></span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Propensity Score Distributions"</span>)</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Check extremes</span></span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mydata<span class="sc">$</span>ps[mydata<span class="sc">$</span>training <span class="sc">==</span> <span class="dv">1</span>])  <span class="co"># Treated</span></span>
+<span id="cb49-13"><a href="#cb49-13" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mydata<span class="sc">$</span>ps[mydata<span class="sc">$</span>training <span class="sc">==</span> <span class="dv">0</span>])  <span class="co"># Control</span></span>
+<span id="cb49-14"><a href="#cb49-14" aria-hidden="true" tabindex="-1"></a><span class="co"># Good overlap in range [0.2, 0.8]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="first-match-pair-matching-on-propensity-score" class="level3">
+<h3 class="anchored" data-anchor-id="first-match-pair-matching-on-propensity-score">15.5 First Match: Pair Matching on Propensity Score</h3>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create distance</span></span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>ps_dist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(ps_model, <span class="at">data =</span> mydata)</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute pair match</span></span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>pm1 <span class="ot">&lt;-</span> <span class="fu">pairmatch</span>(ps_dist, <span class="at">data =</span> mydata, <span class="at">remove.unmatchables =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>pm1 <span class="ot">&lt;-</span> pm1</span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a><span class="co"># How many matched?</span></span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(<span class="fu">is.na</span>(pm1))</span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Matched: 620, Unmatched: 380</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb50-12"><a href="#cb50-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance</span></span>
+<span id="cb50-13"><a href="#cb50-13" aria-hidden="true" tabindex="-1"></a>bal1 <span class="ot">&lt;-</span> <span class="fu">balanceTest</span>(training <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> prior_earnings <span class="sc">+</span> </span>
+<span id="cb50-14"><a href="#cb50-14" aria-hidden="true" tabindex="-1"></a>                    employment_history <span class="sc">+</span> <span class="fu">strata</span>(pm1),</span>
+<span id="cb50-15"><a href="#cb50-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> mydata, <span class="at">p.adjust.method =</span> <span class="st">"holm"</span>)</span>
+<span id="cb50-16"><a href="#cb50-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bal1<span class="sc">$</span>overall)</span>
+<span id="cb50-17"><a href="#cb50-17" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bal1<span class="sc">$</span>results[, , <span class="st">"pm1"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Result:</strong> p-value = 0.03 (not great, but improved from unadjusted) <strong>Problem:</strong> Age still imbalanced (z = 2.8)</p>
+</section>
+<section id="iteration-1-add-age-caliper" class="level3">
+<h3 class="anchored" data-anchor-id="iteration-1-add-age-caliper">15.6 Iteration 1: Add Age Caliper</h3>
+<div class="sourceCode" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check age distribution</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>age_dist <span class="ot">&lt;-</span> <span class="fu">match_on</span>(training <span class="sc">~</span> age, <span class="at">data =</span> mydata)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(<span class="fu">as.vector</span>(age_dist), <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.1</span>))</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Add 5-year caliper on age</span></span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>pm2 <span class="ot">&lt;-</span> <span class="fu">pairmatch</span>(ps_dist <span class="sc">+</span> <span class="fu">caliper</span>(age_dist, <span class="dv">5</span>), </span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> mydata, <span class="at">remove.unmatchables =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>pm2 <span class="ot">&lt;-</span> pm2</span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Check balance</span></span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>bal2 <span class="ot">&lt;-</span> <span class="fu">balanceTest</span>(training <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> prior_earnings <span class="sc">+</span> </span>
+<span id="cb51-12"><a href="#cb51-12" aria-hidden="true" tabindex="-1"></a>                    employment_history <span class="sc">+</span> <span class="fu">strata</span>(pm2),</span>
+<span id="cb51-13"><a href="#cb51-13" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> mydata, <span class="at">p.adjust.method =</span> <span class="st">"holm"</span>)</span>
+<span id="cb51-14"><a href="#cb51-14" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bal2<span class="sc">$</span>overall)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Result:</strong> p-value = 0.18 (better!) <strong>Trade-off:</strong> Now only 550 matched (lost 70 units) <strong>Decision:</strong> Acceptable trade-off for better balance</p>
+</section>
+<section id="iteration-2-exact-match-on-education-level" class="level3">
+<h3 class="anchored" data-anchor-id="iteration-2-exact-match-on-education-level">15.7 Iteration 2: Exact Match on Education Level?</h3>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Check if education balance is concern</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>bal2<span class="sc">$</span>results[<span class="st">"education"</span>, , <span class="st">"pm2"</span>]</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Still some imbalance (z = 1.9)</span></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Try exact matching on education categories</span></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>ed_category <span class="ot">&lt;-</span> <span class="fu">cut</span>(mydata<span class="sc">$</span>education, <span class="at">breaks =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">12</span>, <span class="dv">16</span>, <span class="dv">20</span>))</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>pm3 <span class="ot">&lt;-</span> <span class="fu">pairmatch</span>(ps_dist <span class="sc">+</span> <span class="fu">caliper</span>(age_dist, <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>                 <span class="fu">exactMatch</span>(training <span class="sc">~</span> ed_category, <span class="at">data =</span> mydata),</span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">data =</span> mydata, <span class="at">remove.unmatchables =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>mydata<span class="sc">$</span>pm3 <span class="ot">&lt;-</span> pm3</span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>bal3 <span class="ot">&lt;-</span> <span class="fu">balanceTest</span>(training <span class="sc">~</span> age <span class="sc">+</span> education <span class="sc">+</span> prior_earnings <span class="sc">+</span> </span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>                    employment_history <span class="sc">+</span> <span class="fu">strata</span>(pm3),</span>
+<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> mydata, <span class="at">p.adjust.method =</span> <span class="st">"holm"</span>)</span>
+<span id="cb52-16"><a href="#cb52-16" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bal3<span class="sc">$</span>overall)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Result:</strong> p-value = 0.45 (excellent!) <strong>Trade-off:</strong> Now 520 matched (lost 30 more) <strong>Decision:</strong> This is our final design</p>
+</section>
+<section id="final-design-evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="final-design-evaluation">15.8 Final Design Evaluation</h3>
+<div class="sourceCode" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Detailed balance table</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(bal3<span class="sc">$</span>results[, , <span class="st">"pm3"</span>])</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Substantive balance check: worst sets</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>set_diffs <span class="ot">&lt;-</span> mydata <span class="sc">%&gt;%</span></span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pm3)) <span class="sc">%&gt;%</span></span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(pm3) <span class="sc">%&gt;%</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">age_diff =</span> <span class="fu">abs</span>(<span class="fu">mean</span>(age[training<span class="sc">==</span><span class="dv">1</span>]) <span class="sc">-</span> <span class="fu">mean</span>(age[training<span class="sc">==</span><span class="dv">0</span>])),</span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">earn_diff =</span> <span class="fu">abs</span>(<span class="fu">mean</span>(prior_earnings[training<span class="sc">==</span><span class="dv">1</span>]) <span class="sc">-</span> <span class="fu">mean</span>(prior_earnings[training<span class="sc">==</span><span class="dv">0</span>]))</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(set_diffs<span class="sc">$</span>age_diff, <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.1</span>))</span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a><span class="co"># 90% of pairs differ by &lt; 4 years (acceptable)</span></span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a><span class="fu">quantile</span>(set_diffs<span class="sc">$</span>earn_diff, <span class="fu">seq</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="fl">0.1</span>))</span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a><span class="co"># 90% of pairs differ by &lt; $8,000 (acceptable given variance)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="effect-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="effect-estimation">15.9 Effect Estimation</h3>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Precision-weighted estimate (fixed effects)</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>ate_estimate <span class="ot">&lt;-</span> <span class="fu">lm_robust</span>(earnings <span class="sc">~</span> training, </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fixed_effects =</span> <span class="sc">~</span>pm3,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>                          <span class="at">data =</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pm3)),</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>                          <span class="at">clusters =</span> pm3)</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ate_estimate)</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Point estimate: $3,200 increase</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a><span class="co"># 95% CI: [$1,100, $5,300]</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a><span class="co"># p-value: 0.003</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Block-weighted estimate (for comparison)</span></span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>ate_block <span class="ot">&lt;-</span> <span class="fu">difference_in_means</span>(earnings <span class="sc">~</span> training, <span class="at">blocks =</span> pm3,</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>                                <span class="at">data =</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pm3)))</span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(ate_block)</span>
+<span id="cb54-16"><a href="#cb54-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Very similar: $3,150</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="sensitivity-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="sensitivity-analysis">15.10 Sensitivity Analysis</h3>
+<div class="sourceCode" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(senstrat)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Prepare data for senstrat</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>matched_data <span class="ot">&lt;-</span> mydata <span class="sc">%&gt;%</span> <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(pm3)) <span class="sc">%&gt;%</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(pm3, training)</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Run sensitivity analysis</span></span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>sens_result <span class="ot">&lt;-</span> <span class="fu">senstrat</span>(</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">outcome =</span> matched_data<span class="sc">$</span>earnings,</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> matched_data<span class="sc">$</span>training,</span>
+<span id="cb55-11"><a href="#cb55-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">s =</span> <span class="fu">as.numeric</span>(matched_data<span class="sc">$</span>pm3),</span>
+<span id="cb55-12"><a href="#cb55-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="fl">0.1</span>)</span>
+<span id="cb55-13"><a href="#cb55-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb55-14"><a href="#cb55-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-15"><a href="#cb55-15" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sens_result)</span>
+<span id="cb55-16"><a href="#cb55-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb55-17"><a href="#cb55-17" aria-hidden="true" tabindex="-1"></a><span class="co"># Interpretation: Significant up to Γ = 1.4</span></span>
+<span id="cb55-18"><a href="#cb55-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Meaning: Unobserved confounder would need to increase</span></span>
+<span id="cb55-19"><a href="#cb55-19" aria-hidden="true" tabindex="-1"></a><span class="co"># odds of treatment by 40% to change conclusions</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="reporting" class="level3">
+<h3 class="anchored" data-anchor-id="reporting">15.11 Reporting</h3>
+<p><strong>Methods Summary:</strong> “We used 1:1 propensity score matching with calipers on age (5 years) and exact matching on education level. Final matched sample included 520 individuals (260 pairs). Balance tests showed no significant imbalance on observed covariates (χ² p-value = 0.45).”</p>
+<p><strong>Results Summary:</strong> “Job training increased earnings by $3,200 (95% CI: $1,100-$5,300, p=0.003). Results are robust to moderate unobserved confounding (Γ = 1.4), suggesting conclusions are reasonably robust.”</p>
+</section>
+<section id="lessons-from-this-case" class="level3">
+<h3 class="anchored" data-anchor-id="lessons-from-this-case">15.12 Lessons from This Case</h3>
+<ul>
+<li>Started simple, iterated based on balance</li>
+<li>Made explicit trade-offs (balance vs.&nbsp;sample size)</li>
+<li>Documented all steps transparently</li>
+<li>Sensitivity analysis part of causal argument</li>
+<li>Appropriate hedging in conclusions</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="case-study-2-complex-evaluation-with-multiple-constraints-full-matching" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-2-complex-evaluation-with-multiple-constraints-full-matching">16. Case Study 2: Complex Evaluation with Multiple Constraints (Full Matching)</h2>
+<section id="context" class="level3">
+<h3 class="anchored" data-anchor-id="context">16.1 Context</h3>
+<p><strong>Background:</strong> Federal agency evaluating effect of site visits on contractor compliance.</p>
+<p><strong>Complexity factors:</strong> - Multiple confounders (contract size, type, history) - Some contractors much larger than others - Geographic clustering - Want to retain all observations (political sensitivity)</p>
+<p><strong>Data:</strong> 2,000 contractors - Treatment: Received site visit (N=600) - Control: No visit (N=1,400) - Covariates: Contract value, contract type, prior violations, region, years in business</p>
+</section>
+<section id="why-full-matching" class="level3">
+<h3 class="anchored" data-anchor-id="why-full-matching">16.2 Why Full Matching?</h3>
+<ul>
+<li>Cannot afford to discard contractors (all are stakeholders)</li>
+<li>Variable set sizes can accommodate diverse population</li>
+<li>Some contractors have no close matches → allow flexible set sizes</li>
+</ul>
+</section>
+<section id="approach" class="level3">
+<h3 class="anchored" data-anchor-id="approach">16.3 Approach</h3>
+<p>[Detailed walk-through showing:] - Exact matching on contract type and region - Mahalanobis distance on continuous variables - Calipers on contract size - Iteration with set size constraints - Comparison to pair matching (too many lost observations) - Final design with variable sets (1:1 to 1:5) - Careful interpretation of variable-sized sets for stakeholders</p>
+</section>
+<section id="key-takeaways" class="level3">
+<h3 class="anchored" data-anchor-id="key-takeaways">16.4 Key Takeaways</h3>
+<ul>
+<li>Full matching when sample retention critical</li>
+<li>Exact matching handles categorical variables with political importance</li>
+<li>Communication challenge: explaining variable sets to non-technical audience</li>
+<li>Solution: Focus on overall balance, use example sets for illustration</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="case-study-3-dose-response-analysis-non-bipartite-matching" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-3-dose-response-analysis-non-bipartite-matching">17. Case Study 3: Dose-Response Analysis (Non-bipartite Matching)</h2>
+<section id="context-1" class="level3">
+<h3 class="anchored" data-anchor-id="context-1">17.1 Context</h3>
+<p><strong>Background:</strong> Education researcher studying effect of class size on student achievement.</p>
+<p><strong>Why non-bipartite:</strong> - Treatment is continuous (class size: 15-35 students) - No clear “control” group - Interested in full dose-response curve - Non-linear effects plausible</p>
+<p><strong>Data:</strong> 500 classrooms - Treatment: Class size (continuous) - Covariates: Teacher experience, school resources, student demographics - Outcome: Average test scores</p>
+</section>
+<section id="approach-1" class="level3">
+<h3 class="anchored" data-anchor-id="approach-1">17.2 Approach</h3>
+<p>[Detailed walk-through showing:] - Creating matched triplets varying in class size - Ensuring balance on confounders within triplets - Estimation of dose-response curve - Testing for non-linearity - Comparison to unmatched analysis - Visualization of results</p>
+</section>
+<section id="key-challenges" class="level3">
+<h3 class="anchored" data-anchor-id="key-challenges">17.3 Key Challenges</h3>
+<ul>
+<li>Balance evaluation more complex</li>
+<li>Functional form uncertainty</li>
+<li>Communication: dose-response curves harder to explain than simple treatment effects</li>
+</ul>
+</section>
+<section id="key-takeaways-1" class="level3">
+<h3 class="anchored" data-anchor-id="key-takeaways-1">17.4 Key Takeaways</h3>
+<ul>
+<li>Non-bipartite matching viable for continuous treatments</li>
+<li>Requires more careful modeling than binary treatment</li>
+<li>Visualization essential for communication</li>
+<li>Consider whether binning treatment to high/low/medium simpler</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="comparative-case-study-same-data-four-methods" class="level2">
+<h2 class="anchored" data-anchor-id="comparative-case-study-same-data-four-methods">18. Comparative Case Study: Same Data, Four Methods</h2>
+<section id="setup-1" class="level3">
+<h3 class="anchored" data-anchor-id="setup-1">18.1 Setup</h3>
+<p>Using job training data from Case Study 1, apply all four methods: 1. Pair matching (optmatch) 2. Full matching (optmatch) 3. Bipartite bmatch (designmatch) 4. Compare results systematically</p>
+</section>
+<section id="implementation-1" class="level3">
+<h3 class="anchored" data-anchor-id="implementation-1">18.2 Implementation</h3>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="co"># [Complete code showing all four approaches with same distance matrices]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="comparison-table" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-table">18.3 Comparison Table</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 9%">
+<col style="width: 19%">
+<col style="width: 18%">
+<col style="width: 19%">
+<col style="width: 9%">
+<col style="width: 22%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Sample Retained</th>
+<th>Balance (χ² p)</th>
+<th>Point Estimate</th>
+<th>95% CI</th>
+<th>Computation Time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pair (optmatch)</td>
+<td>520/1000 (52%)</td>
+<td>0.45</td>
+<td>$3,200</td>
+<td>[$1,100, $5,300]</td>
+<td>2 seconds</td>
+</tr>
+<tr class="even">
+<td>Full (optmatch)</td>
+<td>980/1000 (98%)</td>
+<td>0.52</td>
+<td>$3,100</td>
+<td>[$1,300, $4,900]</td>
+<td>3 seconds</td>
+</tr>
+<tr class="odd">
+<td>Pair (designmatch)</td>
+<td>510/1000 (51%)</td>
+<td>0.48</td>
+<td>$3,250</td>
+<td>[$1,000, $5,500]</td>
+<td>45 seconds</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">18.4 Interpretation</h3>
+<ul>
+<li>All methods give similar point estimates (reassuring!)</li>
+<li>Full matching has narrower CI (more sample)</li>
+<li>Full matching also achieved slightly better balance</li>
+<li>For this case, full matching preferred</li>
+<li>designmatch didn’t add value (standard constraints sufficient)</li>
+</ul>
+</section>
+<section id="decision-guidelines" class="level3">
+<h3 class="anchored" data-anchor-id="decision-guidelines">18.5 Decision Guidelines</h3>
+<p><strong>Use pair matching when:</strong> - Interpretation simplicity paramount - Ample sample size - Stakeholder communication critical</p>
+<p><strong>Use full matching when:</strong> - Cannot afford to lose observations - Want maximum statistical power - Audience comfortable with variable sets</p>
+<p><strong>Use designmatch when:</strong> - Standard constraints insufficient - Need near-exact matching - Specific balance requirements</p>
+</section>
+<section id="lessons" class="level3">
+<h3 class="anchored" data-anchor-id="lessons">18.6 Lessons</h3>
+<ul>
+<li>Results often robust to method choice (good sign!)</li>
+<li>When different methods give different answers, investigate why</li>
+<li>Use comparison as sensitivity check</li>
+<li>Method choice often driven by practical considerations, not just statistics</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="appendices" class="level2">
+<h2 class="anchored" data-anchor-id="appendices">Appendices</h2>
+<p>[Same appendices as Approach 1]</p>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>[Bibliography]</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

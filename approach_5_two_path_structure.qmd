@@ -3,9 +3,13 @@
 ## Approach 5: Two-Path Structure (Quick Start + Deep Dive)
 
 **How to Use This Guide:**
+
 - **Need to get started quickly?** → Read Part A (Practitioner's Guide) and skim the relevant Method Module in Part C
+
 - **Want deep understanding?** → Read Part B (Conceptual Foundation) before diving into Part C
+
 - **Comparing methods?** → Jump to Part D (Case Studies) after reading Part A
+
 - **Reference specific parameters?** → Use Part C (Method Encyclopædia) as lookup
 
 ---
@@ -35,15 +39,23 @@ START: What type of treatment do you have?
 ### 1.2 Is Matching Right for Your Study?
 
 **Use matching when:**
+
 - ✓ Treatment assignment is non-random
+
 - ✓ You have comparison group
+
 - ✓ Rich covariate information available
+
 - ✓ Seeking causal estimates
 
 **Don't use matching when:**
+
 - ✗ True randomized experiment (matching redundant)
+
 - ✗ No comparison group exists
+
 - ✗ Poor covariate overlap between groups
+
 - ✗ Better design available (RDD, IV)
 
 **Quick check:** Can you identify 5+ pre-treatment covariates that predict both treatment and outcome? If yes → matching likely appropriate.

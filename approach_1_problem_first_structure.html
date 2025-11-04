@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>approach_1_problem_first_structure</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="approach_1_problem_first_structure_files/libs/clipboard/clipboard.min.js"></script>
+<script src="approach_1_problem_first_structure_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="approach_1_problem_first_structure_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="approach_1_problem_first_structure_files/libs/quarto-html/popper.min.js"></script>
+<script src="approach_1_problem_first_structure_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="approach_1_problem_first_structure_files/libs/quarto-html/anchor.min.js"></script>
+<link href="approach_1_problem_first_structure_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="approach_1_problem_first_structure_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="approach_1_problem_first_structure_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="approach_1_problem_first_structure_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="approach_1_problem_first_structure_files/libs/bootstrap/bootstrap-bb462d781dde1847d9e3ccf7736099dd.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+
+<section id="the-oes-guide-to-making-and-evaluating-matched-designs" class="level1">
+<h1>The OES Guide to Making and Evaluating Matched Designs</h1>
+<section id="approach-1-problem-first-structure-practitioner-focused" class="level2">
+<h2 class="anchored" data-anchor-id="approach-1-problem-first-structure-practitioner-focused">Approach 1: Problem-First Structure (Practitioner-Focused)</h2>
+<hr>
+</section>
+<section id="when-should-you-use-matching" class="level2">
+<h2 class="anchored" data-anchor-id="when-should-you-use-matching">1. When Should You Use Matching?</h2>
+<section id="decision-framework" class="level3">
+<h3 class="anchored" data-anchor-id="decision-framework">1.1 Decision Framework</h3>
+<ul>
+<li><strong>Flowchart</strong>: Treatment assignment → Sample characteristics → Research question → Method recommendation</li>
+<li><strong>Key decision points</strong>:
+<ul>
+<li>Is your treatment binary, multi-level, or continuous?</li>
+<li>Do you have a clear comparison group?</li>
+<li>Are you seeking causal estimates or descriptive comparisons?</li>
+<li>What are your data constraints (sample size, missingness)?</li>
+</ul></li>
+</ul>
+</section>
+<section id="contexts-where-matching-excels" class="level3">
+<h3 class="anchored" data-anchor-id="contexts-where-matching-excels">1.2 Contexts Where Matching Excels</h3>
+<ul>
+<li>Observational studies with selection into treatment</li>
+<li>When you have rich covariate information</li>
+<li>Policy evaluations without experimental assignment</li>
+<li>When you need transparent, interpretable comparisons</li>
+<li>Studies where exact balance on key variables is critical</li>
+</ul>
+</section>
+<section id="when-not-to-use-matching" class="level3">
+<h3 class="anchored" data-anchor-id="when-not-to-use-matching">1.3 When NOT to Use Matching</h3>
+<ul>
+<li>True experiments (matching is redundant)</li>
+<li>Weak overlap between treated and control groups</li>
+<li>Limited covariate information</li>
+<li>When regression discontinuity or IV designs are available</li>
+<li>Very small sample sizes (case-by-case)</li>
+</ul>
+</section>
+<section id="alternatives-to-consider" class="level3">
+<h3 class="anchored" data-anchor-id="alternatives-to-consider">1.4 Alternatives to Consider</h3>
+<ul>
+<li>Regression adjustment (and why it’s different)</li>
+<li>Inverse probability weighting</li>
+<li>Regression discontinuity designs</li>
+<li>Instrumental variables</li>
+<li>Difference-in-differences</li>
+<li>Synthetic control methods</li>
+</ul>
+</section>
+<section id="common-pitfalls-and-red-flags" class="level3">
+<h3 class="anchored" data-anchor-id="common-pitfalls-and-red-flags">1.5 Common Pitfalls and Red Flags</h3>
+<ul>
+<li>“Fishing” for balance by trying many matching approaches</li>
+<li>Matching on post-treatment variables</li>
+<li>Over-matching (matching away treatment effects)</li>
+<li>Ignoring common support problems</li>
+<li>Confusing balance with bias elimination</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="why-we-match-the-causal-inference-problem" class="level2">
+<h2 class="anchored" data-anchor-id="why-we-match-the-causal-inference-problem">2. Why We Match: The Causal Inference Problem</h2>
+<section id="the-fundamental-problem-of-causal-inference" class="level3">
+<h3 class="anchored" data-anchor-id="the-fundamental-problem-of-causal-inference">2.1 The Fundamental Problem of Causal Inference</h3>
+<ul>
+<li>Potential outcomes framework</li>
+<li>The missing counterfactual</li>
+<li>Simple numerical example with job training program</li>
+</ul>
+</section>
+<section id="alternative-explanations-and-confounding" class="level3">
+<h3 class="anchored" data-anchor-id="alternative-explanations-and-confounding">2.2 Alternative Explanations and Confounding</h3>
+<ul>
+<li>What is a confounder?</li>
+<li>Visual examples: DAGs showing confounding paths</li>
+<li>The age and job training example (expanded from current draft)</li>
+</ul>
+</section>
+<section id="what-randomization-does" class="level3">
+<h3 class="anchored" data-anchor-id="what-randomization-does">2.3 What Randomization Does</h3>
+<ul>
+<li>How random assignment eliminates confounding</li>
+<li>Balance in expectation vs.&nbsp;exact balance</li>
+<li>Block-randomized experiments as template</li>
+</ul>
+</section>
+<section id="what-randomization-doesnt-do" class="level3">
+<h3 class="anchored" data-anchor-id="what-randomization-doesnt-do">2.4 What Randomization Doesn’t Do</h3>
+<ul>
+<li>Doesn’t guarantee exact balance</li>
+<li>Doesn’t solve non-compliance</li>
+<li>Doesn’t address spillovers or interference</li>
+<li>Limited to observed confounders in practice</li>
+</ul>
+</section>
+<section id="what-matching-can-achieve" class="level3">
+<h3 class="anchored" data-anchor-id="what-matching-can-achieve">2.5 What Matching Can Achieve</h3>
+<ul>
+<li>Approximating experimental comparison groups</li>
+<li>Creating defensible counterfactuals</li>
+<li>Making assumptions explicit and testable</li>
+<li>Reducing model dependence</li>
+</ul>
+</section>
+<section id="what-matching-cannot-achieve" class="level3">
+<h3 class="anchored" data-anchor-id="what-matching-cannot-achieve">2.6 What Matching Cannot Achieve</h3>
+<ul>
+<li><strong>Critical</strong>: Cannot control for unobserved confounders</li>
+<li>Cannot fix fundamental lack of overlap</li>
+<li>Cannot create data where none exists</li>
+<li>Not a substitute for good research design</li>
+</ul>
+</section>
+<section id="core-assumptions-for-causal-interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="core-assumptions-for-causal-interpretation">2.7 Core Assumptions for Causal Interpretation</h3>
+<ul>
+<li><strong>Ignorability/No unmeasured confounding</strong>: Treatment assignment independent of potential outcomes given covariates</li>
+<li><strong>Overlap/Common support</strong>: Positive probability of treatment for all covariate values</li>
+<li><strong>SUTVA</strong>: Stable unit treatment value assumption</li>
+<li>Making these assumptions plausible through design</li>
+</ul>
+</section>
+<section id="the-stratification-solution" class="level3">
+<h3 class="anchored" data-anchor-id="the-stratification-solution">2.8 The Stratification Solution</h3>
+<ul>
+<li>How stratification addresses confounding</li>
+<li>Connection between exact matching and stratification</li>
+<li>Why we need algorithms for multivariate matching</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="the-matching-toolkit-methods-overview" class="level2">
+<h2 class="anchored" data-anchor-id="the-matching-toolkit-methods-overview">3. The Matching Toolkit: Methods Overview</h2>
+<section id="quick-reference-table" class="level3">
+<h3 class="anchored" data-anchor-id="quick-reference-table">3.1 Quick Reference Table</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 17%">
+<col style="width: 17%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Method</th>
+<th>Treatment Type</th>
+<th>Set Structure</th>
+<th>Software</th>
+<th>Best For</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Pair Matching</td>
+<td>Binary</td>
+<td>Fixed pairs</td>
+<td>optmatch, designmatch</td>
+<td>Maximum transparency</td>
+</tr>
+<tr class="even">
+<td>Full Matching</td>
+<td>Binary</td>
+<td>Variable sets</td>
+<td>optmatch</td>
+<td>Maximum sample use</td>
+</tr>
+<tr class="odd">
+<td>Bipartite (designmatch)</td>
+<td>Binary</td>
+<td>Fixed k:1</td>
+<td>designmatch</td>
+<td>Fine-tuned constraints</td>
+</tr>
+<tr class="even">
+<td>Non-bipartite</td>
+<td>Continuous/Multi-level</td>
+<td>Variable sets</td>
+<td>designmatch</td>
+<td>Dose-response</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="bipartite-vs.-non-bipartite-matching" class="level3">
+<h3 class="anchored" data-anchor-id="bipartite-vs.-non-bipartite-matching">3.2 Bipartite vs.&nbsp;Non-bipartite Matching</h3>
+<ul>
+<li><strong>Bipartite</strong>: Separate treated and control groups
+<ul>
+<li>Used when treatment is binary</li>
+<li>Creates strata comparing treated to control units</li>
+<li>Most common in practice</li>
+</ul></li>
+<li><strong>Non-bipartite</strong>: No clear treated/control division
+<ul>
+<li>Used with continuous treatments or doses</li>
+<li>Creates strata varying in treatment level</li>
+<li>Each stratum has range of treatment values</li>
+</ul></li>
+</ul>
+</section>
+<section id="pair-matching-vs.-full-matching" class="level3">
+<h3 class="anchored" data-anchor-id="pair-matching-vs.-full-matching">3.3 Pair Matching vs.&nbsp;Full Matching</h3>
+<ul>
+<li><strong>Pair matching</strong>: One treated, one control per set
+<ul>
+<li>Advantages: Maximum simplicity, easy interpretation</li>
+<li>Disadvantages: Discards data, may force poor matches</li>
+<li>Effective sample size considerations</li>
+</ul></li>
+<li><strong>Full matching</strong>: Variable number of treated and controls
+<ul>
+<li>Advantages: Uses all data, optimizes overall balance</li>
+<li>Disadvantages: More complex sets to interpret</li>
+<li>When to prefer each approach</li>
+</ul></li>
+</ul>
+</section>
+<section id="distance-metrics-compared" class="level3">
+<h3 class="anchored" data-anchor-id="distance-metrics-compared">3.4 Distance Metrics Compared</h3>
+<ul>
+<li><strong>Mahalanobis distance</strong>: Weights all covariates equally (after scaling)
+<ul>
+<li>When to use: Theory suggests all covariates matter equally</li>
+<li>Rank-based version for robustness</li>
+</ul></li>
+<li><strong>Propensity score distance</strong>: Weights by predictiveness
+<ul>
+<li>When to use: Some covariates strongly predict treatment</li>
+<li>Requires careful model specification</li>
+</ul></li>
+<li><strong>Absolute/Euclidean distance</strong>: Single variable differences
+<ul>
+<li>When to use: One variable dominates concern</li>
+</ul></li>
+<li><strong>Combined distances</strong>: Adding multiple distance matrices
+<ul>
+<li>When to use: Multiple dimensions of similarity matter</li>
+</ul></li>
+</ul>
+</section>
+<section id="software-ecosystem" class="level3">
+<h3 class="anchored" data-anchor-id="software-ecosystem">3.5 Software Ecosystem</h3>
+<ul>
+<li><strong>optmatch</strong>: Network flow optimization, fast, flexible</li>
+<li><strong>designmatch</strong>: Mixed integer programming, more constraints</li>
+<li><strong>Other options</strong>: MatchIt, Matching, CBPS (brief mentions)</li>
+<li>When to use which package</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="building-your-match-step-by-step-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="building-your-match-step-by-step-workflow">4. Building Your Match: Step-by-Step Workflow</h2>
+<section id="universal-matching-workflow" class="level3">
+<h3 class="anchored" data-anchor-id="universal-matching-workflow">4.1 Universal Matching Workflow</h3>
+<pre><code>1. Define comparison question
+2. Identify relevant covariates (theory-driven)
+3. Assess overlap/common support
+4. Choose matching method and distance
+5. Set initial constraints
+6. Execute matching algorithm
+7. Evaluate balance
+8. Iterate if needed (steps 5-7)
+9. Once satisfied: estimate effects
+10. Sensitivity analysis</code></pre>
+</section>
+<section id="step-1-2-choosing-covariates" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-2-choosing-covariates">4.2 Step 1-2: Choosing Covariates</h3>
+<ul>
+<li><strong>Theory-driven selection</strong>: What variables could confound?</li>
+<li>Pre-treatment covariates only (post-treatment variables are outcomes)</li>
+<li>Balance quantity vs.&nbsp;quality of covariates</li>
+<li>What to do about missing covariate data</li>
+<li>Example decision process for job training case</li>
+</ul>
+</section>
+<section id="step-3-assessing-overlap" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-assessing-overlap">4.3 Step 3: Assessing Overlap</h3>
+<ul>
+<li>Visual checks: propensity score distributions by group</li>
+<li>Identifying regions of poor overlap</li>
+<li>Trimming decisions and trade-offs</li>
+<li>Code examples for overlap assessment</li>
+</ul>
+</section>
+<section id="step-4-selecting-distance-metrics" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-selecting-distance-metrics">4.4 Step 4: Selecting Distance Metrics</h3>
+<ul>
+<li>Decision tree for metric selection</li>
+<li>When to combine multiple distances</li>
+<li>Dimension reduction strategies</li>
+<li>Code: Creating distance matrices</li>
+</ul>
+</section>
+<section id="step-5-setting-constraints" class="level3">
+<h3 class="anchored" data-anchor-id="step-5-setting-constraints">4.5 Step 5: Setting Constraints</h3>
+<ul>
+<li><strong>Calipers</strong>: Maximum allowed distance
+<ul>
+<li>How to choose caliper width</li>
+<li>Trade-offs: balance vs.&nbsp;sample retention</li>
+</ul></li>
+<li><strong>Exact matching</strong>: Perfect balance on categorical variables
+<ul>
+<li>When to use exact matching</li>
+<li>Computational considerations</li>
+</ul></li>
+<li><strong>Set size restrictions</strong>: min/max controls
+<ul>
+<li>Impact on effective sample size</li>
+<li>When to constrain set sizes</li>
+</ul></li>
+</ul>
+</section>
+<section id="steps-6-8-execute-and-iterate" class="level3">
+<h3 class="anchored" data-anchor-id="steps-6-8-execute-and-iterate">4.6 Steps 6-8: Execute and Iterate</h3>
+<ul>
+<li>Running your first match</li>
+<li>Interpreting initial results</li>
+<li>Systematic iteration strategy (not data mining)</li>
+<li>When to stop iterating</li>
+</ul>
+</section>
+<section id="documentation-best-practices" class="level3">
+<h3 class="anchored" data-anchor-id="documentation-best-practices">4.7 Documentation Best Practices</h3>
+<ul>
+<li>Keep record of all attempts</li>
+<li>Pre-specify stopping rules if possible</li>
+<li>Transparent reporting of iteration process</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="method-details-bipartite-matching-with-optmatch" class="level2">
+<h2 class="anchored" data-anchor-id="method-details-bipartite-matching-with-optmatch">5. Method Details: Bipartite Matching with optmatch</h2>
+<section id="when-to-use-optmatch" class="level3">
+<h3 class="anchored" data-anchor-id="when-to-use-optmatch">5.1 When to Use optmatch</h3>
+<ul>
+<li>Fast network flow algorithm</li>
+<li>Flexible distance specifications</li>
+<li>Excellent for exploratory matching</li>
+<li>R-native with good integration</li>
+</ul>
+</section>
+<section id="core-functions" class="level3">
+<h3 class="anchored" data-anchor-id="core-functions">5.2 Core Functions</h3>
+<ul>
+<li><code>match_on()</code>: Creating distance matrices</li>
+<li><code>pairmatch()</code>: Pair matching</li>
+<li><code>fullmatch()</code>: Full matching with variable sets</li>
+<li><code>caliper()</code>: Adding distance constraints</li>
+<li><code>exactMatch()</code>: Perfect balance requirements</li>
+</ul>
+</section>
+<section id="key-parameters-and-their-effects" class="level3">
+<h3 class="anchored" data-anchor-id="key-parameters-and-their-effects">5.3 Key Parameters and Their Effects</h3>
+<section id="pairmatch-parameters" class="level4">
+<h4 class="anchored" data-anchor-id="pairmatch-parameters">5.3.1 pairmatch() Parameters</h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">pairmatch</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  distance,           <span class="co"># Distance matrix</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">controls =</span> <span class="dv">1</span>,       <span class="co"># Number of controls per treated</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  data,              <span class="co"># Data frame</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  remove.unmatchables <span class="co"># Keep or drop unmatched units</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><strong>controls</strong>: Fixed ratio (e.g., 2 means 1:2 matching)</li>
+<li><strong>remove.unmatchables</strong>: TRUE drops units that can’t be matched</li>
+<li>Trade-offs of each parameter choice</li>
+</ul>
+</section>
+<section id="fullmatch-parameters" class="level4">
+<h4 class="anchored" data-anchor-id="fullmatch-parameters">5.3.2 fullmatch() Parameters</h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">fullmatch</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  distance,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  min.controls,     <span class="co"># Minimum controls per treated</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  max.controls,     <span class="co"># Maximum controls per treated</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  data,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  tol              <span class="co"># Optimization tolerance</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><strong>min/max.controls</strong>: Constrains set sizes
+<ul>
+<li>Larger range = better balance, more complex sets</li>
+<li>Smaller range = simpler interpretation, may sacrifice balance</li>
+</ul></li>
+<li><strong>tol</strong>: Smaller values = better solution, slower computation</li>
+<li>Effective sample size implications</li>
+</ul>
+</section>
+<section id="distance-specification-options" class="level4">
+<h4 class="anchored" data-anchor-id="distance-specification-options">5.3.3 Distance Specification Options</h4>
+<ul>
+<li>Method argument: “rank_mahalanobis”, “mahalanobis”</li>
+<li>Within-group matching using exactMatch()</li>
+<li>Combining distances with + operator</li>
+<li>Adding calipers and penalties</li>
+</ul>
+</section>
+</section>
+<section id="complete-worked-example" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example">5.4 Complete Worked Example</h3>
+<ul>
+<li>Job training program data (use existing simulated data)</li>
+<li>Step-by-step code with narrative</li>
+<li>Multiple iterations shown</li>
+<li>Comparison of pair vs.&nbsp;full match on same data</li>
+</ul>
+</section>
+<section id="parameter-tuning-guide" class="level3">
+<h3 class="anchored" data-anchor-id="parameter-tuning-guide">5.5 Parameter Tuning Guide</h3>
+<ul>
+<li>Starting recommendations</li>
+<li>How to adjust based on balance results</li>
+<li>Computational time considerations</li>
+</ul>
+</section>
+<section id="troubleshooting-common-issues" class="level3">
+<h3 class="anchored" data-anchor-id="troubleshooting-common-issues">5.6 Troubleshooting Common Issues</h3>
+<ul>
+<li>“No feasible solution” errors</li>
+<li>Very slow execution</li>
+<li>Poor balance despite iteration</li>
+<li>Excessive dropped units</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="method-details-bipartite-matching-with-designmatch" class="level2">
+<h2 class="anchored" data-anchor-id="method-details-bipartite-matching-with-designmatch">6. Method Details: Bipartite Matching with designmatch</h2>
+<section id="when-to-use-designmatch" class="level3">
+<h3 class="anchored" data-anchor-id="when-to-use-designmatch">6.1 When to Use designmatch</h3>
+<ul>
+<li>Need more fine-grained control over constraints</li>
+<li>Want to specify “near” constraints (penalties, not hard limits)</li>
+<li>Working with integer programming optimization</li>
+<li>Specific balance requirements</li>
+</ul>
+</section>
+<section id="core-function-bmatch" class="level3">
+<h3 class="anchored" data-anchor-id="core-function-bmatch">6.2 Core Function: bmatch()</h3>
+</section>
+<section id="key-parameters-and-their-effects-1" class="level3">
+<h3 class="anchored" data-anchor-id="key-parameters-and-their-effects-1">6.3 Key Parameters and Their Effects</h3>
+<section id="basic-bmatch-syntax" class="level4">
+<h4 class="anchored" data-anchor-id="basic-bmatch-syntax">6.3.1 Basic bmatch() Syntax</h4>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  t_ind,           <span class="co"># Treatment indicator (sorted!)</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  dist_mat,        <span class="co"># Distance matrix</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  n_controls,      <span class="co"># Fixed number of controls</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  total_groups,    <span class="co"># Number of matched sets</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>  solver           <span class="co"># Optimization solver settings</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><strong>Critical</strong>: Data must be sorted by treatment (decreasing)</li>
+<li><strong>n_controls</strong>: Fixed ratio only (no variable sets like fullmatch)</li>
+<li><strong>total_groups</strong>: Determines how many units are matched</li>
+</ul>
+</section>
+<section id="constraint-parameters" class="level4">
+<h4 class="anchored" data-anchor-id="constraint-parameters">6.3.2 Constraint Parameters</h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bmatch</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  ...,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  subset_weight,   <span class="co"># Weight on minimizing distance vs. maximizing matches</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  near_exact,      <span class="co"># Variables to nearly match</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  exact,           <span class="co"># Variables to exactly match</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  near_pairs       <span class="co"># Pairs of variables to be near each other</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li><strong>subset_weight</strong>: 0 = minimize distance only; 1 = maximize matches</li>
+<li><strong>near_exact</strong>: Soft constraint (penalty for deviation)</li>
+<li><strong>exact</strong>: Hard constraint (must match exactly)</li>
+<li><strong>near_pairs</strong>: Keep specified variables close together</li>
+</ul>
+</section>
+<section id="solver-options" class="level4">
+<h4 class="anchored" data-anchor-id="solver-options">6.3.3 Solver Options</h4>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>solver <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">name =</span> <span class="st">"highs"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">approximate =</span> <span class="dv">1</span>,  <span class="co"># Use heuristics (faster)</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">t_max =</span> <span class="dv">1000</span>,    <span class="co"># Time limit in seconds</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">trace =</span> <span class="dv">1</span>        <span class="co"># Verbosity</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Solver choice: “highs”, “gurobi”, “symphony”</li>
+<li>Trade-offs: speed vs.&nbsp;optimality</li>
+</ul>
+</section>
+</section>
+<section id="comparison-to-optmatch" class="level3">
+<h3 class="anchored" data-anchor-id="comparison-to-optmatch">6.4 Comparison to optmatch</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Feature</th>
+<th>optmatch</th>
+<th>designmatch</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Algorithm</td>
+<td>Network flow</td>
+<td>Mixed integer programming</td>
+</tr>
+<tr class="even">
+<td>Variable set sizes</td>
+<td>Yes (fullmatch)</td>
+<td>No</td>
+</tr>
+<tr class="odd">
+<td>Near constraints</td>
+<td>No</td>
+<td>Yes</td>
+</tr>
+<tr class="even">
+<td>Speed</td>
+<td>Faster</td>
+<td>Slower</td>
+</tr>
+<tr class="odd">
+<td>Flexibility</td>
+<td>High</td>
+<td>Very high</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="complete-worked-example-1" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example-1">6.5 Complete Worked Example</h3>
+<ul>
+<li>Same job training data as optmatch example</li>
+<li>Demonstrating near_exact constraints</li>
+<li>Converting bmatch output to usable format</li>
+<li>Comparison to equivalent optmatch design</li>
+</ul>
+</section>
+<section id="when-designmatch-is-worth-the-extra-complexity" class="level3">
+<h3 class="anchored" data-anchor-id="when-designmatch-is-worth-the-extra-complexity">6.6 When designmatch is Worth the Extra Complexity</h3>
+<ul>
+<li>Need near-exact balance without hard calipers</li>
+<li>Multiple competing balance objectives</li>
+<li>Want to penalize rather than prohibit certain matches</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="method-details-non-bipartite-matching" class="level2">
+<h2 class="anchored" data-anchor-id="method-details-non-bipartite-matching">7. Method Details: Non-bipartite Matching</h2>
+<section id="when-to-use-non-bipartite-matching" class="level3">
+<h3 class="anchored" data-anchor-id="when-to-use-non-bipartite-matching">7.1 When to Use Non-bipartite Matching</h3>
+<ul>
+<li>Continuous treatment variable (dosage, intensity)</li>
+<li>Multi-level treatment (low, medium, high dose)</li>
+<li>No clear control group</li>
+<li>Interested in dose-response relationships</li>
+</ul>
+</section>
+<section id="key-conceptual-differences" class="level3">
+<h3 class="anchored" data-anchor-id="key-conceptual-differences">7.2 Key Conceptual Differences</h3>
+<ul>
+<li>Creates pairs/sets varying in treatment level</li>
+<li>Each set should have spread on treatment variable</li>
+<li>Still aiming to match on confounders</li>
+</ul>
+</section>
+<section id="using-nmatch-from-designmatch" class="level3">
+<h3 class="anchored" data-anchor-id="using-nmatch-from-designmatch">7.3 Using nmatch() from designmatch</h3>
+<ul>
+<li>Function syntax and key parameters</li>
+<li>Creating appropriate distance matrices</li>
+<li>Specifying treatment variation requirements</li>
+</ul>
+</section>
+<section id="complete-worked-example-2" class="level3">
+<h3 class="anchored" data-anchor-id="complete-worked-example-2">7.4 Complete Worked Example</h3>
+<ul>
+<li>Using trtcont variable from simulated data</li>
+<li>Creating quartile-based comparisons</li>
+<li>Evaluation specific to non-bipartite case</li>
+</ul>
+</section>
+<section id="special-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="special-considerations">7.5 Special Considerations</h3>
+<ul>
+<li>Effective sample size more complex</li>
+<li>Balance evaluation differs slightly</li>
+<li>Estimation approaches for dose-response</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="evaluating-your-design" class="level2">
+<h2 class="anchored" data-anchor-id="evaluating-your-design">8. Evaluating Your Design</h2>
+<section id="philosophy-how-good-is-good-enough" class="level3">
+<h3 class="anchored" data-anchor-id="philosophy-how-good-is-good-enough">8.1 Philosophy: How Good is Good Enough?</h3>
+<ul>
+<li>No universal standard</li>
+<li>Context and theory should guide</li>
+<li>Balance vs.&nbsp;sample size trade-offs</li>
+<li>Comparison to experimental standard as benchmark</li>
+</ul>
+</section>
+<section id="two-complementary-approaches" class="level3">
+<h3 class="anchored" data-anchor-id="two-complementary-approaches">8.2 Two Complementary Approaches</h3>
+<ol type="1">
+<li><strong>Substantive balance</strong>: Look at specific important variables</li>
+<li><strong>Statistical balance</strong>: Overall comparison to randomized experiments</li>
+</ol>
+</section>
+<section id="substantive-balance-evaluation" class="level3">
+<h3 class="anchored" data-anchor-id="substantive-balance-evaluation">8.3 Substantive Balance Evaluation</h3>
+<section id="within-set-differences-visualization" class="level4">
+<h4 class="anchored" data-anchor-id="within-set-differences-visualization">8.3.1 Within-Set Differences Visualization</h4>
+<ul>
+<li>Boxplots by set for key variables (keep existing Figure)</li>
+<li>Identifying worst-performing sets</li>
+<li>Quantile summaries of set-specific differences</li>
+<li>Code for creating these diagnostics</li>
+</ul>
+</section>
+<section id="context-specific-standards" class="level4">
+<h4 class="anchored" data-anchor-id="context-specific-standards">8.3.2 Context-Specific Standards</h4>
+<ul>
+<li>What difference in age is acceptable for your study?</li>
+<li>Which variables absolutely must be balanced?</li>
+<li>Can you defend remaining imbalances?</li>
+<li>Documenting your reasoning</li>
+</ul>
+</section>
+</section>
+<section id="statistical-balance-the-omnibus-test" class="level3">
+<h3 class="anchored" data-anchor-id="statistical-balance-the-omnibus-test">8.4 Statistical Balance: The Omnibus Test</h3>
+<section id="conceptual-foundation" class="level4">
+<h4 class="anchored" data-anchor-id="conceptual-foundation">8.4.1 Conceptual Foundation</h4>
+<ul>
+<li>What would we expect in a randomized experiment?</li>
+<li>Comparing observational design to experimental benchmark</li>
+<li>Why large differences can occur by chance</li>
+</ul>
+</section>
+<section id="using-balancetest-from-ritools" class="level4">
+<h4 class="anchored" data-anchor-id="using-balancetest-from-ritools">8.4.2 Using balanceTest() from RItools</h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">balanceTest</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  formula,           <span class="co"># Treatment ~ covariates + strata()</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  data,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  p.adjust.method    <span class="co"># Multiple testing correction</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Interpreting the overall χ² test</li>
+<li>Interpreting individual covariate statistics</li>
+<li>Understanding p-values in this context
+<ul>
+<li>p = 0.001: Design looks much worse than experiment</li>
+<li>p = 0.80: Design looks better than 80% of experiments</li>
+</ul></li>
+</ul>
+</section>
+<section id="individual-covariate-balance" class="level4">
+<h4 class="anchored" data-anchor-id="individual-covariate-balance">8.4.3 Individual Covariate Balance</h4>
+<ul>
+<li>Z-statistics and adjusted p-values</li>
+<li>Multiple testing corrections (Holm-Bonferroni)</li>
+<li>Standardized differences</li>
+<li>Which statistics matter most</li>
+</ul>
+</section>
+<section id="alternative-coin-package" class="level4">
+<h4 class="anchored" data-anchor-id="alternative-coin-package">8.4.4 Alternative: coin Package</h4>
+<ul>
+<li>independence_test() for omnibus testing</li>
+<li>When to use permutation-based vs.&nbsp;asymptotic tests</li>
+<li>Computational considerations</li>
+</ul>
+</section>
+</section>
+<section id="deep-dive-what-balancetest-is-doing" class="level3">
+<h3 class="anchored" data-anchor-id="deep-dive-what-balancetest-is-doing">8.5 Deep Dive: What balanceTest() is Doing</h3>
+<section id="the-test-statistic" class="level4">
+<h4 class="anchored" data-anchor-id="the-test-statistic">8.5.1 The Test Statistic</h4>
+<ul>
+<li>Harmonic mean (precision) weights explained</li>
+<li>Why this weighting scheme is powerful</li>
+<li>Connection to fixed effects estimation</li>
+<li>Mathematical details (keep current section)</li>
+</ul>
+</section>
+<section id="the-null-distribution" class="level4">
+<h4 class="anchored" data-anchor-id="the-null-distribution">8.5.2 The Null Distribution</h4>
+<ul>
+<li>Permutation-based inference</li>
+<li>Why we shuffle within strata</li>
+<li>Large-sample χ² approximation</li>
+<li>Code showing manual calculation (keep current section)</li>
+</ul>
+</section>
+<section id="the-d²-statistic-in-detail" class="level4">
+<h4 class="anchored" data-anchor-id="the-d²-statistic-in-detail">8.5.3 The d² Statistic in Detail</h4>
+<ul>
+<li>Combining multiple covariate tests</li>
+<li>Why squared and standardized differences</li>
+<li>Connection to multivariate testing</li>
+</ul>
+</section>
+</section>
+<section id="iteration-strategies" class="level3">
+<h3 class="anchored" data-anchor-id="iteration-strategies">8.6 Iteration Strategies</h3>
+<section id="systematic-improvement-approach" class="level4">
+<h4 class="anchored" data-anchor-id="systematic-improvement-approach">8.6.1 Systematic Improvement Approach</h4>
+<ol type="1">
+<li>Identify worst-balanced covariates</li>
+<li>Prioritize by substantive importance</li>
+<li>Adjust constraints to target these</li>
+<li>Re-match and evaluate</li>
+<li>Document all attempts</li>
+</ol>
+</section>
+<section id="common-iteration-tactics" class="level4">
+<h4 class="anchored" data-anchor-id="common-iteration-tactics">8.6.2 Common Iteration Tactics</h4>
+<ul>
+<li>Tightening calipers on problematic variables</li>
+<li>Adding exact matching on categorical variables</li>
+<li>Changing distance metric</li>
+<li>Adjusting set size constraints</li>
+<li>Changing match ratio</li>
+</ul>
+</section>
+<section id="when-to-stop" class="level4">
+<h4 class="anchored" data-anchor-id="when-to-stop">8.6.3 When to Stop</h4>
+<ul>
+<li>Pre-specified balance standards met</li>
+<li>Diminishing returns on iteration</li>
+<li>Sample size becoming too small</li>
+<li>Trade-off between balance and retention</li>
+</ul>
+</section>
+<section id="avoiding-data-mining" class="level4">
+<h4 class="anchored" data-anchor-id="avoiding-data-mining">8.6.4 Avoiding Data Mining</h4>
+<ul>
+<li>Don’t iterate based on outcome analysis</li>
+<li>Document all attempts transparently</li>
+<li>Use theory, not chance, to guide changes</li>
+<li>Consider pre-registration of stopping rules</li>
+</ul>
+</section>
+</section>
+<section id="reporting-balance-results" class="level3">
+<h3 class="anchored" data-anchor-id="reporting-balance-results">8.7 Reporting Balance Results</h3>
+<ul>
+<li>What to include in papers/reports</li>
+<li>Tables and figures for transparency</li>
+<li>Describing iteration process</li>
+<li>Making match quality transparent to readers</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="from-design-to-inference-estimation-and-testing" class="level2">
+<h2 class="anchored" data-anchor-id="from-design-to-inference-estimation-and-testing">9. From Design to Inference: Estimation and Testing</h2>
+<section id="what-the-matched-design-allows-you-to-conclude" class="level3">
+<h3 class="anchored" data-anchor-id="what-the-matched-design-allows-you-to-conclude">9.1 What the Matched Design Allows You to Conclude</h3>
+<section id="causal-claims-vs.-associational-claims" class="level4">
+<h4 class="anchored" data-anchor-id="causal-claims-vs.-associational-claims">9.1.1 Causal Claims vs.&nbsp;Associational Claims</h4>
+<ul>
+<li>Under what assumptions is causal language appropriate?</li>
+<li>Making assumptions explicit</li>
+<li>Appropriate hedging language</li>
+<li>Sensitivity analysis as part of causal argument</li>
+</ul>
+</section>
+<section id="target-estimands" class="level4">
+<h4 class="anchored" data-anchor-id="target-estimands">9.1.2 Target Estimands</h4>
+<ul>
+<li>Average Treatment Effect (ATE)</li>
+<li>Average Treatment Effect on the Treated (ATT)</li>
+<li>Which estimand does your design target?</li>
+<li>Sample vs.&nbsp;population effects</li>
+</ul>
+</section>
+</section>
+<section id="estimation-approaches" class="level3">
+<h3 class="anchored" data-anchor-id="estimation-approaches">9.2 Estimation Approaches</h3>
+<section id="within-set-estimation" class="level4">
+<h4 class="anchored" data-anchor-id="within-set-estimation">9.2.1 Within-Set Estimation</h4>
+<ul>
+<li>Difference in means within each set/pair</li>
+<li>Weighted combination across sets</li>
+<li>This is what you calculated in Section 2!</li>
+</ul>
+</section>
+<section id="weighting-schemes" class="level4">
+<h4 class="anchored" data-anchor-id="weighting-schemes">9.2.2 Weighting Schemes</h4>
+<p><strong>Block-Size Weights (Horvitz-Thompson Style)</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">difference_in_means</span>(outcome <span class="sc">~</span> treatment, <span class="at">blocks =</span> matched_sets, data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Weights by number of treated in each set</li>
+<li>Unbiased under randomization within sets</li>
+<li>ATT-style estimator</li>
+</ul>
+<p><strong>Precision Weights (Fixed Effects Style)</strong></p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">lm_robust</span>(outcome <span class="sc">~</span> treatment, <span class="at">fixed_effects =</span> <span class="sc">~</span>matched_sets, data)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># OR equivalently:</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">lm_robust</span>(outcome <span class="sc">~</span> treatment <span class="sc">+</span> matched_sets, data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Harmonic mean weights</li>
+<li>Lower variance estimates</li>
+<li>May be biased but often preferred in practice</li>
+</ul>
+</section>
+<section id="which-weights-to-use" class="level4">
+<h4 class="anchored" data-anchor-id="which-weights-to-use">9.2.3 Which Weights to Use?</h4>
+<ul>
+<li>Practical guidance: pair matching → doesn’t matter</li>
+<li>Full matching → precision weights reduce variance</li>
+<li>Why we often use fixed effects approach</li>
+<li>Acknowledging bias-variance trade-off</li>
+</ul>
+</section>
+</section>
+<section id="standard-errors-and-confidence-intervals" class="level3">
+<h3 class="anchored" data-anchor-id="standard-errors-and-confidence-intervals">9.3 Standard Errors and Confidence Intervals</h3>
+<section id="clustering-at-set-level" class="level4">
+<h4 class="anchored" data-anchor-id="clustering-at-set-level">9.3.1 Clustering at Set Level</h4>
+<ul>
+<li>Why standard errors must account for design</li>
+<li>Using cluster-robust standard errors</li>
+<li>Implementation in estimatr package</li>
+</ul>
+</section>
+<section id="randomization-based-inference" class="level4">
+<h4 class="anchored" data-anchor-id="randomization-based-inference">9.3.2 Randomization-Based Inference</h4>
+<ul>
+<li>Permutation tests within sets</li>
+<li>More conservative in small samples</li>
+<li>Implementation with coin package</li>
+</ul>
+</section>
+</section>
+<section id="testing-hypotheses-about-effects" class="level3">
+<h3 class="anchored" data-anchor-id="testing-hypotheses-about-effects">9.4 Testing Hypotheses About Effects</h3>
+<section id="null-hypothesis-framework" class="level4">
+<h4 class="anchored" data-anchor-id="null-hypothesis-framework">9.4.1 Null Hypothesis Framework</h4>
+<ul>
+<li>Sharp null hypothesis of no effect</li>
+<li>Why this is stronger than typical nulls</li>
+<li>Randomization-based testing</li>
+</ul>
+</section>
+<section id="implementation-examples" class="level4">
+<h4 class="anchored" data-anchor-id="implementation-examples">9.4.2 Implementation Examples</h4>
+<ul>
+<li>Using lm_robust() for linear models</li>
+<li>Using permutation tests</li>
+<li>Comparison of p-values</li>
+</ul>
+</section>
+</section>
+<section id="complete-estimation-examples" class="level3">
+<h3 class="anchored" data-anchor-id="complete-estimation-examples">9.5 Complete Estimation Examples</h3>
+<ul>
+<li>Using fm1 design from earlier sections</li>
+<li>Block-size weighted estimate</li>
+<li>Precision weighted estimate</li>
+<li>With appropriate uncertainty quantification</li>
+<li>Reporting template</li>
+</ul>
+</section>
+<section id="non-bipartite-estimation-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="non-bipartite-estimation-considerations">9.6 Non-bipartite Estimation Considerations</h3>
+<ul>
+<li>Dose-response curves</li>
+<li>Comparing adjacent levels</li>
+<li>More complex than binary treatment</li>
+<li>Brief overview with references</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="sensitivity-analysis-assessing-robustness" class="level2">
+<h2 class="anchored" data-anchor-id="sensitivity-analysis-assessing-robustness">10. Sensitivity Analysis: Assessing Robustness</h2>
+<section id="the-unobserved-confounder-problem" class="level3">
+<h3 class="anchored" data-anchor-id="the-unobserved-confounder-problem">10.1 The Unobserved Confounder Problem</h3>
+<ul>
+<li>What matching cannot do</li>
+<li>Why sensitivity analysis is essential</li>
+<li>Making the case for plausibility</li>
+</ul>
+</section>
+<section id="rosenbaum-sensitivity-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="rosenbaum-sensitivity-analysis">10.2 Rosenbaum Sensitivity Analysis</h3>
+<section id="the-γ-parameter" class="level4">
+<h4 class="anchored" data-anchor-id="the-γ-parameter">10.2.1 The Γ Parameter</h4>
+<ul>
+<li>What Γ represents: odds ratio of differential treatment assignment</li>
+<li>Interpreting different Γ values</li>
+<li>Relationship to unobserved confounding</li>
+</ul>
+</section>
+<section id="using-senstrat-package" class="level4">
+<h4 class="anchored" data-anchor-id="using-senstrat-package">10.2.2 Using senstrat Package</h4>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(senstrat)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">senstrat</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  outcome,</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  treatment,</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>  strata,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">gamma =</span> <span class="fu">seq</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="fl">0.1</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Running sensitivity analysis</li>
+<li>Interpreting results</li>
+<li>How large must bias be to change conclusions?</li>
+</ul>
+</section>
+<section id="reporting-sensitivity-results" class="level4">
+<h4 class="anchored" data-anchor-id="reporting-sensitivity-results">10.2.3 Reporting Sensitivity Results</h4>
+<ul>
+<li>“Conclusions robust to Γ = X”</li>
+<li>Contextualizing what this means substantively</li>
+<li>Comparing to plausible confounders</li>
+</ul>
+</section>
+</section>
+<section id="outcome-based-sensitivity-sensemakr" class="level3">
+<h3 class="anchored" data-anchor-id="outcome-based-sensitivity-sensemakr">10.3 Outcome-Based Sensitivity (sensemakr)</h3>
+<section id="benchmarking-approach" class="level4">
+<h4 class="anchored" data-anchor-id="benchmarking-approach">10.3.1 Benchmarking Approach</h4>
+<ul>
+<li>Using observed covariates as benchmarks</li>
+<li>“A confounder would need to be X times stronger than age…”</li>
+<li>More intuitive for some audiences</li>
+</ul>
+</section>
+<section id="using-sensemakr-package" class="level4">
+<h4 class="anchored" data-anchor-id="using-sensemakr-package">10.3.2 Using sensemakr Package</h4>
+<ul>
+<li>Implementation with matched designs</li>
+<li>Visualization of sensitivity</li>
+<li>Reporting recommendations</li>
+</ul>
+</section>
+</section>
+<section id="integrating-sensitivity-into-causal-claims" class="level3">
+<h3 class="anchored" data-anchor-id="integrating-sensitivity-into-causal-claims">10.4 Integrating Sensitivity into Causal Claims</h3>
+<ul>
+<li>Sensitivity analysis as part of evidence</li>
+<li>When conclusions are robust vs.&nbsp;fragile</li>
+<li>How to discuss in papers</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="complete-case-study-job-training-program-evaluation" class="level2">
+<h2 class="anchored" data-anchor-id="complete-case-study-job-training-program-evaluation">11. Complete Case Study: Job Training Program Evaluation</h2>
+<section id="background-and-research-question" class="level3">
+<h3 class="anchored" data-anchor-id="background-and-research-question">11.1 Background and Research Question</h3>
+<ul>
+<li>Policy context (realistic scenario)</li>
+<li>Available data description</li>
+<li>Evaluation goals</li>
+</ul>
+</section>
+<section id="step-1-2-covariate-selection" class="level3">
+<h3 class="anchored" data-anchor-id="step-1-2-covariate-selection">11.2 Step 1-2: Covariate Selection</h3>
+<ul>
+<li>Theory of selection into job training</li>
+<li>Which covariates are confounders?</li>
+<li>Data exploration</li>
+</ul>
+</section>
+<section id="step-3-assessing-overlap-1" class="level3">
+<h3 class="anchored" data-anchor-id="step-3-assessing-overlap-1">11.3 Step 3: Assessing Overlap</h3>
+<ul>
+<li>Propensity score distributions</li>
+<li>Regions of common support</li>
+<li>Trimming decisions</li>
+</ul>
+</section>
+<section id="step-4-5-method-and-distance-choice" class="level3">
+<h3 class="anchored" data-anchor-id="step-4-5-method-and-distance-choice">11.4 Step 4-5: Method and Distance Choice</h3>
+<ul>
+<li>Why full matching with propensity distance</li>
+<li>Initial constraint decisions</li>
+<li>Rationale for each choice</li>
+</ul>
+</section>
+<section id="step-6-8-first-match-and-iteration" class="level3">
+<h3 class="anchored" data-anchor-id="step-6-8-first-match-and-iteration">11.5 Step 6-8: First Match and Iteration</h3>
+<ul>
+<li>Initial balance results</li>
+<li>Problems identified</li>
+<li>Iteration 1: Adding age caliper</li>
+<li>Iteration 2: Exact matching on education</li>
+<li>Final design</li>
+</ul>
+</section>
+<section id="step-9-effect-estimation" class="level3">
+<h3 class="anchored" data-anchor-id="step-9-effect-estimation">11.6 Step 9: Effect Estimation</h3>
+<ul>
+<li>Weighted analysis</li>
+<li>Confidence intervals</li>
+<li>Interpretation</li>
+</ul>
+</section>
+<section id="step-10-sensitivity-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="step-10-sensitivity-analysis">11.7 Step 10: Sensitivity Analysis</h3>
+<ul>
+<li>Rosenbaum bounds</li>
+<li>Benchmarking</li>
+<li>Robustness conclusions</li>
+</ul>
+</section>
+<section id="complete-reporting-template" class="level3">
+<h3 class="anchored" data-anchor-id="complete-reporting-template">11.8 Complete Reporting Template</h3>
+<ul>
+<li>How to write this up</li>
+<li>Tables and figures</li>
+<li>Appendix materials</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="trade-offs-and-method-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="trade-offs-and-method-comparison">12. Trade-offs and Method Comparison</h2>
+<section id="the-bias-variance-interpretability-triangle" class="level3">
+<h3 class="anchored" data-anchor-id="the-bias-variance-interpretability-triangle">12.1 The Bias-Variance-Interpretability Triangle</h3>
+<ul>
+<li>You can’t optimize all three simultaneously</li>
+<li>How different methods make different trade-offs</li>
+</ul>
+</section>
+<section id="systematic-comparison-table" class="level3">
+<h3 class="anchored" data-anchor-id="systematic-comparison-table">12.2 Systematic Comparison Table</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Dimension</th>
+<th>Pair Match</th>
+<th>Full Match</th>
+<th>designmatch</th>
+<th>Non-bipartite</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Sample use</td>
+<td>Poor</td>
+<td>Excellent</td>
+<td>Medium</td>
+<td>Excellent</td>
+</tr>
+<tr class="even">
+<td>Balance achievable</td>
+<td>Good</td>
+<td>Best</td>
+<td>Excellent</td>
+<td>Good</td>
+</tr>
+<tr class="odd">
+<td>Interpretability</td>
+<td>Excellent</td>
+<td>Good</td>
+<td>Good</td>
+<td>Medium</td>
+</tr>
+<tr class="even">
+<td>Computation time</td>
+<td>Fast</td>
+<td>Fast</td>
+<td>Slow</td>
+<td>Medium</td>
+</tr>
+<tr class="odd">
+<td>Flexibility</td>
+<td>Medium</td>
+<td>High</td>
+<td>Very high</td>
+<td>High</td>
+</tr>
+<tr class="even">
+<td>Learning curve</td>
+<td>Easy</td>
+<td>Easy</td>
+<td>Steep</td>
+<td>Medium</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="decision-framework-summary" class="level3">
+<h3 class="anchored" data-anchor-id="decision-framework-summary">12.3 Decision Framework Summary</h3>
+<ul>
+<li>Flowchart for method selection</li>
+<li>Context-specific recommendations</li>
+<li>When to try multiple approaches</li>
+</ul>
+</section>
+<section id="computational-considerations" class="level3">
+<h3 class="anchored" data-anchor-id="computational-considerations">12.4 Computational Considerations</h3>
+<ul>
+<li>Sample size scalability</li>
+<li>Memory requirements</li>
+<li>When to use approximations</li>
+<li>Parallel processing options</li>
+</ul>
+</section>
+<section id="the-sample-size-trade-off" class="level3">
+<h3 class="anchored" data-anchor-id="the-sample-size-trade-off">12.5 The Sample Size Trade-off</h3>
+<ul>
+<li>Pair matching: Maximum balance, minimum sample</li>
+<li>Full matching: Good balance, maximum sample</li>
+<li>When sample size constraints dominate</li>
+</ul>
+</section>
+<section id="the-interpretability-trade-off" class="level3">
+<h3 class="anchored" data-anchor-id="the-interpretability-trade-off">12.6 The Interpretability Trade-off</h3>
+<ul>
+<li>Simple pairs are easy to understand</li>
+<li>Complex sets are harder to explain</li>
+<li>Stakeholder communication considerations</li>
+</ul>
+</section>
+<section id="practical-recommendations-by-context" class="level3">
+<h3 class="anchored" data-anchor-id="practical-recommendations-by-context">12.7 Practical Recommendations by Context</h3>
+<ul>
+<li>Small samples (N &lt; 200)</li>
+<li>Medium samples (N = 200-2000)</li>
+<li>Large samples (N &gt; 2000)</li>
+<li>When you have strong theory about key confounders</li>
+<li>When you’re unsure what matters</li>
+<li>When transparency is paramount</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="appendices" class="level2">
+<h2 class="anchored" data-anchor-id="appendices">Appendices</h2>
+<section id="appendix-a-software-installation-and-setup" class="level3">
+<h3 class="anchored" data-anchor-id="appendix-a-software-installation-and-setup">Appendix A: Software Installation and Setup</h3>
+<ul>
+<li>Installing required R packages</li>
+<li>Python alternatives (brief)</li>
+<li>Stata alternatives (brief)</li>
+</ul>
+</section>
+<section id="appendix-b-mathematical-details" class="level3">
+<h3 class="anchored" data-anchor-id="appendix-b-mathematical-details">Appendix B: Mathematical Details</h3>
+<ul>
+<li>Optimization problems in detail</li>
+<li>Balance test derivations</li>
+<li>Weighting scheme mathematics</li>
+</ul>
+</section>
+<section id="appendix-c-additional-resources" class="level3">
+<h3 class="anchored" data-anchor-id="appendix-c-additional-resources">Appendix C: Additional Resources</h3>
+<ul>
+<li>Key papers to read</li>
+<li>Online tutorials</li>
+<li>When to consult a statistician</li>
+</ul>
+</section>
+<section id="appendix-d-glossary" class="level3">
+<h3 class="anchored" data-anchor-id="appendix-d-glossary">Appendix D: Glossary</h3>
+<ul>
+<li>Technical terms defined</li>
+<li>Common abbreviations</li>
+</ul>
+</section>
+<section id="appendix-e-troubleshooting-guide" class="level3">
+<h3 class="anchored" data-anchor-id="appendix-e-troubleshooting-guide">Appendix E: Troubleshooting Guide</h3>
+<ul>
+<li>Common errors and solutions</li>
+<li>Performance optimization tips</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="references" class="level2">
+<h2 class="anchored" data-anchor-id="references">References</h2>
+<p>[Bibliography as in original document]</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
