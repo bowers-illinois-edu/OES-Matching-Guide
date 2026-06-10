@@ -922,7 +922,16 @@ d_dist[1:3,1:5]
 
 ```
 
-TODO START HERE
+<!-- TODO START HERE
+  Next tasks in order:
+  1. Complete this d2-by-hand block: make it eval:true, fix bt_fm1$overal typo,
+     and add a closing sentence tying it back to the paragraph below.
+  2. Consolidate the three duplicate "## Calipers" sections (lines ~1065, ~1093, ~1108)
+     into one coherent section.
+  3. Write exact matching section (optmatch exactMatch() + designmatch exact= argument).
+  4. Write designmatch near_exact constraints section.
+  Then continue with Stage 4: estimation and sensitivity analysis per the Roadmap.
+-->
 
 ```{r}
 #| eval: false
