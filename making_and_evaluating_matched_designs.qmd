@@ -96,6 +96,39 @@ This memo also is a code tutorial, showing examples throughout. It is currently
 only using R because that is the language where those who have been developing
 modern approaches to the creation of matched designs are working.
 
+## Roadmap
+
+This guide proceeds in four broad stages.
+
+**Stage 1: The simplest case.** We begin with a matched design that has only two
+strata and one covariate. This simple case introduces the core ideas of
+stratification, within-strata estimation, and weighted combination of
+strata-specific effects — ideas that carry through everything that follows.
+
+**Stage 2: Creating a matched design.** We then show how to generalize from two
+strata to hundreds, and from one variable to many, using optimal matching
+algorithms. We cover two R packages: `optmatch`, which uses network flow
+optimization, and `designmatch`, which uses integer programming. Both support
+*bipartite matching* (one treated group vs. one control group) and we also show
+*non-bipartite matching* for continuous or multi-level treatments. We demonstrate
+the key tools for controlling how the algorithm works: distance matrices
+(Mahalanobis and propensity score), calipers (which forbid poor matches),
+and exact matching constraints (which force perfect balance on key variables).
+
+**Stage 3: Evaluating and improving the design.** A matched design is not
+accepted or rejected in a single step — it is iterated. We show two
+complementary ways to assess a design: inspecting within-set differences on
+substantively important variables, and comparing the overall design to the
+covariate balance we would expect from a randomized experiment using the omnibus
+test in `balanceTest`. We explain in detail what that test is doing so that its
+output can be interpreted and acted upon.
+
+**Stage 4: From design to inference.** Once satisfied with the design, we show
+how to estimate average treatment effects and test hypotheses using the matched
+sets as strata, following the same logic as a block-randomized experiment. We
+close with sensitivity analysis — tools for reasoning about how large an
+unobserved confounder would need to be to change our conclusions.
+
 # Create Data
 
 To make this guide portable, we are making up a fake dataset with covariates
