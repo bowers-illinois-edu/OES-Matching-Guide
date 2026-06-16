@@ -35,21 +35,30 @@ To render:
 quarto render
 ```
 
-The full render takes several minutes because the matching and balance
-computations are heavy.
+The render takes several minutes because the matching and balance
+computations are heavy. To avoid re-running that code on every publish, the
+document sets `execute.freeze: auto`: rendering locally stores the computed
+results under `_freeze/`, which is committed to the repository.
 
-## Hosting on GitHub Pages
+## Publishing to GitHub Pages
 
-`_quarto.yml` sends the rendered output to the `docs/` directory. The published
-site is served from there:
+Publishing is automated by the GitHub Action in
+`.github/workflows/publish.yml`. The Action does **not** run R. It renders
+from the committed `_freeze/` results, so it only needs Quarto, and a build
+takes about a minute. The Pages source is set to "GitHub Actions" (Settings ->
+Pages), so nothing rendered is committed to `git` and `docs/` is gitignored.
 
-1. Render locally with `quarto render` (this writes
-   `docs/making_and_evaluating_matched_designs.html`).
-2. Commit the contents of `docs/` along with your source changes.
-3. In the repository on GitHub, go to Settings -> Pages and set the source to
-   the `main` branch, `/docs` folder.
+The workflow to update the published guide:
 
-`docs/index.html` redirects the site root to the guide, and `docs/.nojekyll`
-tells GitHub Pages not to run the files through Jekyll. The rendered HTML is
-self-contained (`embed-resources: true`), so it carries its own CSS, fonts, and
-images in one file.
+1. Edit `making_and_evaluating_matched_designs.qmd` (or `big.bib`).
+2. Render locally with `quarto render`. This re-executes the R code and
+   refreshes `_freeze/`.
+3. Commit your source changes **and** the updated `_freeze/`, then push to
+   `main`. (You do not need to commit `docs/`.)
+4. The Action renders and deploys; the guide goes live at
+   <https://bowers-illinois-edu.github.io/OES-Matching-Guide/>.
+
+If you push a change to the `.qmd` without refreshing `_freeze/`, the Action
+will try to re-execute the R code, find no R available, and fail --- a
+deliberate signal that you need to render locally first. You can also trigger
+a publish by hand from the Actions tab ("Run workflow").

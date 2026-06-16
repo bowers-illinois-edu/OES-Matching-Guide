@@ -1,7 +1,10 @@
 name: Render and publish guide
 
-# Render the Quarto guide and publish it to GitHub Pages via the
-# GitHub Actions deployment path (no rendered HTML is committed to the repo).
+# Publish the Quarto guide to GitHub Pages via the GitHub Actions
+# deployment path. R code is NOT executed here: the committed _freeze/
+# directory holds results computed locally (execute.freeze in the .qmd),
+# so CI only needs Quarto to turn those results into HTML. To refresh the
+# results, render locally (which re-executes R) and commit _freeze/.
 on:
   push:
     branches: [main]
@@ -34,36 +37,10 @@ jobs:
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
-
-      - name: Set up R
-        uses: r-lib/actions/setup-r@v2
         with:
-          use-public-rspm: true
+          version: "1.9.38"
 
-      # Installs from Posit Package Manager binaries and caches the library
-      # between runs, so only the first build pays the full compile cost.
-      - name: Install R package dependencies
-        uses: r-lib/actions/setup-r-dependencies@v2
-        with:
-          packages: |
-            any::rmarkdown
-            any::knitr
-            any::renv
-            any::tidyverse
-            any::RItools
-            any::optmatch
-            any::designmatch
-            any::highs
-            any::coin
-            any::conflicted
-            any::estimatr
-            any::senstrat
-            any::sensemakr
-            any::formula.tools
-            any::gridExtra
-            any::arm
-            any::MASS
-
+      # Uses the committed _freeze/ results; does not execute R.
       - name: Render the guide
         run: quarto render
 

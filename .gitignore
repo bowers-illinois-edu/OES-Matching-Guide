@@ -9,12 +9,18 @@
 # Node (only used for the remark markdown linter)
 node_modules/
 
-# Quarto intermediate/build files (the published site lives in docs/)
+# Quarto intermediate/build files
 /.quarto/
 *_files/
 *.knit.md
-/_freeze/
+
+# Rendered site: built and published by the GitHub Action, not committed.
+# (The Action renders from the committed _freeze/ results, so _freeze/ is
+# intentionally NOT ignored.)
+/docs/
 
 # Large replication data: exceeds GitHub's 100 MB per-file limit; keep out of the repo
 replication_file.zip
 replication_file/
+
+**/*.quarto_ipynb

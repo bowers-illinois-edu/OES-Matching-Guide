@@ -8,6 +8,7 @@ execute:
   output: true
   message: false
   warning: false
+  freeze: auto
 format:
   html:
     toc: true
