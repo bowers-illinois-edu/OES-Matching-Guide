@@ -2,3 +2,19 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# macOS
+.DS_Store
+
+# Node (only used for the remark markdown linter)
+node_modules/
+
+# Quarto intermediate/build files (the published site lives in docs/)
+/.quarto/
+*_files/
+*.knit.md
+/_freeze/
+
+# Large replication data: exceeds GitHub's 100 MB per-file limit; keep out of the repo
+replication_file.zip
+replication_file/

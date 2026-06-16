@@ -39,6 +39,7 @@ library(senstrat)
 library(sensemakr)
 conflicts_prefer(dplyr::select)
 conflicts_prefer(dplyr::filter)
+conflicts_prefer(optmatch::strata)
 options(digits=4,scipen=8)
 ```
 
@@ -103,7 +104,7 @@ This guide proceeds in four broad stages.
 **Stage 1: The simplest case.** We begin with a matched design that has only two
 strata and one covariate. This simple case introduces the core ideas of
 stratification, within-strata estimation, and weighted combination of
-strata-specific effects — ideas that carry through everything that follows.
+strata-specific effects --- ideas that carry through everything that follows.
 
 **Stage 2: Creating a matched design.** We then show how to generalize from two
 strata to hundreds, and from one variable to many, using optimal matching
@@ -116,7 +117,7 @@ the key tools for controlling how the algorithm works: distance matrices
 and exact matching constraints (which force perfect balance on key variables).
 
 **Stage 3: Evaluating and improving the design.** A matched design is not
-accepted or rejected in a single step — it is iterated. We show two
+accepted or rejected in a single step --- it is iterated. We show two
 complementary ways to assess a design: inspecting within-set differences on
 substantively important variables, and comparing the overall design to the
 covariate balance we would expect from a randomized experiment using the omnibus
@@ -126,7 +127,7 @@ output can be interpreted and acted upon.
 **Stage 4: From design to inference.** Once satisfied with the design, we show
 how to estimate average treatment effects and test hypotheses using the matched
 sets as strata, following the same logic as a block-randomized experiment. We
-close with sensitivity analysis — tools for reasoning about how large an
+close with sensitivity analysis --- tools for reasoning about how large an
 unobserved confounder would need to be to change our conclusions.
 
 # Create Data
@@ -583,7 +584,7 @@ people who are `r min(dat$age)` with people who are `r max(dat$age)` whereas
 after matching the worse set has has a difference of `r
 max(dat_plot1$agediff)`.
 
-```{r makeplot1}
+```{r}
 #| echo: false
 #| output: true
 #| label: fig-fm_eval_age
@@ -595,7 +596,6 @@ bpfm1 <- ggplot(dat_plot1 %>% filter(agediff > quantile(agediff,.9)), aes(x = fm
   geom_text(aes(x=fm1,y=min(age),label=nb))+
   annotate("text",x = 0, y = min(dat_plot1$age), label="Set \n size")
 bpfm1 <- bpfm1 + scale_x_discrete(expand = expand_scale(add = c(2, 0.5)))
-bpfm1
 
 bporig <- ggplot(dat_plot1, aes(x = nostrata, y = age)) +
   geom_boxplot() +
