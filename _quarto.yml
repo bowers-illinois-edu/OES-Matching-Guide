@@ -1,0 +1,5 @@
+project:
+  type: default
+  output-dir: docs
+  render:
+    - making_and_evaluating_matched_designs.qmd
