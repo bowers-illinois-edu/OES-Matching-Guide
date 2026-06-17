@@ -923,19 +923,8 @@ d_dist[1:3,1:5]
 
 ```
 
-<!-- TODO START HERE
-  Next tasks in order:
-  1. Complete this d2-by-hand block: make it eval:true, fix bt_fm1$overal typo,
-     and add a closing sentence tying it back to the paragraph below.
-  2. Consolidate the three duplicate "## Calipers" sections (lines ~1065, ~1093, ~1108)
-     into one coherent section.
-  3. Write exact matching section (optmatch exactMatch() + designmatch exact= argument).
-  4. Write designmatch near_exact constraints section.
-  Then continue with Stage 4: estimation and sensitivity analysis per the Roadmap.
--->
-
 ```{r}
-#| eval: false
+#| eval: true
 
 d_dist_cov_mat <- cov(t(d_dist))
 inv_dist_cov_mat <- MASS::ginv(d_dist_cov_mat)
@@ -957,7 +946,7 @@ d2_dist<-apply(d_dist, 2, function(thed){
 ## The chi-squared reference distribution only uses a one-sided p-value going in the positive direction
 d2_p<-mean(d2_dist>=obs_d2)
 cbind(obs_d2,d2_p)
-bt_fm1$overal
+bt_fm1$overall
 
 length(d2_dist)
 
@@ -969,6 +958,8 @@ dist_compare <- ggplot(d2_dists,aes(x=tstat,group=type,color=type))+
 dist_compare
 
 ```
+
+As the plot shows, all three approaches to the reference distribution --- direct permutation, the $\chi^2$ large-sample approximation, and our hand-built permutation of the $d^2$ statistic --- agree closely, confirming that `balanceTest` is doing exactly what we described above.
 
 So, we can see that the omnibus test is a test the combines the tests of the
 nulls for each individual variable. The use of the $\chi^2$ distribution as a
@@ -1075,11 +1066,21 @@ dm1_fm1$overall["set_id",]
 
 ## Calipers
 
-The optmatch package allows calipers (which forbids certain pairs from being matched).^[You can implement penalties by hand.] Here, for example, we forbid comparisons which differ by more than 2 propensity score standardized distances.
+A **caliper** forbids pairs whose distance exceeds a threshold by setting those
+entries in the distance matrix to `Inf`, making them unavailable to the
+optimizer. This is useful both to eliminate the worst matches and to speed up
+optimization on large datasets. In `optmatch` the `caliper()` function adds
+these constraints to any distance matrix via ordinary addition.
 
-Maybe we would prefer to limit the worse matches?
+### Caliper on a single variable
+
+A common starting point is to inspect the distribution of distances and then
+choose a caliper that rules out only the most extreme pairs. Here we apply a
+caliper on the absolute difference in `preY` (baseline outcome), forbidding
+pairs that differ by more than 0.08:
 
 ```{r caliper_one_dim}
+## First inspect: how are the distances distributed?
 quantile(as.vector(abs_dist), seq(0, 1, .1))
 
 fm2 <- fullmatch(abs_dist + caliper(abs_dist, .08), data = dat)
@@ -1092,22 +1093,26 @@ xb2$overall
 xb2$results[, , ]
 ```
 
+### Caliper on the propensity score
+
+A very common practice is to apply a caliper of 0.2 propensity-score standard
+deviations (roughly 2 standard deviations of the linear propensity score in many
+applications). Here we first inspect the propensity-distance distribution and
+then apply a caliper of 2 standard deviations:
+
 ```{r}
-## First inspect the distance matrix itself: how are the distances distributed?
+## Inspect the distance matrix itself
 quantile(as.vector(ps_dist), seq(0, 1, .1))
-## Next, apply a caliper (setting entries to Infinite)
+## Apply a caliper (sets forbidden entries to Inf)
 ps_distCal <- ps_dist + caliper(ps_dist, 2)
 as.matrix(ps_dist)[5:10, 5:10]
 as.matrix(ps_distCal)[5:10, 5:10]
 summary(ps_distCal)
 ```
-## Calipers
 
-The optmatch package allows calipers (which forbid certain pairs from being
-matched).^[You can implement penalties by hand.] Here, for example, we forbid
-comparisons which differ by more than 2 standard deviations on the propensity
-score. (Notice that we also use the `propensity.model` option to `summary` here
-to get a quick look at the balance test:)
+Now use the caliper-constrained propensity distance for full matching and pair
+matching. The `propensity.model` option to `summary` gives a quick balance
+check:
 
 ```{r}
 fmCal1 <- fullmatch(ps_dist + caliper(ps_dist, 2), data = dat, tol = .00001)
@@ -1116,38 +1121,34 @@ pmCal1 <- pairmatch(ps_dist + caliper(ps_dist, 2), data = dat, remove.unmatchabl
 summary(pmCal1, propensity.model = psmod)
 ```
 
-## Calipers
+### Multiple calipers
 
-Another example: We may want to match on mahalanobis distance but disallow any
-pairs with extreme propensity distance and/or extreme differences in baseline
-homicide rates (here using many covariates all together).
-
+Calipers on different variables can be combined by adding them together. Here we
+match on Mahalanobis distance but additionally disallow any pair that is too far
+apart on the propensity score or on the baseline outcome:
 
 ```{r}
-## Create an R formulate object from vectors of variable names
+## Create a mahalanobis distance matrix (rank-transformed)
 balfmla <- reformulate(c("tenure", "age"), response = "trtbin")
-
-## Create a mahalanobis distance matrix (of rank transformed data)
 mhdist <- match_on(balfmla, data = dat, method = "rank_mahalanobis")
 
-## Now make a matrix recording absolute differences between neighborhoods in
-## terms of baseline homicide rate
+## Absolute difference in baseline outcome
 tmppreY <- dat$preY
 names(tmppreY) <- rownames(dat)
 abs_dist <- match_on(tmppreY, z = dat$trtbin, data = dat)
 abs_dist[1:3, 1:3]
 quantile(as.vector(abs_dist), seq(0, 1, .1))
 quantile(as.vector(mhdist), seq(0, 1, .1))
-## Now create a new distance matrix using two calipers:
+
+## Combine: match on MH distance, forbid pairs >9 MH units or >2 preY units apart
 distCal <- ps_dist + caliper(mhdist, 9) + caliper(abs_dist, 2)
 as.matrix(distCal)[5:10, 5:10]
-## Compare to:
 as.matrix(mhdist)[5:10, 5:10]
 ```
 
-## Calipers
-
-Now, use this new matrix for the creation of stratified designs --- but possibly excluding some units (also showing here the `tol` argument. The version with the tighter tolerance produces a solution with smaller overall distances)
+Now create full matches from the combined-caliper distance. The `tol` argument
+controls the optimizer's tolerance; a tighter tolerance yields smaller total
+distances at the cost of longer run time:
 
 ```{r}
 fmCal2a <- fullmatch(distCal, data = dat, tol = .001)
@@ -1164,6 +1165,8 @@ fmCal2b_dists <- matched.distances(fmCal2b, distCal)
 mean(unlist(fmCal2a_dists))
 mean(unlist(fmCal2b_dists))
 ```
+
+As expected, the tighter tolerance (`fmCal2b`) achieves a lower mean within-stratum distance.
 
 ## Exact Matching
 
@@ -1194,13 +1197,92 @@ dat$fmEx1 <- fmEx1
 ftable(grade = dat$gradeLowHi, Trt = dat$trtbin, fmEx1, col.vars = c("grade", "Trt"))
 ```
 
+### Exact matching with `designmatch`
+
+The `bmatch` function supports exact matching through its `exact` argument,
+which accepts a matrix of indicator variables --- one column per variable on
+which exact matching is required. Every matched pair must share the same value
+on every column.
+
+```{r}
+## Build the indicator matrix required by bmatch.
+## Each column codes membership in one level of a categorical variable.
+## bmatch will force every matched pair to match on all columns.
+exact_vars <- model.matrix(~ gradeLowHi + sex - 1, data = datmm_dm)
+
+dm_exact <- bmatch(
+  t_ind    = datmm_dm$trtbin,
+  dist_mat = ps_dist_dm,
+  exact    = exact_vars,
+  solver   = solverlist,
+  subset_weight = 0,
+  total_groups  = sum(datmm_dm$trtbin),
+  n_controls    = 1
+)
+
+datmm_dm$id <- row.names(datmm_dm)
+dm_exact_dat <- bmatch_to_dat(dm_exact, origid = datmm_dm$id)
+datmm_dm_exact_res <- left_join(datmm_dm, dm_exact_dat, by = "id")
+
+## How many treated units were left unmatched?
+sum(is.na(datmm_dm_exact_res$set_id))
+
+## Verify that every matched pair shares the same gradeLowHi and sex
+matched_pairs <- datmm_dm_exact_res[!is.na(datmm_dm_exact_res$set_id), ]
+ftable(gradeLowHi = matched_pairs$gradeLowHi,
+       sex        = matched_pairs$sex,
+       set_id     = matched_pairs$set_id)
+```
+
+Exact matching forces every stratum to be internally homogeneous on the
+specified variables; the trade-off is that more units may be left unmatched when
+the exact cells are sparse.
+
+### Near-exact matching with `designmatch`
+
+When strict exact matching would discard too many units, `designmatch` offers
+**near-exact** constraints via the `near_exact` argument. Near-exact matching
+penalizes pairs that differ on a categorical variable rather than forbidding
+them outright. The penalty weight controls the trade-off between minimizing
+covariate distance and matching exactly.
+
+```{r}
+## near_exact takes a list with element $covs (the matrix of categorical
+## variables to penalize) and $devs (a scalar penalty weight per mismatch).
+near_exact_vars <- model.matrix(~ gradeLowHi + sex - 1, data = datmm_dm)
+
+dm_near_exact <- bmatch(
+  t_ind    = datmm_dm$trtbin,
+  dist_mat = ps_dist_dm,
+  near_exact = list(covs = near_exact_vars, devs = 10),
+  solver   = solverlist,
+  subset_weight = 0,
+  total_groups  = sum(datmm_dm$trtbin),
+  n_controls    = 1
+)
+
+dm_near_exact_dat <- bmatch_to_dat(dm_near_exact, origid = datmm_dm$id)
+datmm_dm_near_res <- left_join(datmm_dm, dm_near_exact_dat, by = "id")
+
+## How many units were left unmatched?
+sum(is.na(datmm_dm_near_res$set_id))
+
+## How often did pairs differ on gradeLowHi or sex?
+matched_near <- datmm_dm_near_res[!is.na(datmm_dm_near_res$set_id), ]
+```
+
+Near-exact matching typically retains more matched units than strict exact
+matching while still strongly discouraging cross-category pairs. Increasing the
+`devs` penalty pushes the solution toward exact matching; decreasing it toward
+unrestricted distance minimization.
+
 ### A further note on exact matching: Splitting up the matching process by hand
 
 If exact matching is still not working, one can directly split up the matching
-process into separte pieces that would be defined by the exact matching calls
+process into separate pieces that would be defined by the exact matching calls
 above.
 
-In `optmatch` once can follow these kinds of ideas:
+In `optmatch` one can follow these kinds of ideas:
 <https://cran.r-project.org/web/packages/optmatch/vignettes/matching-within-subgroups.html>.
 For example, one can first produce the distance matrices of interest and then
 use `findSubproblems()` to create a list of matrices, each of which can be
