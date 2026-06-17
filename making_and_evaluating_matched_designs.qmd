@@ -1008,6 +1008,9 @@ solverlist <- list(name = "highs", approximate = 1, t_max = 1000, trace = 1)
 
 dm1 <- bmatch(t_ind=datmm_dm$trtbin, dist_mat=ps_dist_dm, solver=solverlist, subset_weight=0, total_groups=sum(datmm_dm$trtbin),n_controls=1)
 
+## Diagnostic: print the structure of the bmatch result so we can confirm field names
+str(dm1)
+
 ## there is no summary method or other methods to easily inspect the result,
 ## but we created a function to convert the results of bmatch to a factor like
 ## that produced by optmatch so that we can use tidyverse to make plots and
