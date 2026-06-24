@@ -1208,6 +1208,7 @@ on every column.
 ## Build the indicator matrix required by bmatch.
 ## Each column codes membership in one level of a categorical variable.
 ## bmatch will force every matched pair to match on all columns.
+datmm_dm$gradeLowHi <- ifelse(datmm_dm$grade %in% c(4,5,6), "hi", "lo")
 exact_vars <- model.matrix(~ gradeLowHi + sex - 1, data = datmm_dm)
 
 dm_exact <- bmatch(
@@ -1215,8 +1216,7 @@ dm_exact <- bmatch(
   dist_mat = ps_dist_dm,
   exact    = exact_vars,
   solver   = solverlist,
-  subset_weight = 0,
-  total_groups  = sum(datmm_dm$trtbin),
+  subset_weight = 1,
   n_controls    = 1
 )
 
@@ -1256,8 +1256,7 @@ dm_near_exact <- bmatch(
   dist_mat = ps_dist_dm,
   near_exact = list(covs = near_exact_vars, devs = 10),
   solver   = solverlist,
-  subset_weight = 0,
-  total_groups  = sum(datmm_dm$trtbin),
+  subset_weight = 1,
   n_controls    = 1
 )
 
