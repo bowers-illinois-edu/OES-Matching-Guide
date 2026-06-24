@@ -1006,7 +1006,7 @@ solverlist <- list(name = "highs", approximate = 1, t_max = 1000, trace = 1)
 ## from designmatch where subset_weight=0 and the emphasis is on minimizing
 ## distances (just like the pairmatch function in optmatch)
 
-dm1 <- bmatch(t_ind=datmm_dm$trtbin, dist_mat=ps_dist_dm, solver=solverlist, subset_weight=0, total_groups=sum(datmm_dm$trtbin),n_controls=1)
+dm1 <- bmatch(t_ind=datmm_dm$trtbin, dist_mat=ps_dist_dm, solver=solverlist, subset_weight=1, n_controls=1)
 
 ## there is no summary method or other methods to easily inspect the result,
 ## but we created a function to convert the results of bmatch to a factor like
