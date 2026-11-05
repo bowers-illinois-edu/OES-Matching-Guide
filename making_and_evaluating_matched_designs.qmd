@@ -1001,10 +1001,10 @@ solverlist <- list(name = "highs", approximate = 1, t_max = 1000, trace = 1)
 ## fixed numbers of controls (i.e. every match can be 1 to 2, or 1 to 3, but not a
 ## mixture of those)
 
-## I'm still a little confused by the subset_weight argument. Sometimes I use
-## the total_groups function instead. ## Here I am copying the call to distmatch()
-## from designmatch where subset_weight=0 and the emphasis is on minimizing
-## distances (just like the pairmatch function in optmatch)
+## The subset_weight argument sets how much the optimizer rewards matching more
+## treated units versus minimizing total distance. With subset_weight=1, the
+## solver is allowed to leave treated units unmatched (a partial match) when
+## that lowers the total distance; this is why some units are dropped below.
 
 dm1 <- bmatch(t_ind=datmm_dm$trtbin, dist_mat=ps_dist_dm, solver=solverlist, subset_weight=1, n_controls=1)
 
@@ -1038,7 +1038,7 @@ bmatch_to_dat <- function(obj,origid) {
 datmm_dm$id <- row.names(datmm_dm)
 dm1_dat <- bmatch_to_dat(dm1,origid=datmm_dm$id)
 datmm_dm_res <- left_join(datmm_dm,dm1_dat,by="id")
-## This particular design dropped 332 people.
+## The number of people not placed into any matched set (dropped from the design)
 sum(is.na(datmm_dm_res$set_id))
 
 ```
@@ -1124,26 +1124,24 @@ summary(pmCal1, propensity.model = psmod)
 ### Multiple calipers
 
 Calipers on different variables can be combined by adding them together. Here we
-match on Mahalanobis distance but additionally disallow any pair that is too far
-apart on the propensity score or on the baseline outcome:
+match on the propensity-score distance (`ps_dist`) but additionally disallow any
+pair that is too far apart on a Mahalanobis distance computed from just `tenure`
+and `age` (`mh_dist_ta`) or on the baseline outcome (`abs_dist`, created above):
 
 ```{r}
-## Create a mahalanobis distance matrix (rank-transformed)
-balfmla <- reformulate(c("tenure", "age"), response = "trtbin")
-mhdist <- match_on(balfmla, data = dat, method = "rank_mahalanobis")
+## A rank-based Mahalanobis distance using only tenure and age
+## (different from the 8-covariate mh_dist above)
+mh_fmla_ta <- reformulate(c("tenure", "age"), response = "trtbin")
+mh_dist_ta <- match_on(mh_fmla_ta, data = dat, method = "rank_mahalanobis")
 
-## Absolute difference in baseline outcome
-tmppreY <- dat$preY
-names(tmppreY) <- rownames(dat)
-abs_dist <- match_on(tmppreY, z = dat$trtbin, data = dat)
-abs_dist[1:3, 1:3]
 quantile(as.vector(abs_dist), seq(0, 1, .1))
-quantile(as.vector(mhdist), seq(0, 1, .1))
+quantile(as.vector(mh_dist_ta), seq(0, 1, .1))
 
-## Combine: match on MH distance, forbid pairs >9 MH units or >2 preY units apart
-distCal <- ps_dist + caliper(mhdist, 9) + caliper(abs_dist, 2)
+## Combine: minimize propensity distance, but forbid pairs more than 9
+## Mahalanobis units or more than 2 preY units apart
+distCal <- ps_dist + caliper(mh_dist_ta, 9) + caliper(abs_dist, 2)
 as.matrix(distCal)[5:10, 5:10]
-as.matrix(mhdist)[5:10, 5:10]
+as.matrix(mh_dist_ta)[5:10, 5:10]
 ```
 
 Now create full matches from the combined-caliper distance. The `tol` argument
@@ -1200,21 +1198,23 @@ ftable(grade = dat$gradeLowHi, Trt = dat$trtbin, fmEx1, col.vars = c("grade", "T
 ### Exact matching with `designmatch`
 
 The `bmatch` function supports exact matching through its `exact` argument,
-which accepts a matrix of indicator variables --- one column per variable on
+which accepts a list whose `covs` element is a matrix of indicator variables --- one column per variable on
 which exact matching is required. Every matched pair must share the same value
 on every column.
 
 ```{r}
+## `sexF` is the 0/1 indicator created when the covariates were expanded
+## (see `datmm` above); there is no `sex` column in `datmm_dm`.
 ## Build the indicator matrix required by bmatch.
 ## Each column codes membership in one level of a categorical variable.
 ## bmatch will force every matched pair to match on all columns.
 datmm_dm$gradeLowHi <- ifelse(datmm_dm$grade %in% c(4,5,6), "hi", "lo")
-exact_vars <- model.matrix(~ gradeLowHi + sex - 1, data = datmm_dm)
+exact_vars <- model.matrix(~ gradeLowHi + sexF - 1, data = datmm_dm)
 
 dm_exact <- bmatch(
   t_ind    = datmm_dm$trtbin,
   dist_mat = ps_dist_dm,
-  exact    = exact_vars,
+  exact    = list(covs = exact_vars),
   solver   = solverlist,
   subset_weight = 1,
   n_controls    = 1
@@ -1230,7 +1230,7 @@ sum(is.na(datmm_dm_exact_res$set_id))
 ## Verify that every matched pair shares the same gradeLowHi and sex
 matched_pairs <- datmm_dm_exact_res[!is.na(datmm_dm_exact_res$set_id), ]
 ftable(gradeLowHi = matched_pairs$gradeLowHi,
-       sex        = matched_pairs$sex,
+       sexF       = matched_pairs$sexF,
        set_id     = matched_pairs$set_id)
 ```
 
@@ -1242,19 +1242,22 @@ the exact cells are sparse.
 
 When strict exact matching would discard too many units, `designmatch` offers
 **near-exact** constraints via the `near_exact` argument. Near-exact matching
-penalizes pairs that differ on a categorical variable rather than forbidding
-them outright. The penalty weight controls the trade-off between minimizing
-covariate distance and matching exactly.
+does not forbid pairs that differ on a categorical variable outright. Instead
+it caps the total number of matched pairs that may differ on each variable. The
+cap controls the trade-off between minimizing covariate distance and matching
+exactly.
 
 ```{r}
-## near_exact takes a list with element $covs (the matrix of categorical
-## variables to penalize) and $devs (a scalar penalty weight per mismatch).
-near_exact_vars <- model.matrix(~ gradeLowHi + sex - 1, data = datmm_dm)
+## near_exact takes a list with element $covs (a matrix with one 0/1 column per
+## categorical variable) and $devs (a vector with one element per column of
+## $covs: the maximum number of matched pairs allowed to differ on that column).
+near_exact_vars <- cbind(gradeHi = as.numeric(datmm_dm$gradeLowHi == "hi"),
+                         sexF = datmm_dm$sexF)
 
 dm_near_exact <- bmatch(
   t_ind    = datmm_dm$trtbin,
   dist_mat = ps_dist_dm,
-  near_exact = list(covs = near_exact_vars, devs = 10),
+  near_exact = list(covs = near_exact_vars, devs = rep(10, ncol(near_exact_vars))),
   solver   = solverlist,
   subset_weight = 1,
   n_controls    = 1
@@ -1268,12 +1271,49 @@ sum(is.na(datmm_dm_near_res$set_id))
 
 ## How often did pairs differ on gradeLowHi or sex?
 matched_near <- datmm_dm_near_res[!is.na(datmm_dm_near_res$set_id), ]
+mismatch_by_pair <- matched_near %>%
+  group_by(set_id) %>%
+  summarize(differ_grade = n_distinct(gradeLowHi) > 1,
+            differ_sex = n_distinct(sexF) > 1)
+colSums(mismatch_by_pair[, c("differ_grade", "differ_sex")])
 ```
 
 Near-exact matching typically retains more matched units than strict exact
-matching while still strongly discouraging cross-category pairs. Increasing the
-`devs` penalty pushes the solution toward exact matching; decreasing it toward
-unrestricted distance minimization.
+matching because it can tolerate a few cross-category pairs. Decreasing the
+`devs` values pushes the solution toward exact matching (`devs = 0` is exact
+matching); increasing them moves it toward unrestricted distance minimization.
+
+### Comparing the designs
+
+Now we can put the designs side by side: how many people did each design drop,
+and does the omnibus test still find imbalance on the covariates? A larger
+p-value means the design looks more like a block-randomized experiment.
+
+```{r design_comparison}
+## Omnibus balance p-value for a design, using the same covariates throughout
+omnibus_p <- function(strata_var, data) {
+  fmla <- stats::update(balfmla_new_for_comparison,
+                        as.formula(paste(".~.-1+strata(", strata_var, ")")))
+  balanceTest(fmla, data = data)$overall[strata_var, 3]
+}
+
+datmm$pm1 <- dat$pm1
+
+design_comparison <- data.frame(
+  design = c("optmatch: full match", "optmatch: pair match",
+             "designmatch: pair match", "designmatch: exact",
+             "designmatch: near-exact"),
+  n_unmatched = c(sum(is.na(datmm$fm1)), sum(is.na(datmm$pm1)),
+                  sum(is.na(datmm_dm_res$set_id)),
+                  sum(is.na(datmm_dm_exact_res$set_id)),
+                  sum(is.na(datmm_dm_near_res$set_id))),
+  omnibus_p = c(omnibus_p("fm1", datmm), omnibus_p("pm1", datmm),
+                omnibus_p("set_id", datmm_dm_res),
+                omnibus_p("set_id", datmm_dm_exact_res),
+                omnibus_p("set_id", datmm_dm_near_res))
+)
+design_comparison
+```
 
 ### A further note on exact matching: Splitting up the matching process by hand
 
