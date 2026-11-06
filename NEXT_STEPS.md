@@ -20,39 +20,33 @@ and reframed for audiences afterwards.
   could plausibly have been in either group). Checked against truth.
 - Audit, `checks/` scripts, open questions.
 
-## In progress and NOT verified (committed as a WIP commit; `_freeze/` does NOT match it)
+## Eligibility work: verified after the fact (render finished)
 
-- **Eligibility in the data** (income test on `pay`, only eligible people can
-  enroll; `dat` is restricted to eligible people, `dat_all` keeps everyone).
-  Treated falls to 250 of 750 eligible.
-- Wording changes to the precision-weight text ("either received the
-  intervention or not"; eligibility example removed).
-- `checks/guide_data_check.R` updated for eligibility.
-- The WIP commit's `_freeze/` is from before eligibility, so it is stale and
-  publishing this branch's `.qmd` would fail in CI. A render was started but its
-  result was not read. **Before trusting or
-  publishing: run `quarto render`, then read the data and Stage 1 sections.**
-  Prose in those sections was written for the data before eligibility and has
-  not been rechecked against the new numbers: the treated share by stratum,
-  "estimates are higher than the target in every row", "treated people still
-  have higher baseline outcomes within each stratum", and the true averages.
-- The design section still has stale text (see `CLAIMS_AUDIT.md` rows 5-9, 11-12:
-  the 33-year set, "19 p-values", "9 covariates", the unrendered inline
-  expression, the 334 sets, the "persons 1 and 3 ... 627 and 383" paragraph).
+- Eligibility in the data (income test on `pay`; only eligible people can
+  enroll; `dat` restricted to eligible people, `dat_all` keeps everyone).
+  250 treated of 750 eligible.
+- The render succeeded and `_freeze/` was refreshed. I checked the data and
+  Stage 1 prose against the new output: treated share by stratum (174/375 vs
+  76/375), stratum estimates have the right pattern but are too large, estimates
+  exceed the target in every row, treated people still have higher `preY` within
+  each stratum, and by-hand and regression estimates agree. True averages are
+  1.00 (treated), 0.58 (eligible untreated), 0.72 (all eligible).
+- Still stale: the design section (see `CLAIMS_AUDIT.md` rows 5-9, 11-12: the
+  33-year set, "19 p-values", "9 covariates", the unrendered inline expression,
+  the 334 sets, the "persons 1 and 3 ... 627 and 383" paragraph). Those numbers
+  were written for the data before eligibility and were not rechecked.
 
 ## Next, in order
 
-1. Render, verify, and commit the eligibility work (or fix what the numbers
-   contradict).
-2. Rework the design section: the match-everyone design fails (p about 0),
+1. Rework the design section: the match-everyone design fails (p about 0),
    overlap and who the estimate is about, calipers that balance (propensity
    distance, 5 years on `age`, .08 on `preY`: p about .77, 69 units dropped on
    the guide's seed), what happens when eligibility is ignored (about 0.92 vs
    1.14 averaged over 30 seeds), and balance beyond the omnibus p-value.
-3. Estimation chapter: treated-count weights for the treated question,
+2. Estimation chapter: treated-count weights for the treated question,
    subgroup effects, randomization-based tests within sets.
-4. Sensitivity chapter: add the unobserved confounder (`motiv`) then.
-5. Questions for Jake are in `OPEN_QUESTIONS.md` (which questions the guide
+3. Sensitivity chapter: add the unobserved confounder (`motiv`) then.
+4. Questions for Jake are in `OPEN_QUESTIONS.md` (which questions the guide
    supports, weighting framing and the overlap-population citation, spillover,
    eligibility and cutoffs, scope).
 
