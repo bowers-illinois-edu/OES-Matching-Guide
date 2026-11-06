@@ -220,35 +220,58 @@ work: how much the intervention changed each person's outcome (the variable
  baseline outcomes more.
 
 Because the effect differs from person to person, "the effect of the
-intervention" needs a precise meaning. In this guide we ask: *what was the
-average effect of the intervention among the people who actually received it?*
-(Statisticians call this the average treatment effect on the treated.) <!--
-REVIEW: is the average effect on the treated the right target for this
-audience? See OPEN_QUESTIONS.md, question 1. -->
+intervention" is not one number: it depends on whose average we want. Different
+decisions call for different averages:
+
+ - *How did the program work for the people it served?* This asks for the
+ average effect among the people who received it.
+ - *What would happen if we extended the program to people it has not yet
+ served?* This asks for the average effect among the people who did not receive
+ it.
+ - *What would happen across everyone who is eligible?* This asks for the
+ average effect across everyone.
+
+A fourth kind of question, *for whom does it work?*, asks for effects within
+subgroups rather than one average. We come back to it below. Because we
+simulated each person's effect, we can compute the true value of each average:
 
 ```{r truth}
-att_truth <- mean(dat$effect[dat$trtbin == 1])
+truth <- c(
+  among_treated = mean(dat$effect[dat$trtbin == 1]),
+  among_untreated = mean(dat$effect[dat$trtbin == 0]),
+  among_everyone = mean(dat$effect)
+)
+att_truth <- truth[["among_treated"]]
+
 naive_fit <- lm(postY ~ trtbin, data = dat)
 naive_diff <- coef(naive_fit)[["trtbin"]]
-c(true_average_effect_on_treated = att_truth, naive_difference = naive_diff)
+round(c(truth, naive_difference = naive_diff), 2)
 ```
 
-The true average effect among the treated is `r round(att_truth, 2)`. A simple
-comparison of average outcomes between treated and untreated people gives
-`r round(naive_diff, 2)`, which is `r round(naive_diff / att_truth, 1)` times too
-large. The naive comparison is wrong because the treated people started out
-different: they had higher baseline outcomes and were older, and those
-differences would have produced higher outcomes even without the intervention.
-The rest of this guide is about building a research design that closes that gap
-using only information that was available before we looked at outcomes.
+A simple comparison of average outcomes between treated and untreated people
+gives `r round(naive_diff, 2)`. The true averages are `r round(truth[["among_treated"]], 2)`
+among the treated, `r round(truth[["among_untreated"]], 2)` among the untreated, and
+`r round(truth[["among_everyone"]], 2)` among everyone. The naive comparison is far from all of
+them because the treated people started out different: they had higher baseline
+outcomes and were older, and those differences would have produced higher
+outcomes even without the intervention. The rest of this guide is about building
+a research design that closes that gap using only information that was
+available before we looked at outcomes.
+
+Through most of the guide we follow the first question, the effect among the
+people the program served, because the matched designs we build compare each
+treated person with similar untreated people, which speaks most directly to it.
+We say what changes for the other questions as we go. <!-- REVIEW: is the
+treated-people question the right running example for this audience? See
+OPEN_QUESTIONS.md, "Reframing from Ben". -->
 
 # The simplest matched design: 2 strata, 1 variable
 
 Before using any matching software, we show the idea of a matched design in its
 simplest form: two strata defined by one variable. We also show the outcome
 analysis here, to be clear about how stratification can stand in for linear
-additive "controlling for", and about how the choice of weights decides which
-question an estimate answers.
+additive "controlling for", and about how the question you ask decides how to
+combine the strata.
 
 In the previous section we saw that baseline outcome (`preY`) helps determine
 who receives the intervention and also affects the outcome after it, so it is a
@@ -274,80 +297,119 @@ Two things differ between the strata: a much larger share of the high-baseline
 group received the intervention (see the table), and the two within-stratum
 differences are quite different from each other. Part of that is real (in these
 data the intervention helps people with higher baseline outcomes more), and part
-is that the comparisons are still imperfect. We now need a single number, which
-means choosing how to combine the two stratum-specific differences.
+is that the comparisons are still imperfect.
 
-## Combining strata: the weights choose the question
+## For whom does it work?
 
-Think of each stratum as a small experiment, $b$, with $n_b$ people of whom
-$n_{Tb}$ were treated and $n_{Cb}$ were not, and write $\hat\tau_b$ for the
-treated-minus-untreated difference in that stratum. Three weightings are common.
+If the decision question is about who benefits, the stratum-specific
+differences *are* the answer, and no weighting is needed. For a program
+manager deciding where to target a program, this is often the most useful
+output. The table below sets each stratum's estimate beside the truth (which we
+know only because we simulated the data):
 
- - **Stratum-size weights**, $n_b / n$. These ask: what was the average effect
- across everyone in these strata, treated or not?
- - **Treated-count weights**, $n_{Tb} / n_T$. These ask: what was the average
- effect among the people who were treated? Strata with more treated people count
- for more. This is the question we asked in the data section.
- - **Precision weights**, proportional to $n_b \, p_b (1 - p_b)$, where
- $p_b = n_{Tb}/n_b$ is the share treated in the stratum. These are what a linear
- regression with "fixed effects" for strata produces. Under the usual regression
- assumptions they give the estimate with the smallest standard error when the
- effect is the same in every stratum. They favor strata where treated and
- untreated people are about equally numerous.
-
-When effects differ across strata and the share treated differs across strata,
-as it does here, these weightings answer different questions and give different
-numbers. <!-- REVIEW: the target estimand and which weights to recommend are
-open decisions (OPEN_QUESTIONS.md, questions 1 and 2). A reference for the
-precision-weight result would help here. -->
-
-```{r weighting}
+```{r by_stratum}
 dat_sets <- dat_two %>%
   group_by(stratum) %>%
   summarize(
     n = n(),
     n_treated = sum(trtbin),
     n_control = sum(1 - trtbin),
-    est = mean(postY[trtbin == 1]) - mean(postY[trtbin == 0]),
+    estimate = mean(postY[trtbin == 1]) - mean(postY[trtbin == 0]),
     ## Known only because we simulated the data:
-    true_effect_among_treated = mean(effect[trtbin == 1]),
+    true_among_treated = mean(effect[trtbin == 1]),
+    true_among_untreated = mean(effect[trtbin == 0]),
+    true_among_everyone = mean(effect),
     .groups = "drop"
-  ) %>%
+  )
+dat_sets %>% select(stratum, n, n_treated, estimate, true_among_treated)
+```
+
+The estimates have the right pattern, a larger effect in the high-baseline
+group, but both are too large (we return to why below). Reporting stratum
+effects next to any overall average keeps that pattern visible.
+
+## Combining strata: the question chooses the weights
+
+Sometimes we need a single number. This is where weights enter, and it is
+worth saying how they connect to matching. Matching is a way of building
+strata: each matched pair or matched set is a small stratum of similar people,
+just like the two big strata here but many more and much smaller. Once you have
+strata, you still have to combine the stratum-specific differences into one
+overall number, and the weights say how. So the weights are not a separate topic
+from matching; they are the step that comes after it. (With matched *pairs*,
+each of which has exactly one treated and one untreated person, the weightings
+below all agree, which is one reason they are easy to overlook. With matched
+sets of different sizes, they can differ a lot.)
+
+Think of each stratum as a small experiment,
+$b$, with $n_b$ people of whom $n_{Tb}$ were treated and $n_{Cb}$ were not, and
+write $\hat\tau_b$ for the treated-minus-untreated difference in that stratum.
+Which weights combine the $\hat\tau_b$ correctly depends on the question:
+
+| Question | Average we want | Weight on stratum $b$ |
+|---|---|---|
+| How did it work for the people it served? | among the treated | $n_{Tb} / n_T$ (share of all treated people) |
+| What if we extend it to people not yet served? | among the untreated | $n_{Cb} / n_C$ (share of all untreated people) |
+| What across everyone eligible? | among everyone | $n_b / n$ (share of everyone) |
+| One efficient summary when effects are about equal | precision-weighted | proportional to $n_b \, p_b (1 - p_b)$, where $p_b = n_{Tb}/n_b$ |
+
+The precision weights are what a linear regression with "fixed effects" for
+strata produces. Under the usual regression assumptions they give the estimate
+with the smallest standard error when the effect is the same in every stratum.
+They favor strata where treated and untreated people are about equally
+numerous, and they do not correspond to any one group of people, so when
+effects differ across strata they answer none of the first three questions
+exactly. When the effect *is* the same everywhere, all four weightings agree.
+<!-- REVIEW: the precision-weight result is stated from standard theory without
+a checked citation. See OPEN_QUESTIONS.md. -->
+
+We can check the weights in this table against the truth. Applying each set of
+weights to the *true* stratum averages should give exactly the true overall
+average for its question:
+
+```{r targets_and_estimates}
+dat_sets <- dat_sets %>%
   mutate(
-    w_size = n / sum(n),
     w_treated = n_treated / sum(n_treated),
+    w_control = n_control / sum(n_control),
+    w_size = n / sum(n),
     w_prec0 = n * (n_treated / n) * (n_control / n),
     w_prec = w_prec0 / sum(w_prec0)
   )
 
-dat_sets %>% select(stratum, n, n_treated, est, true_effect_among_treated, w_size, w_treated, w_prec)
-```
-
-```{r weighted_estimates}
-by_hand <- c(
-  stratum_size = sum(dat_sets$est * dat_sets$w_size),
-  treated_count = sum(dat_sets$est * dat_sets$w_treated),
-  precision = sum(dat_sets$est * dat_sets$w_prec)
+results <- tibble(
+  question = c("served (treated)", "not yet served (untreated)", "everyone", "precision summary"),
+  true_target = c(
+    sum(dat_sets$w_treated * dat_sets$true_among_treated),
+    sum(dat_sets$w_control * dat_sets$true_among_untreated),
+    sum(dat_sets$w_size * dat_sets$true_among_everyone),
+    sum(dat_sets$w_prec * dat_sets$true_among_everyone)
+  ),
+  estimate = c(
+    sum(dat_sets$w_treated * dat_sets$estimate),
+    sum(dat_sets$w_control * dat_sets$estimate),
+    sum(dat_sets$w_size * dat_sets$estimate),
+    sum(dat_sets$w_prec * dat_sets$estimate)
+  )
 )
-c(true_average_effect_on_treated = att_truth, naive = naive_diff, by_hand)
+results
+
+## The first three targets should equal the true averages from the data section
+all.equal(results$true_target[1:3], unname(truth))
 ```
 
-The three weighted estimates range from `r round(min(by_hand), 2)` to
-`r round(max(by_hand), 2)`, compared with `r round(naive_diff, 2)` for the naive
-comparison and a truth of `r round(att_truth, 2)`. Splitting people into just
-two groups on one variable moves the estimate in the right direction but does
-not get to the truth, and the choice of weights matters.
+The `true_target` column agrees with the truth for the first three questions
+(the check prints `TRUE`), so the weights are right. The precision summary has a
+different target, `r round(results$true_target[4], 2)`, which belongs to none of
+the three groups. The `estimate` column is higher than the target in every row.
+That gap is not a weighting problem; it is the confounding that remains inside
+each stratum.
 
-Because we simulated the data, we can also check that the treated-count weights
-are the right ones for our question. Applying them to the *true* average effect
-among the treated in each stratum gives exactly the true overall average:
-
-```{r check_treated_weights}
-all.equal(sum(dat_sets$true_effect_among_treated * dat_sets$w_treated), att_truth)
-```
-
-The weights are right; what is still wrong is the within-stratum comparison
-(`est` is larger than `true_effect_among_treated` in both strata).
+Untreated people and everyone can only be the target if the treated people have
+comparable untreated counterparts *and* the untreated people have comparable
+treated counterparts. The matched designs we build below start from the first
+direction, which is why we follow the first question. We return to this when we
+discuss overlap.
 
 ### The same estimates from regression
 
@@ -363,6 +425,7 @@ dat_two <- dat_two %>%
     p_b = mean(trtbin),
     w_size_i = trtbin / p_b + (1 - trtbin) / (1 - p_b),
     w_treated_i = ifelse(trtbin == 1, 1, p_b / (1 - p_b)),
+    w_control_i = ifelse(trtbin == 1, (1 - p_b) / p_b, 1),
     w_prec_i = w_size_i * p_b * (1 - p_b)
   ) %>%
   ungroup()
@@ -370,14 +433,16 @@ dat_two <- dat_two %>%
 est_size <- lm_robust(postY ~ trtbin, weights = w_size_i, data = dat_two)
 est_blocks <- difference_in_means(postY ~ trtbin, blocks = stratum, data = dat_two)
 est_treated <- lm_robust(postY ~ trtbin, weights = w_treated_i, data = dat_two)
+est_control <- lm_robust(postY ~ trtbin, weights = w_control_i, data = dat_two)
 est_fe <- lm_robust(postY ~ trtbin, fixed_effects = ~stratum, data = dat_two)
 est_prec <- lm_robust(postY ~ trtbin, weights = w_prec_i, data = dat_two)
 
 data.frame(
-  weights = c("stratum size", "treated count", "precision"),
-  by_hand = unname(by_hand),
-  regression = c(coef(est_size)[["trtbin"]], coef(est_treated)[["trtbin"]], coef(est_fe)[["trtbin"]]),
-  another_way = c(coef(est_blocks)[["trtbin"]], NA, coef(est_prec)[["trtbin"]])
+  weights = c("treated count", "untreated count", "stratum size", "precision"),
+  by_hand = results$estimate,
+  regression = c(coef(est_treated)[["trtbin"]], coef(est_control)[["trtbin"]],
+                 coef(est_size)[["trtbin"]], coef(est_fe)[["trtbin"]]),
+  another_way = c(NA, NA, coef(est_blocks)[["trtbin"]], coef(est_prec)[["trtbin"]])
 )
 ```
 
@@ -403,11 +468,13 @@ another.
 ## Summary of the section
 
 Holding one variable roughly constant with two strata moved the estimate toward
-the truth, and combining the strata required a choice of weights that decides
-which question the estimate answers. We chose treated-count weights because our
-question is about the people who were treated. Precision weights, the default
-that "fixed effects" regression gives you, answer a different question whenever
-effects and shares treated differ across strata.
+the truth. Two choices came up that do not go away as designs get more
+sophisticated. First, report effects within subgroups whenever the question is
+about who benefits, and keep them next to any overall average. Second, when you
+do need one number, the question decides the weights: the people the program
+served, the people it has not yet served, and everyone are different averages
+with different weights, and the precision weights that regression "fixed
+effects" give you correspond to none of them when effects differ.
 
 What should we do if we want to hold more than one variable constant, or if
 those variables take many values? We need many more strata, each containing

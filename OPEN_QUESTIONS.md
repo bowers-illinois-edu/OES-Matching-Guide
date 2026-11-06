@@ -125,3 +125,53 @@ The guide should include a simulated outcome with a known effect.
   comparable and more transparent? Simulations support the second.
 - **New:** unresolved warning ("Error gathering complete data") in the
   simulation scripts; source not found.
+
+## Reframing from Ben (2026-11-06): questions, not one estimand
+
+The audience is government staff trying to understand whether a program or
+policy is working, at several levels (community, fiscal, political), and
+heterogeneous effects matter to them. They are not building theory. So the
+guide should probably not pick one target and one weighting. Instead it should
+start from the decision question, and the estimand and weights follow:
+
+| Decision question | Target | Weights |
+|---|---|---|
+| How did the program work for the people it served? | average effect on the treated | treated-count |
+| What would happen if we extended it to people not yet served? | average effect on the untreated | control-count |
+| What would happen across everyone eligible? | average effect on everyone in the matched sets | stratum-size |
+| For whom does it work? | effect within subgroups (no averaging across them) | weights within subgroup |
+| A single efficient summary when effects are about equal | precision-weighted average | precision (regression "fixed effects" default) |
+
+Decisions for Jake that replace questions 1 and 2:
+- Which of these questions does the guide support in detail (treated only, or
+  treated, untreated and everyone)? ATE and the untreated version need
+  comparable treated units for controls, which the guide's matching, which
+  matches each treated unit to controls, does not provide. I have not checked how far that
+  holds in the simulated data.
+- Does the guide show subgroup effects next to any average? (Recommended: yes,
+  since heterogeneity is central for this audience.)
+- Are community-level effects (spillovers, clustered programs), fiscal impact
+  and political outcomes in scope? Matching on individual units answers the
+  first kind of question only for individual-level outcomes.
+- The precision-weight result is stated from standard theory, not a checked
+  citation.
+
+### Refinements after discussion (2026-11-06)
+
+- **Direction of matching.** Earlier wording said a design that matches each
+  treated unit to controls "does not provide" comparable treated units for the
+  untreated. More precisely: it does not *guarantee* them. Matching in the other
+  direction, or full matching (sets with one treated and several controls, or
+  one control and several treated), can support the untreated and everyone
+  questions, subject to overlap in that direction. The data have 334 treated and
+  666 untreated, so pair matching leaves about 332 untreated people out. Not yet
+  checked: how many untreated people lack a comparable treated person.
+- **Communities.** A community defined as a grouping of people can be handled
+  with the same machinery: as strata (effects within each community) or as a
+  weighting choice (weight communities equally for "the average community", or
+  by size for "the average person"). Individual-level matching cannot handle
+  spillover onto untreated neighbors or programs delivered to a whole
+  community. Which of these does the guide cover?
+- **Guide text.** Stage 1 now states the question-to-weights table and explains
+  that weights are the step after matching builds strata; with matched pairs all
+  weightings agree.
