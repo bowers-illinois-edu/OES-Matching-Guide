@@ -1,5 +1,11 @@
 # Run from the repository root: Rscript checks/dgp_check.R
 # What drives treatment and outcome in the simulated data, and how biased is the naive estimate?
+#
+# NOTE: written for the ORIGINAL data-generating process (outcome = .2*sd(preY)*trtbin +
+# preY + noise; see commit 11d16be). The guide's makedata chunk has since changed, so
+# the "planted effect" and simulation sections below no longer describe the guide's
+# data. Use checks/guide_data_check.R for the current data. Kept because
+# CLAIMS_AUDIT.md cites its findings about the original data.
 suppressMessages({library(tidyverse); library(estimatr)})
 ln <- readLines("making_and_evaluating_matched_designs.qmd")
 s <- grep("^```\\{r makedata\\}", ln); e <- which(ln == "```" & seq_along(ln) > s)[1]

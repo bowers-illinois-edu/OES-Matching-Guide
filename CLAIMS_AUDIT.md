@@ -11,6 +11,13 @@ reframe it for different audiences afterwards.
 
 ## What the checks show about the running example
 
+*These findings describe the original data (outcome driven by `preY` only). The
+guide's `makedata` chunk now uses the revised outcome with a person-level
+`effect`; its results are in `checks/guide_data_check.R`. On the revised data:
+naive 1.94 vs true effect on the treated 1.01; matching everyone fails (p < 1e-3);
+propensity distance with calipers of 5 years on `age` and .08 on `preY` balances
+(p = .84) and drops 75 units (42 treated).*
+
 | Finding | Evidence |
 |---|---|
 | Treatment is driven by `preY` (cor .41) and `age` (.30). `demog` is 96% `age`. | `dgp_check.R` |
@@ -55,11 +62,15 @@ is 0.30. Mean estimates:
   is only the right form when there is no kink.)
 - With `motiv` active, every adjusted estimate is biased by about +0.3, which
   gives the sensitivity chapter something concrete to bound.
-- **Unresolved:** the full simulation scripts emit one warning per simulation,
-  always "Error gathering complete data..." from a `tryCatch` handler
-  (`value[[3L]](cond)`). A stripped-down pipeline over six seeds emits none, so
-  I have not found the source and cannot say it is harmless. Treat the
-  simulation numbers as provisional until it is traced.
+- **The repeated warning is understood.** The simulation scripts emit one
+  warning per simulation, "Error gathering complete data...". It comes from
+  `match_on(psmod, data = d)`: inside `optmatch`, `scores()` tries to rebuild
+  the model frame, falls back, and warns that it will not impute missing
+  values. A likely reason it appears only in the scripts: `scores()` re-evaluates
+  the model's original `data = d`, and `d` is a local variable inside the
+  simulation function, whereas the guide's `dat` is global. (I inferred this; I
+  did not test it.) These data have no missing values, so the matches are
+  unaffected either way.
 
 ### Where regression and matching really diverge: effect heterogeneity (`checks/dgp_heterogeneity.R`)
 

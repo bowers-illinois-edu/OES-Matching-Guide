@@ -161,7 +161,15 @@ dat <- dat %>% mutate(
   trtcont = rnorm(n = N, mean = demog + preY, sd = sd(demog + preY)),
   ##  trtbin = rbinom(n = N, size = 1, prob = pmin(.95,demog+preY)),
   trtbin = as.numeric(trtcont >= quantile(trtcont, 2 / 3)),
-  postY = .2 * sd(preY) * trtbin + preY + rnorm(N)
+  ## The effect of the intervention on each person. We can write this down only
+  ## because we are simulating: with real data we never see it. It is positive
+  ## for everyone and larger for people with higher baseline outcomes (preY).
+  effect = .1 + 3 * preY,
+  ## The outcome each person would have without the intervention. It depends on
+  ## baseline outcome (non-linearly) and on age, so a naive comparison of
+  ## treated and untreated people mixes up the intervention with those two.
+  postY0 = 2 * preY + 4 * preY^2 + .03 * (age - 45) + rnorm(N),
+  postY = postY0 + trtbin * effect
 )
 
 ## optmatch will need row names
@@ -195,6 +203,44 @@ able to **interpret** the relationship we calculate between intervention and
 outcome as reflecting, as much as possible, only the intervention and the
 outcome and not age and education.^[We borrow the idea of "interpretable
 comparisons" from @kinder1993behalf]
+
+## What is true in these data, and what a naive comparison says
+
+Because we made these data up, we know something that we never know in real
+work: how much the intervention changed each person's outcome (the variable
+`effect`). We built three features into the data that real programs often have:
+
+ 1. People with higher baseline outcomes (`preY`) and older people (`age`) are
+ more likely to receive the intervention. (`demog`, which also helps determine
+ who is treated, is almost entirely a function of `age` in these data.)
+ 2. Baseline outcome and age also affect the outcome after the intervention, so
+ a simple comparison of treated and untreated people mixes up the
+ intervention with those two characteristics.
+ 3. The intervention helps everyone a little and helps people with higher
+ baseline outcomes more.
+
+Because the effect differs from person to person, "the effect of the
+intervention" needs a precise meaning. In this guide we ask: *what was the
+average effect of the intervention among the people who actually received it?*
+(Statisticians call this the average treatment effect on the treated.) <!--
+REVIEW: is the average effect on the treated the right target for this
+audience? See OPEN_QUESTIONS.md, question 1. -->
+
+```{r truth}
+att_truth <- mean(dat$effect[dat$trtbin == 1])
+naive_fit <- lm(postY ~ trtbin, data = dat)
+naive_diff <- coef(naive_fit)[["trtbin"]]
+c(true_average_effect_on_treated = att_truth, naive_difference = naive_diff)
+```
+
+The true average effect among the treated is `r round(att_truth, 2)`. A simple
+comparison of average outcomes between treated and untreated people gives
+`r round(naive_diff, 2)`, which is `r round(naive_diff / att_truth, 1)` times too
+large. The naive comparison is wrong because the treated people started out
+different: they had higher baseline outcomes and were older, and those
+differences would have produced higher outcomes even without the intervention.
+The rest of this guide is about building a research design that closes that gap
+using only information that was available before we looked at outcomes.
 
 # The simplest matched design: 2 strata, 1 variable
 
