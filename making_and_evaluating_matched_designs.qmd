@@ -351,17 +351,26 @@ Which weights combine the $\hat\tau_b$ correctly depends on the question:
 | How did it work for the people it served? | among the treated | $n_{Tb} / n_T$ (share of all treated people) |
 | What if we extend it to people not yet served? | among the untreated | $n_{Cb} / n_C$ (share of all untreated people) |
 | What across everyone eligible? | among everyone | $n_b / n$ (share of everyone) |
-| One efficient summary when effects are about equal | precision-weighted | proportional to $n_b \, p_b (1 - p_b)$, where $p_b = n_{Tb}/n_b$ |
+| What for people who could plausibly have gone either way? (also: one efficient summary when effects are about equal) | precision-weighted | proportional to $n_b \, p_b (1 - p_b)$, where $p_b = n_{Tb}/n_b$ |
 
 The precision weights are what a linear regression with "fixed effects" for
 strata produces. Under the usual regression assumptions they give the estimate
 with the smallest standard error when the effect is the same in every stratum.
 They favor strata where treated and untreated people are about equally
-numerous, and they do not correspond to any one group of people, so when
-effects differ across strata they answer none of the first three questions
-exactly. When the effect *is* the same everywhere, all four weightings agree.
-<!-- REVIEW: the precision-weight result is stated from standard theory without
-a checked citation. See OPEN_QUESTIONS.md. -->
+numerous, which are the strata where the comparison between treated and
+untreated people is most informative. So when effects differ across strata they
+do not answer any of the first three questions exactly. They answer a fourth:
+*what was the average effect for people who could plausibly have been in either
+group?* That can be a useful question, for instance when deciding about people
+near the margin of eligibility, but it is a different question from the first
+three, and it is worth choosing it on purpose rather than getting it by default
+from a regression. When the effect *is* the same everywhere, all four
+weightings agree. <!-- REVIEW: the precision-weight result is stated from
+standard theory without a checked citation. The "could plausibly have been in
+either group" reading follows from the weights being proportional to
+p(1 - p); I believe the literature calls this the overlap population (Li,
+Morgan and Zaslavsky 2018) but have not checked the reference. See
+OPEN_QUESTIONS.md. -->
 
 We can check the weights in this table against the truth. Applying each set of
 weights to the *true* stratum averages should give exactly the true overall
@@ -400,8 +409,9 @@ all.equal(results$true_target[1:3], unname(truth))
 
 The `true_target` column agrees with the truth for the first three questions
 (the check prints `TRUE`), so the weights are right. The precision summary has a
-different target, `r round(results$true_target[4], 2)`, which belongs to none of
-the three groups. The `estimate` column is higher than the target in every row.
+different target, `r round(results$true_target[4], 2)`, which is the average
+effect for people who could plausibly have been in either group, not for any of
+the three groups above. The `estimate` column is higher than the target in every row.
 That gap is not a weighting problem; it is the confounding that remains inside
 each stratum.
 
@@ -474,7 +484,8 @@ about who benefits, and keep them next to any overall average. Second, when you
 do need one number, the question decides the weights: the people the program
 served, the people it has not yet served, and everyone are different averages
 with different weights, and the precision weights that regression "fixed
-effects" give you correspond to none of them when effects differ.
+effects" give you answer a fourth question, about people who could plausibly
+have been in either group, when effects differ.
 
 What should we do if we want to hold more than one variable constant, or if
 those variables take many values? We need many more strata, each containing

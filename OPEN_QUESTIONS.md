@@ -175,3 +175,21 @@ Decisions for Jake that replace questions 1 and 2:
 - **Guide text.** Stage 1 now states the question-to-weights table and explains
   that weights are the step after matching builds strata; with matched pairs all
   weightings agree.
+
+### Precision weights and the overlap population (2026-11-06)
+
+Precision weights (proportional to n p (1 - p)) target the average effect for
+people who could plausibly have been in either group. I believe this is the
+"overlap population" in the literature (Li, Morgan and Zaslavsky 2018); I have
+not checked the reference. The guide no longer says these weights correspond to
+no group. Jake: is this the framing we want, and is that the right citation?
+
+### Spillover design idea (Ben, 2026-11-06)
+
+Define exposure groups from known facts (distance, network ties) before looking
+at outcomes: T treated, S untreated but exposed, C untreated and unexposed.
+Match T to C for the direct effect and S to C for the spillover effect. Needs
+C to be truly unexposed and location-related covariates in the matching. A
+gradient of exposure is a continuous treatment (non-bipartite matching).
+Untested. Bibliography entries by Bowers, Fredrickson and Panagopoulos may be
+relevant; unread.
