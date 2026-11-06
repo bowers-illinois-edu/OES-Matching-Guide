@@ -244,140 +244,175 @@ using only information that was available before we looked at outcomes.
 
 # The simplest matched design: 2 strata, 1 variable
 
-As an example of where we are going, we show an example of what is, in essence,
-a matched design, but one that has only 2 strata and using only 1 variable.
-Here we will also show the outcome analysis, just to be clear about how
-stratification can enable adjustment or substitute for linear additive
-"controlling for".
+Before using any matching software, we show the idea of a matched design in its
+simplest form: two strata defined by one variable. We also show the outcome
+analysis here, to be clear about how stratification can stand in for linear
+additive "controlling for", and about how the choice of weights decides which
+question an estimate answers.
 
-Say that we want to remove the effect of sex from the relationship between the
-intervention and the outcome. The simplest and most transparent way to do this
-would be to calculate the relationship between the intervention and the outcome
-only among men and only among women (imagining that our administrative data do
-not yet record non-binary gender).
-
-Below we show this most basic approach to using stratification to remove or
-control for the effects of a single variable with two levels as a way to
-introduce multivariate optimal matching later. What we see here is that the
-effect among men is different from the effect among women, and that the effect
-among each sex cannot be confounded by sex --- after all the variables `sex` is
-held perfectly constant.
+In the previous section we saw that baseline outcome (`preY`) helps determine
+who receives the intervention and also affects the outcome after it, so it is a
+natural variable to hold constant. The simplest way to do that is to split
+people into those with baseline outcomes above the median and those below it,
+and then compare treated and untreated people only within each group.
 
 ```{r two_strata_example}
-with(dat, table(treated=trtbin, sex=sex, exclude = c()))
-lm_sexM <- lm(postY ~ trtbin, data = dat, subset = sex == "M")
-lm_sexF <- lm(postY ~ trtbin, data = dat, subset = sex == "F")
-coef(lm_sexM)[["trtbin"]]
-coef(lm_sexF)[["trtbin"]]
+dat_two <- dat %>%
+  mutate(stratum = factor(ifelse(preY > median(preY), "high preY", "low preY"),
+                          levels = c("low preY", "high preY")))
+
+## Who is treated in each stratum?
+with(dat_two, table(treated = trtbin, stratum = stratum))
+
+## The treated-versus-untreated difference in outcomes within each stratum
+lm_low <- lm(postY ~ trtbin, data = dat_two, subset = stratum == "low preY")
+lm_high <- lm(postY ~ trtbin, data = dat_two, subset = stratum == "high preY")
+c(low_preY = coef(lm_low)[["trtbin"]], high_preY = coef(lm_high)[["trtbin"]])
 ```
 
-Now, these are two descriptions of the relationship of interest, but we tend to
-think about stratification as a way to *remove* confounding relationships from
-*a single overall* relationship. How to calculate this? We show this in steps
-here --- first doing it very simply by hand, and then using "fixed effects". We
-will return to these ideas after creating matched designs using `optmatch` and
-`designmatch` or another approach to stratification since this is the same way
-that we will estimate effects after creating hundreds of matched pairs or sets
-later.
+Two things differ between the strata: a much larger share of the high-baseline
+group received the intervention (see the table), and the two within-stratum
+differences are quite different from each other. Part of that is real (in these
+data the intervention helps people with higher baseline outcomes more), and part
+is that the comparisons are still imperfect. We now need a single number, which
+means choosing how to combine the two stratum-specific differences.
 
-We know how to analyze a block-randomized (or strata-randomized) experiment
-[@gerber2012field]: each block is a mini-experiment. We *estimate the ATE
-within each block* and *combine by weighting each block specific estimate*.
+## Combining strata: the weights choose the question
 
-The *block-size weight* produces an unbiased estimator in randomized
-experiments --- in an observational study we don't know about the bias since we
-don't exactly know how to repeat the study.  The *precision weight* (aka the
-"fixed effects" weights) tends to produce smaller standard errors and
-confidence intervals but is biased in randomized experiments. In standard
-practice with matched designs we use the *precision weight* approach because
-(1) we tend to have matched sets that are nearly the same size (i.e. pairs)
-which means that the block-size weight and the precision-weight approaches tend
-to be nearly the same and (2) we can calculate the precision-weighted results
-quickly using the fact that "fixed effects" in linear regression models create
-precision weights and (3) we know that our estimators are biased because we
-neither observe all relevant confounders nor do we know the functional form
-that relates them to the treatment.
+Think of each stratum as a small experiment, $b$, with $n_b$ people of whom
+$n_{Tb}$ were treated and $n_{Cb}$ were not, and write $\hat\tau_b$ for the
+treated-minus-untreated difference in that stratum. Three weightings are common.
+
+ - **Stratum-size weights**, $n_b / n$. These ask: what was the average effect
+ across everyone in these strata, treated or not?
+ - **Treated-count weights**, $n_{Tb} / n_T$. These ask: what was the average
+ effect among the people who were treated? Strata with more treated people count
+ for more. This is the question we asked in the data section.
+ - **Precision weights**, proportional to $n_b \, p_b (1 - p_b)$, where
+ $p_b = n_{Tb}/n_b$ is the share treated in the stratum. These are what a linear
+ regression with "fixed effects" for strata produces. Under the usual regression
+ assumptions they give the estimate with the smallest standard error when the
+ effect is the same in every stratum. They favor strata where treated and
+ untreated people are about equally numerous.
+
+When effects differ across strata and the share treated differs across strata,
+as it does here, these weightings answer different questions and give different
+numbers. <!-- REVIEW: the target estimand and which weights to recommend are
+open decisions (OPEN_QUESTIONS.md, questions 1 and 2). A reference for the
+precision-weight result would help here. -->
 
 ```{r weighting}
-## First collapse the data to the level of the strata and calculate weights
-dat_sets <- dat %>%
-  group_by(sex) %>%
+dat_sets <- dat_two %>%
+  group_by(stratum) %>%
   summarize(
-    nb = n(),
-    ateb = mean(postY[trtbin == 1]) - mean(postY[trtbin == 0]),
-    prob_trt = mean(trtbin), ## proportion treated in the strata
-    nbwt = n() / nrow(dat), ## proportion of the total data in the strata
-    prec_wt = nbwt * prob_trt * (1 - prob_trt),
+    n = n(),
+    n_treated = sum(trtbin),
+    n_control = sum(1 - trtbin),
+    est = mean(postY[trtbin == 1]) - mean(postY[trtbin == 0]),
+    ## Known only because we simulated the data:
+    true_effect_among_treated = mean(effect[trtbin == 1]),
+    .groups = "drop"
+  ) %>%
+  mutate(
+    w_size = n / sum(n),
+    w_treated = n_treated / sum(n_treated),
+    w_prec0 = n * (n_treated / n) * (n_control / n),
+    w_prec = w_prec0 / sum(w_prec0)
   )
 
-dat_sets$prec_wt_norm <- with(dat_sets, prec_wt / sum(prec_wt))
-
-## The two groups of people with the treatment estimated within each set along with some weights
-dat_sets %>% select(sex, nb, ateb, prob_trt, nbwt, prec_wt_norm)
-
-## The overall estimation using the two kinds of weights
-est_ate_nw <- with(dat_sets, sum(ateb * nbwt))
-est_ate_pw <- with(dat_sets, sum(ateb * prec_wt_norm))
-
-c(block_size_wt = est_ate_nw, precision_wt = est_ate_pw)
+dat_sets %>% select(stratum, n, n_treated, est, true_effect_among_treated, w_size, w_treated, w_prec)
 ```
 
-Strata-level weights can also be represented at the individual level --- and
-this allows us to use linear models (least squares) to produce block-weighted
-estimates of the overall average causal effect after "holding constant" sex.
+```{r weighted_estimates}
+by_hand <- c(
+  stratum_size = sum(dat_sets$est * dat_sets$w_size),
+  treated_count = sum(dat_sets$est * dat_sets$w_treated),
+  precision = sum(dat_sets$est * dat_sets$w_prec)
+)
+c(true_average_effect_on_treated = att_truth, naive = naive_diff, by_hand)
+```
 
-```{r make_strata_level_data}
-## Now creating the weights at the individual level
-dat <- dat %>%
-  group_by(sex) %>%
+The three weighted estimates range from `r round(min(by_hand), 2)` to
+`r round(max(by_hand), 2)`, compared with `r round(naive_diff, 2)` for the naive
+comparison and a truth of `r round(att_truth, 2)`. Splitting people into just
+two groups on one variable moves the estimate in the right direction but does
+not get to the truth, and the choice of weights matters.
+
+Because we simulated the data, we can also check that the treated-count weights
+are the right ones for our question. Applying them to the *true* average effect
+among the treated in each stratum gives exactly the true overall average:
+
+```{r check_treated_weights}
+all.equal(sum(dat_sets$true_effect_among_treated * dat_sets$w_treated), att_truth)
+```
+
+The weights are right; what is still wrong is the within-stratum comparison
+(`est` is larger than `true_effect_among_treated` in both strata).
+
+### The same estimates from regression
+
+Stratum-level weights can be turned into person-level weights, which lets us
+use least squares. This is the same logic as analyzing a block-randomized
+experiment [@gerber2012field]: each stratum is a mini-experiment and we combine
+the stratum-specific estimates by weighting.
+
+```{r individual_level}
+dat_two <- dat_two %>%
+  group_by(stratum) %>%
   mutate(
-    nb = n(),
-    mb = sum(trtbin),
-    ateb = mean(postY[trtbin == 1]) - mean(postY[trtbin == 0]),
-    prob_trt = mean(trtbin),
-    nbwt = (trtbin / prob_trt) + (1 - trtbin) / (1 - prob_trt),
-    prec_wt = nbwt * prob_trt * (1 - prob_trt)
+    p_b = mean(trtbin),
+    w_size_i = trtbin / p_b + (1 - trtbin) / (1 - p_b),
+    w_treated_i = ifelse(trtbin == 1, 1, p_b / (1 - p_b)),
+    w_prec_i = w_size_i * p_b * (1 - p_b)
   ) %>%
   ungroup()
 
-## Two ways to use the block-size weight
-est_ate1a <- difference_in_means(postY ~ trtbin, blocks = sex, data = dat)
-est_ate1b <- lm_robust(postY ~ trtbin, weights = nbwt, data = dat)
-est_ate1c <- lm(postY ~ trtbin, weights = nbwt, data = dat)
+est_size <- lm_robust(postY ~ trtbin, weights = w_size_i, data = dat_two)
+est_blocks <- difference_in_means(postY ~ trtbin, blocks = stratum, data = dat_two)
+est_treated <- lm_robust(postY ~ trtbin, weights = w_treated_i, data = dat_two)
+est_fe <- lm_robust(postY ~ trtbin, fixed_effects = ~stratum, data = dat_two)
+est_prec <- lm_robust(postY ~ trtbin, weights = w_prec_i, data = dat_two)
 
-## Three other ways to use the precision or harmonic weight
-est_ate2a <- lm_robust(postY ~ trtbin + sex, data = dat)
-est_ate2b <- lm_robust(postY ~ trtbin, fixed_effects = ~sex, data = dat)
-est_ate2c <- lm_robust(postY ~ trtbin, weights = prec_wt, data = dat)
+data.frame(
+  weights = c("stratum size", "treated count", "precision"),
+  by_hand = unname(by_hand),
+  regression = c(coef(est_size)[["trtbin"]], coef(est_treated)[["trtbin"]], coef(est_fe)[["trtbin"]]),
+  another_way = c(coef(est_blocks)[["trtbin"]], NA, coef(est_prec)[["trtbin"]])
+)
 ```
 
-Notice that we get the same result for the overall effect whether we first
-calculate differences of means within strata and then take a weighted average
-of those strata specific differences of means, or whether we hand off that job
-to least squares. The only difference here is whether we choose to weight only
-using the proportion of the data in the block, or whether we also want to take
-into account the proportion taking the intervention within the strata.
+Each row should agree across columns: the weights, not the software, decide the
+answer.
 
-```{r}
-## Block-size weighted results
-c(est_ate_nw, coef(est_ate1a)[["trtbin"]], coef(est_ate1b)[["trtbin"]], coef(est_ate1c)[["trtbin"]])
-## Precision weighted results
-c(est_ate_pw, coef(est_ate2a)[["trtbin"]], coef(est_ate2b)[["trtbin"]], coef(est_ate2c)[["trtbin"]])
+### What is still wrong
+
+Within each stratum, treated people still have higher baseline outcomes than
+untreated people:
+
+```{r residual_imbalance}
+dat_two %>%
+  group_by(stratum, treated = trtbin) %>%
+  summarize(mean_preY = mean(preY), .groups = "drop")
 ```
+
+A stratum of "above the median" contains very different people. That remaining
+difference in baseline outcome is one reason the stratified estimates are still
+too large; differences in age within strata, which we have not touched, are
+another.
 
 ## Summary of the section
 
-So, we have seen that we can "control for" a single binary variable using
-stratification. We didn't need to evaluate the stratification --- after all, we
-just held sex perfectly constant within strata. If someone asked, "Does this
-design remove sex as an alternative explanation?" we could answer simply, "Yes.
-We only compare women with women and men with men." And we were able to produce
-an estimate of an overall effect by calculating effects within strata and
-combining them via weighting. And we showed that we can use OLS for this
-purpose --- just as we would if we had a block-randomized experiment.
+Holding one variable roughly constant with two strata moved the estimate toward
+the truth, and combining the strata required a choice of weights that decides
+which question the estimate answers. We chose treated-count weights because our
+question is about the people who were treated. Precision weights, the default
+that "fixed effects" regression gives you, answer a different question whenever
+effects and shares treated differ across strata.
 
-What should we do if we have more than one variable? Or if those variables have
-more than a few values? We explain that below as we introduce optimal matching.
+What should we do if we want to hold more than one variable constant, or if
+those variables take many values? We need many more strata, each containing
+similar people, and an algorithm to build them. That is the job of optimal
+matching, which we turn to next.
 
 # Create a design, evaluate and iterate if needed
 
