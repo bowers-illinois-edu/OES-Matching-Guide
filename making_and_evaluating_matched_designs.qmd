@@ -1001,10 +1001,13 @@ solverlist <- list(name = "highs", approximate = 1, t_max = 1000, trace = 1)
 ## fixed numbers of controls (i.e. every match can be 1 to 2, or 1 to 3, but not a
 ## mixture of those)
 
-## The subset_weight argument sets how much the optimizer rewards matching more
-## treated units versus minimizing total distance. With subset_weight=1, the
-## solver is allowed to leave treated units unmatched (a partial match) when
-## that lowers the total distance; this is why some units are dropped below.
+## subset_weight trades off the total distance between matched pairs against
+## the number of matched pairs: the larger it is, the more the optimizer values
+## matching additional treated units. Its scale is the scale of dist_mat (here
+## rescaled to have mean about 1), so subset_weight=1 means a pair is kept only
+## if it adds less than about one average distance. Some treated units are
+## therefore left unmatched, which is why some units are dropped below.
+## subset_weight=NULL instead forces every treated unit to be matched.
 
 dm1 <- bmatch(t_ind=datmm_dm$trtbin, dist_mat=ps_dist_dm, solver=solverlist, subset_weight=1, n_controls=1)
 
