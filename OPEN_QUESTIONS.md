@@ -191,5 +191,27 @@ at outcomes: T treated, S untreated but exposed, C untreated and unexposed.
 Match T to C for the direct effect and S to C for the spillover effect. Needs
 C to be truly unexposed and location-related covariates in the matching. A
 gradient of exposure is a continuous treatment (non-bipartite matching).
-Untested. Bibliography entries by Bowers, Fredrickson and Panagopoulos may be
-relevant; unread.
+Untested. Jake co-authored work on interference (Bowers, Fredrickson and
+Panagopoulos entries are in big.bib); I have not read it. Jake: is that the
+right reference, and how would you set up S and C?
+
+### Eligibility (Ben, 2026-11-06)
+
+Eligibility rules are central to many government programs, so the guide should
+treat them explicitly. Where they touch the design:
+
+- **The comparison pool.** Untreated people who were never eligible are poor
+  comparisons: they could not have been treated, so they are not "either way"
+  people. The usual pool is eligible people who did not enroll (non-participants).
+- **The estimand.** Effect among those who enrolled vs among everyone eligible
+  (take-up matters) vs the effect of being offered the program. These are
+  different questions with different designs.
+- **Eligibility as a design variable.** It is known before outcomes, so it can
+  be matched on exactly or used to restrict the data.
+- **Sharp cutoffs.** If everyone above a threshold is treated and no one below
+  is, there are no mixed strata near the cutoff, so matching has nothing to work
+  with there (a regression discontinuity design is the usual tool). Out of scope?
+- **Our simulated data have no eligibility variable.** Options: add an
+  `eligible` indicator (with some ineligible untreated people who resemble the
+  treated) so the design chapter can show that restricting to eligible people
+  matters; or leave it as a prose section only. Decision needed.

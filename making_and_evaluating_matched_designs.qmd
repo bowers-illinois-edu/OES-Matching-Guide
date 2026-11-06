@@ -154,13 +154,19 @@ dat <- dat %>% mutate(
   edu = factor(sample(letters[1:8], size = N, prob = runif(n = 8, min = .1, max = pmax(.2, demog)), replace = TRUE)),
   grade = sample(1:6, size = N, replace = TRUE),
   pay = abs(rnorm(n = N, mean = (demog + .01) * 50000 + 50000, sd = 50000)),
+  ## An income test: only people with pay at or below the 75th percentile are
+  ## eligible for the program. `pay` is not one of the covariates we match on
+  ## below, so ignoring eligibility would not be fixed by matching alone.
+  eligible = as.numeric(pay <= quantile(pay, .75)),
   tenure = rnorm(n = N, mean = 10, sd = 3),
   perf = runif(n = N, min = 1, max = 10),
   preY0 = abs(.2 * demog + rnorm(N)),
   preY = (preY0 - min(preY0)) / (max(preY0) - min(preY0)),
   trtcont = rnorm(n = N, mean = demog + preY, sd = sd(demog + preY)),
   ##  trtbin = rbinom(n = N, size = 1, prob = pmin(.95,demog+preY)),
-  trtbin = as.numeric(trtcont >= quantile(trtcont, 2 / 3)),
+  ## Only eligible people can enroll. Among them, the third with the highest
+  ## trtcont (which depends on demog and baseline outcome) enroll.
+  trtbin = as.numeric(eligible == 1 & trtcont >= quantile(trtcont[eligible == 1], 2 / 3)),
   ## The effect of the intervention on each person. We can write this down only
   ## because we are simulating: with real data we never see it. It is positive
   ## for everyone and larger for people with higher baseline outcomes (preY).
@@ -168,7 +174,9 @@ dat <- dat %>% mutate(
   ## The outcome each person would have without the intervention. It depends on
   ## baseline outcome (non-linearly) and on age, so a naive comparison of
   ## treated and untreated people mixes up the intervention with those two.
-  postY0 = 2 * preY + 4 * preY^2 + .03 * (age - 45) + rnorm(N),
+  ## Pay also affects the outcome, so ineligible (higher-pay) people differ from
+  ## eligible people for reasons unrelated to the program.
+  postY0 = 2 * preY + 4 * preY^2 + .03 * (age - 45) + .3 * (pay - mean(pay)) / sd(pay) + rnorm(N),
   postY = postY0 + trtbin * effect
 )
 
@@ -208,7 +216,7 @@ comparisons" from @kinder1993behalf]
 
 Because we made these data up, we know something that we never know in real
 work: how much the intervention changed each person's outcome (the variable
-`effect`). We built three features into the data that real programs often have:
+`effect`). We built four features into the data that real programs often have:
 
  1. People with higher baseline outcomes (`preY`) and older people (`age`) are
  more likely to receive the intervention. (`demog`, which also helps determine
@@ -218,6 +226,10 @@ work: how much the intervention changed each person's outcome (the variable
  intervention with those two characteristics.
  3. The intervention helps everyone a little and helps people with higher
  baseline outcomes more.
+ 4. The program has an eligibility rule. Only people whose `pay` is at or below
+ the 75th percentile are eligible, and only eligible people can enroll. `pay`
+ also affects the outcome, so ineligible people differ from eligible people for
+ reasons that have nothing to do with the program.
 
 Because the effect differs from person to person, "the effect of the
 intervention" is not one number: it depends on whose average we want. Different
@@ -226,14 +238,35 @@ decisions call for different averages:
  - *How did the program work for the people it served?* This asks for the
  average effect among the people who received it.
  - *What would happen if we extended the program to people it has not yet
- served?* This asks for the average effect among the people who did not receive
- it.
+ served?* This asks for the average effect among the eligible people who did
+ not receive it.
  - *What would happen across everyone who is eligible?* This asks for the
- average effect across everyone.
+ average effect across all eligible people.
 
 A fourth kind of question, *for whom does it work?*, asks for effects within
-subgroups rather than one average. We come back to it below. Because we
-simulated each person's effect, we can compute the true value of each average:
+subgroups rather than one average. We come back to it below.
+
+### Eligibility defines who can be compared
+
+People who are not eligible could not have received the program, so they are not
+a fair comparison for the people who did. From here on we work with the
+eligible people only, who are the population the program could serve. (We keep
+the full data as `dat_all` so we can later show what goes wrong when eligibility
+is ignored.)
+
+```{r eligibility}
+with(dat, table(eligible = eligible, treated = trtbin))
+
+## The comparison we would make if we forgot about eligibility: treated people
+## against everyone not treated, ineligible people included
+naive_all <- coef(lm(postY ~ trtbin, data = dat))[["trtbin"]]
+
+dat_all <- dat
+dat <- dat[dat$eligible == 1, ]
+```
+
+Because we simulated each person's effect, we can compute the true value of each
+average among the eligible people:
 
 ```{r truth}
 truth <- c(
@@ -245,18 +278,20 @@ att_truth <- truth[["among_treated"]]
 
 naive_fit <- lm(postY ~ trtbin, data = dat)
 naive_diff <- coef(naive_fit)[["trtbin"]]
-round(c(truth, naive_difference = naive_diff), 2)
+round(c(truth, naive_difference = naive_diff, naive_including_ineligible = naive_all), 2)
 ```
 
-A simple comparison of average outcomes between treated and untreated people
-gives `r round(naive_diff, 2)`. The true averages are `r round(truth[["among_treated"]], 2)`
-among the treated, `r round(truth[["among_untreated"]], 2)` among the untreated, and
-`r round(truth[["among_everyone"]], 2)` among everyone. The naive comparison is far from all of
-them because the treated people started out different: they had higher baseline
-outcomes and were older, and those differences would have produced higher
-outcomes even without the intervention. The rest of this guide is about building
-a research design that closes that gap using only information that was
-available before we looked at outcomes.
+A simple comparison of average outcomes between treated and untreated eligible
+people gives `r round(naive_diff, 2)`. If we had forgotten about eligibility and
+compared treated people with everyone not treated, we would have gotten
+`r round(naive_all, 2)`. The true averages are `r round(truth[["among_treated"]], 2)`
+among the treated, `r round(truth[["among_untreated"]], 2)` among the eligible
+untreated, and `r round(truth[["among_everyone"]], 2)` among all eligible people. The
+naive comparison is far from all of them because the treated people started out
+different: they had higher baseline outcomes and were older, and those
+differences would have produced higher outcomes even without the intervention.
+The rest of this guide is about building a research design that closes that gap
+using only information that was available before we looked at outcomes.
 
 Through most of the guide we follow the first question, the effect among the
 people the program served, because the matched designs we build compare each
@@ -351,7 +386,7 @@ Which weights combine the $\hat\tau_b$ correctly depends on the question:
 | How did it work for the people it served? | among the treated | $n_{Tb} / n_T$ (share of all treated people) |
 | What if we extend it to people not yet served? | among the untreated | $n_{Cb} / n_C$ (share of all untreated people) |
 | What across everyone eligible? | among everyone | $n_b / n$ (share of everyone) |
-| What for people who could plausibly have gone either way? (also: one efficient summary when effects are about equal) | precision-weighted | proportional to $n_b \, p_b (1 - p_b)$, where $p_b = n_{Tb}/n_b$ |
+| What for people who could plausibly have been either treated or untreated? (also: one efficient summary when effects are about equal) | precision-weighted | proportional to $n_b \, p_b (1 - p_b)$, where $p_b = n_{Tb}/n_b$ |
 
 The precision weights are what a linear regression with "fixed effects" for
 strata produces. Under the usual regression assumptions they give the estimate
@@ -360,14 +395,18 @@ They favor strata where treated and untreated people are about equally
 numerous, which are the strata where the comparison between treated and
 untreated people is most informative. So when effects differ across strata they
 do not answer any of the first three questions exactly. They answer a fourth:
-*what was the average effect for people who could plausibly have been in either
-group?* That can be a useful question, for instance when deciding about people
-near the margin of eligibility, but it is a different question from the first
+*what was the average effect for people who could plausibly have either received
+the intervention or not?* That is, people for whom the comparison is a fair
+one because they had a real chance of landing in either group, as opposed to
+people who almost certainly would or would not have been treated. That can be a
+useful question, for instance when you want an estimate based only on the parts
+of the data where both treated and untreated people are well represented, but
+it is a different question from the first
 three, and it is worth choosing it on purpose rather than getting it by default
 from a regression. When the effect *is* the same everywhere, all four
 weightings agree. <!-- REVIEW: the precision-weight result is stated from
-standard theory without a checked citation. The "could plausibly have been in
-either group" reading follows from the weights being proportional to
+standard theory without a checked citation. The "could plausibly have
+received the intervention or not" reading follows from the weights being proportional to
 p(1 - p); I believe the literature calls this the overlap population (Li,
 Morgan and Zaslavsky 2018) but have not checked the reference. See
 OPEN_QUESTIONS.md. -->
@@ -410,8 +449,8 @@ all.equal(results$true_target[1:3], unname(truth))
 The `true_target` column agrees with the truth for the first three questions
 (the check prints `TRUE`), so the weights are right. The precision summary has a
 different target, `r round(results$true_target[4], 2)`, which is the average
-effect for people who could plausibly have been in either group, not for any of
-the three groups above. The `estimate` column is higher than the target in every row.
+effect for people who could plausibly have either received the intervention or
+not, not for any of the three groups above. The `estimate` column is higher than the target in every row.
 That gap is not a weighting problem; it is the confounding that remains inside
 each stratum.
 
@@ -485,7 +524,7 @@ do need one number, the question decides the weights: the people the program
 served, the people it has not yet served, and everyone are different averages
 with different weights, and the precision weights that regression "fixed
 effects" give you answer a fourth question, about people who could plausibly
-have been in either group, when effects differ.
+have either received the intervention or not, when effects differ.
 
 What should we do if we want to hold more than one variable constant, or if
 those variables take many values? We need many more strata, each containing
@@ -578,11 +617,14 @@ cov_fmla <- reformulate(covs, response = "trtbin")
 ## A multivariate distance score: Mahalanobis distance on rank transformed covariates
 mh_dist <- match_on(cov_fmla, data = dat, method = "rank_mahalanobis")
 mh_dist[1:3, 1:4]
-## person 213 is closer to person 1 in multivariate terms than person 104
-mh_dist[1, c("104", "213")]
+## Person 1 is a treated person. Which control is closest to person 1 in
+## multivariate terms, and which is farthest?
+mh_closest <- names(which.min(mh_dist[1, ]))
+mh_farthest <- names(which.max(mh_dist[1, ]))
+mh_dist[1, c(mh_closest, mh_farthest)]
 ## Here we can compare those two people with person 1 along all of the covariates:
 dat %>%
-  filter(id %in% c(1, 104, 213)) %>%
+  filter(id %in% as.numeric(c(1, mh_closest, mh_farthest))) %>%
   select(one_of(c("trtbin", "id", covs)))
 summary(mh_dist)
 ```
@@ -608,16 +650,15 @@ psmod <- arm::bayesglm(cov_fmla, data = dat, family = binomial())
 zapsmall(coef(psmod))
 ps_dist <- match_on(psmod, data = dat)
 ps_dist[1:3, 1:4]
-ps_dist[1, c("104", "169")]
+## The closest and the farthest control to person 1 on the propensity score
+ps_closest <- names(which.min(ps_dist[1, ]))
+ps_farthest <- names(which.max(ps_dist[1, ]))
+ps_dist[1, c(ps_closest, ps_farthest)]
 
 ## Here we can compare those two people with person 1 along all of the
 ## covariates.
-## Notice that control person 169 is closer to treated person 1
-## across nearly all of the covariates than person 104 in regards to the
-## propensity score
-
 dat %>%
-  filter(id %in% c(1, 104, 169)) %>%
+  filter(id %in% as.numeric(c(1, ps_closest, ps_farthest))) %>%
   select(one_of(c("trtbin", "id", covs)))
 summary(ps_dist)
 ```
