@@ -101,3 +101,27 @@ The guide should include a simulated outcome with a known effect.
     Local Quarto is 1.10.x, CI pins 1.9.38.
 20. **README.** Says groundhog; the project uses `renv`. Author surname
     spelling differs between the `.qmd` ("Jaques-Leslie") and git config.
+
+## Decisions and findings since the first draft (2026-11-06)
+
+- **Decided with Ben:** the example's spine is the estimand story (matching
+  performs about like a correctly adjusted regression; its value is that it
+  does not need the outcome model's form, it exposes overlap before outcomes
+  are touched, and it forces us to say who the estimate is about). A second
+  scenario shows regression and matching diverging under effect heterogeneity.
+  Jake to confirm. See `CLAIMS_AUDIT.md` and `checks/`.
+- **Questions 6-9 (example data):** the candidate structure in
+  `checks/dgp_candidates.R` addresses them (planted effect .3, outcome depends
+  on `preY` and `age`, unobserved `motiv`). It has not been put into the guide.
+- **Question 8 (no design reaches balance):** answered. Designs that match every
+  treated unit cannot balance because 29% of treated units lie above the
+  controls' 95th percentile of `preY`; calipers on `age` and `preY` that drop
+  about 6% of units reach p of about .8.
+- **Questions 1-2 (estimand and weights): now urgent.** Under heterogeneity,
+  precision weights gave .149 and treated-count weights gave .346 for the same
+  matched design (the true effect on the matched treated was .352). Which weights does the
+  guide recommend, and how do we explain the choice to non-statisticians?
+- **New:** does the guide claim matching is better than regression, or only
+  comparable and more transparent? Simulations support the second.
+- **New:** unresolved warning ("Error gathering complete data") in the
+  simulation scripts; source not found.
